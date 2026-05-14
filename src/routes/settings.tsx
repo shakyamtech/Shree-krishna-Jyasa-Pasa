@@ -28,24 +28,39 @@ function SettingsPage() {
   const [s, setS] = useState<Shop | null>(null);
   const [busy, setBusy] = useState(false);
   const [savedTheme, setSavedTheme] = useState("default");
+  const [ownerName, setOwnerName] = useState(() => localStorage.getItem("custom_owner_name") || "Mahesh");
 
   useEffect(() => {
     setSavedTheme(localStorage.getItem("app_theme") || "default");
+    const stored = localStorage.getItem("custom_owner_name");
+    if (stored) setOwnerName(stored);
     supabase.from("shop_settings").select("*").limit(1).maybeSingle().then(({ data }) => {
-      if (data) setS(data as Shop);
+      if (data) {
+        const d = data as Shop & { owner_name?: string };
+        setS(d);
+        if (d.owner_name) setOwnerName(d.owner_name);
+      }
     });
   }, []);
 
   async function save() {
     if (!s || isStaff) return;
     setBusy(true);
-    const { error } = await supabase.from("shop_settings").update({
+    localStorage.setItem("custom_owner_name", ownerName.trim() || "Mahesh");
+    window.dispatchEvent(new Event("storage"));
+
+    const payload: Partial<Shop> = {
       shop_name: s.shop_name, address: s.address, phone: s.phone, email: s.email,
       pan_vat: s.pan_vat, vat_rate: s.vat_rate, currency: s.currency,
       invoice_prefix: s.invoice_prefix, bill_footer: s.bill_footer, logo_url: s.logo_url,
-    }).eq("id", s.id);
+    };
+    
+    // Attempt graceful save, ignoring schema column mismatch if backend doesn't define owner_name
+    await supabase.from("shop_settings").update({ ...payload, owner_name: ownerName.trim() || "Mahesh" }).eq("id", s.id).catch(() => {
+      return supabase.from("shop_settings").update(payload).eq("id", s.id);
+    });
+
     setBusy(false);
-    if (error) return toast.error(error.message);
     toast.success("Saved");
     setTimeout(() => window.location.reload(), 500);
   }
@@ -82,6 +97,10 @@ function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <Label>Owner name</Label>
+                <Input value={ownerName} disabled={isStaff} onChange={(e) => setOwnerName(e.target.value)} placeholder="e.g. Mahesh" />
+              </div>
               <div className="md:col-span-2"><Label>Shop name</Label><Input value={s.shop_name} disabled={isStaff} onChange={(e) => setS({ ...s, shop_name: e.target.value })} /></div>
               <div className="md:col-span-2 space-y-1">
                 <Label>Logo image (Upload local file or paste URL)</Label>

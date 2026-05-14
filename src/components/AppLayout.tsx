@@ -30,6 +30,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [shopName, setShopName] = useState("Shree Krishna Jyasa Pasa");
   const [logoUrl, setLogoUrl] = useState<string | null>("/logo.jpg");
+  const [ownerName, setOwnerName] = useState(() => localStorage.getItem("custom_owner_name") || "Mahesh");
   const [theme, setThemeState] = useState<string>(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("app_theme") || "default";
@@ -78,12 +79,21 @@ export function AppLayout({ children }: { children: ReactNode }) {
   ];
 
   useEffect(() => {
-    supabase.from("shop_settings").select("shop_name, logo_url").limit(1).maybeSingle().then(({ data }) => {
+    supabase.from("shop_settings").select("*").limit(1).maybeSingle().then(({ data }) => {
       if (data) {
-        if (data.shop_name) setShopName(data.shop_name);
-        if (data.logo_url) setLogoUrl(data.logo_url);
+        const d = data as { shop_name?: string; logo_url?: string; owner_name?: string };
+        if (d.shop_name) setShopName(d.shop_name);
+        if (d.logo_url) setLogoUrl(d.logo_url);
+        if (d.owner_name) setOwnerName(d.owner_name);
       }
     });
+
+    const handleStorage = () => {
+      const stored = localStorage.getItem("custom_owner_name");
+      if (stored) setOwnerName(stored);
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   const displayShopName = lang === "ne" && shopName.toLowerCase().includes("shree krishna")
@@ -119,6 +129,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <div className="text-xs font-medium text-sidebar-foreground/70 capitalize flex items-center gap-1 mt-0.5">
               <span className="size-1.5 rounded-full bg-green-500 animate-pulse"></span>
               {lang === "ne" ? ((role || "Staff").toLowerCase() === "owner" ? "मालिक" : "कर्मचारी") : (role || "Staff")} {lang === "ne" ? "खाता" : "Account"}
+              {(!role || role.toLowerCase() === "owner") && ownerName && (
+                <span className="text-amber-600 dark:text-amber-500 font-bold ml-0.5 capitalize truncate max-w-[100px]">
+                  • {ownerName}
+                </span>
+              )}
             </div>
           </div>
           <button className="ml-auto md:hidden text-sidebar-foreground hover:bg-sidebar-accent p-1 rounded-md transition-colors" onClick={() => setOpen(false)}>
