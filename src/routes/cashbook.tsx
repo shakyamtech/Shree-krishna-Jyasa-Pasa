@@ -54,12 +54,20 @@ function CashbookPage() {
         </Dialog>
       </div>
 
-      <Card><CardContent className="p-4 grid gap-3 md:grid-cols-4">
-        <div><Label>From</Label><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></div>
-        <div><Label>To</Label><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></div>
-        <Stat label="Cash in" value={formatNPR(totals.in)} cls="text-green-600" />
-        <Stat label="Cash out" value={formatNPR(totals.out)} cls="text-destructive" />
-      </CardContent></Card>
+      <Card>
+        <CardContent className="p-4 grid gap-4 md:grid-cols-4 items-start">
+          <div>
+            <Label className="text-xs text-muted-foreground block mb-1.5 font-normal">From</Label>
+            <Input type="date" className="h-9 text-xs" value={from} onChange={(e) => setFrom(e.target.value)} />
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground block mb-1.5 font-normal">To</Label>
+            <Input type="date" className="h-9 text-xs" value={to} onChange={(e) => setTo(e.target.value)} />
+          </div>
+          <Stat label="Cash in" value={formatNPR(totals.in)} cls="text-green-600" />
+          <Stat label="Cash out" value={formatNPR(totals.out)} cls="text-destructive" />
+        </CardContent>
+      </Card>
 
       <Card><CardContent className="p-4 flex justify-between font-bold">
         <span>Net balance</span><span className={totals.balance >= 0 ? "text-green-600" : "text-destructive"}>{formatNPR(totals.balance)}</span>
@@ -92,9 +100,9 @@ function CashbookPage() {
 
 function Stat({ label, value, cls }: { label: string; value: string; cls?: string }) {
   return (
-    <div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className={"text-lg font-bold " + (cls ?? "")}>{value}</div>
+    <div className="flex flex-col justify-between h-full">
+      <div className="text-xs text-muted-foreground block mb-1.5">{label}</div>
+      <div className={"text-lg font-bold flex items-center h-9 " + (cls ?? "")}>{value}</div>
     </div>
   );
 }
