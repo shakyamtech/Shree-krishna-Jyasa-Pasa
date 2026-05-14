@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
@@ -93,11 +93,46 @@ interface PLine {
 function NewPurchaseDialog({ suppliers, products, onDone }: { suppliers: Supplier[]; products: Product[]; onDone: () => void }) {
   const [supplierId, setSupplierId] = useState("");
   const [date, setDate] = useState(todayISO());
-  const [vatRate, setVatRate] = useState(13);
+  const [vatRate, setVatRate] = useState(0);
+  const [shopHasVat, setShopHasVat] = useState(false);
   const [paid, setPaid] = useState(0);
   const [paymentMode, setPaymentMode] = useState("cash");
   const [lines, setLines] = useState<PLine[]>([blank()]);
   const [busy, setBusy] = useState(false);
+  const [localSuppliers, setLocalSuppliers] = useState<Supplier[]>(suppliers);
+  const [newSupOpen, setNewSupOpen] = useState(false);
+  const [newSupName, setNewSupName] = useState("");
+  const [newSupPhone, setNewSupPhone] = useState("");
+  const [newSupAddress, setNewSupAddress] = useState("");
+
+  useEffect(() => { setLocalSuppliers(suppliers); }, [suppliers]);
+
+  async function createSupplierInline() {
+    if (!newSupName.trim()) return toast.error("Enter supplier name");
+    try {
+      const { data, error } = await supabase.from("suppliers").insert({
+        name: newSupName.trim(),
+        phone: newSupPhone.trim() || null,
+        address: newSupAddress.trim() || null,
+      }).select("id,name").single();
+      if (error) throw error;
+      setLocalSuppliers((prev) => [...prev, data]);
+      setSupplierId(data.id);
+      setNewSupOpen(false);
+      setNewSupName(""); setNewSupPhone(""); setNewSupAddress("");
+      toast.success("Supplier added & selected!");
+    } catch (e) {
+      toast.error("Failed to add supplier: " + (e as Error).message);
+    }
+  }
+
+  useEffect(() => {
+    supabase.from("shop_settings").select("vat_rate").limit(1).maybeSingle().then(({ data }) => {
+      const v = Number(data?.vat_rate || 0);
+      setVatRate(v);
+      setShopHasVat(v > 0);
+    });
+  }, []);
 
   function blank(): PLine { return { product_id: null, description: "", metal: "gold", purity: "22K", qty: 1, weight_gram: 0, rate_per_gram: 0, making_charge: 0 }; }
 
@@ -172,10 +207,31 @@ function NewPurchaseDialog({ suppliers, products, onDone }: { suppliers: Supplie
       <DialogHeader><DialogTitle>New purchase</DialogTitle></DialogHeader>
       <div className="grid gap-3 md:grid-cols-3">
         <div>
-          <Label>Supplier *</Label>
+          <div className="flex items-center justify-between pb-1">
+            <Label>Supplier *</Label>
+            <Dialog open={newSupOpen} onOpenChange={setNewSupOpen}>
+              <DialogTrigger asChild>
+                <Button variant="link" className="h-auto p-0 text-xs font-medium text-amber-600 dark:text-amber-500">
+                  + Add new
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Quick add supplier</DialogTitle>
+                  <DialogDescription>Register a new supplier instantly during purchase intake</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3 pt-2">
+                  <div><Label>Name *</Label><Input placeholder="Supplier name / Company" value={newSupName} onChange={(e) => setNewSupName(e.target.value)} /></div>
+                  <div><Label>Phone</Label><Input placeholder="Phone number" value={newSupPhone} onChange={(e) => setNewSupPhone(e.target.value)} /></div>
+                  <div><Label>Address</Label><Input placeholder="City / location" value={newSupAddress} onChange={(e) => setNewSupAddress(e.target.value)} /></div>
+                  <Button className="w-full mt-2" onClick={createSupplierInline}>Save & select</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
           <Select value={supplierId} onValueChange={setSupplierId}>
             <SelectTrigger><SelectValue placeholder="Select supplier" /></SelectTrigger>
-            <SelectContent>{suppliers.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+            <SelectContent>{localSuppliers.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <div><Label>Date</Label><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
@@ -248,8 +304,12 @@ function NewPurchaseDialog({ suppliers, products, onDone }: { suppliers: Supplie
         <div />
         <div className="space-y-2 text-sm">
           <div className="flex justify-between"><span>Subtotal</span><span>{formatNPR(totals.subtotal)}</span></div>
-          <div className="flex items-center gap-2"><Label className="w-32">VAT %</Label><Input type="number" value={vatRate} onChange={(e) => setVatRate(Number(e.target.value))} /></div>
-          <div className="flex justify-between"><span>VAT amount</span><span>{formatNPR(totals.vat)}</span></div>
+          {shopHasVat && (
+            <>
+              <div className="flex items-center gap-2"><Label className="w-32">VAT %</Label><Input type="number" value={vatRate} onChange={(e) => setVatRate(Number(e.target.value))} /></div>
+              <div className="flex justify-between"><span>VAT amount</span><span>{formatNPR(totals.vat)}</span></div>
+            </>
+          )}
           <div className="flex justify-between font-bold text-base"><span>TOTAL</span><span>{formatNPR(totals.total)}</span></div>
           <div className="flex items-center gap-2"><Label className="w-32">Paid</Label><Input type="number" value={paid} onChange={(e) => setPaid(Number(e.target.value))} /></div>
           <div className="flex justify-between font-bold"><span>Due</span><span>{formatNPR(totals.due)}</span></div>
