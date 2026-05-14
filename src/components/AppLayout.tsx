@@ -30,16 +30,27 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [shopName, setShopName] = useState("Shree Krishna Jyasa Pasa");
   const [logoUrl, setLogoUrl] = useState<string | null>("/logo.jpg");
-  const [theme, setThemeState] = useState<string>("default");
+  const [theme, setThemeState] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("app_theme") || "default";
+    }
+    return "default";
+  });
 
   useEffect(() => {
-    const saved = localStorage.getItem("app_theme") || "default";
-    setThemeState(saved);
-    const root = document.documentElement;
-    root.classList.remove("theme-emerald", "theme-sapphire", "theme-ruby", "theme-gold");
-    if (saved !== "default") {
-      root.classList.add(`theme-${saved}`);
-    }
+    const syncTheme = () => {
+      const current = localStorage.getItem("app_theme") || "default";
+      setThemeState(current);
+      const root = document.documentElement;
+      root.classList.remove("theme-emerald", "theme-sapphire", "theme-ruby", "theme-gold");
+      if (current !== "default") {
+        root.classList.add(`theme-${current}`);
+      }
+    };
+
+    syncTheme();
+    window.addEventListener("storage", syncTheme);
+    return () => window.removeEventListener("storage", syncTheme);
   }, []);
 
   const setTheme = (t: string) => {
@@ -50,6 +61,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     if (t !== "default") {
       root.classList.add(`theme-${t}`);
     }
+    window.dispatchEvent(new Event("storage"));
   };
 
   const navItems = [
@@ -142,26 +154,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
               >
                 नेपाली
               </button>
-            </div>
-          </div>
-          <div className="flex items-center justify-between bg-sidebar-accent/50 px-2 py-1.5 rounded-md border border-sidebar-border/60">
-            <span className="text-xs font-medium text-sidebar-foreground/70">✨ {lang === "ne" ? "थिम" : "Theme"}</span>
-            <div className="flex items-center gap-2">
-              <button
-                title="Amber Base (Default)"
-                onClick={() => setTheme("default")}
-                className={cn("size-4 rounded-full bg-amber-500 border border-sidebar-border transition-transform", theme === "default" ? "scale-125 ring-2 ring-amber-500 ring-offset-1 ring-offset-background" : "hover:scale-110")}
-              />
-              <button
-                title="Premium Black & Gold Shimmer"
-                onClick={() => setTheme("gold")}
-                className={cn("size-4 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-300 to-amber-950 border border-sidebar-border transition-transform", theme === "gold" ? "scale-125 ring-2 ring-amber-400 ring-offset-1 ring-offset-background" : "hover:scale-110")}
-              />
-              <button
-                title="Aesthetic Blue & Light"
-                onClick={() => setTheme("sapphire")}
-                className={cn("size-4 rounded-full bg-blue-600 border border-sidebar-border transition-transform", theme === "sapphire" ? "scale-125 ring-2 ring-blue-500 ring-offset-1 ring-offset-background" : "hover:scale-110")}
-              />
             </div>
           </div>
           <div className="text-xs text-sidebar-foreground/60 truncate px-1">{user?.email}</div>
