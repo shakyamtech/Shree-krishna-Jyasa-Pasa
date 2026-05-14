@@ -120,47 +120,47 @@ export function AppLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
         <div className="border-t border-sidebar-border p-3 space-y-2">
-          <div className="flex items-center justify-between bg-white/5 px-2 py-1.5 rounded-md border border-white/10">
-            <span className="text-xs font-medium text-white/60">🌐 {lang === "ne" ? "भाषा" : "Language"}</span>
-            <div className="flex bg-black/20 rounded-sm border border-white/10 p-0.5 shadow-xs">
+          <div className="flex items-center justify-between bg-sidebar-accent/50 px-2 py-1.5 rounded-md border border-sidebar-border/60">
+            <span className="text-xs font-medium text-sidebar-foreground/70">🌐 {lang === "ne" ? "भाषा" : "Language"}</span>
+            <div className="flex bg-background/50 rounded-sm border border-sidebar-border/60 p-0.5 shadow-xs">
               <button
                 onClick={() => setLang("en")}
-                className={cn("px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors", lang === "en" ? "bg-amber-600 text-white" : "text-white/50 hover:text-white")}
+                className={cn("px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors", lang === "en" ? "bg-amber-600 text-white" : "text-sidebar-foreground/50 hover:text-sidebar-foreground")}
               >
                 ENG
               </button>
               <button
                 onClick={() => setLang("ne")}
-                className={cn("px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors", lang === "ne" ? "bg-amber-600 text-white" : "text-white/50 hover:text-white")}
+                className={cn("px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors", lang === "ne" ? "bg-amber-600 text-white" : "text-sidebar-foreground/50 hover:text-sidebar-foreground")}
               >
                 नेपाली
               </button>
             </div>
           </div>
-          <div className="flex items-center justify-between bg-white/5 px-2 py-1.5 rounded-md border border-white/10">
-            <span className="text-xs font-medium text-white/60">✨ {lang === "ne" ? "थिम" : "Theme"}</span>
+          <div className="flex items-center justify-between bg-sidebar-accent/50 px-2 py-1.5 rounded-md border border-sidebar-border/60">
+            <span className="text-xs font-medium text-sidebar-foreground/70">✨ {lang === "ne" ? "थिम" : "Theme"}</span>
             <div className="flex items-center gap-2">
               <button
                 title="Amber Base (Default)"
                 onClick={() => setTheme("default")}
-                className={cn("size-4 rounded-full bg-amber-500 border border-white/20 transition-transform", theme === "default" ? "scale-125 ring-2 ring-amber-500 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
+                className={cn("size-4 rounded-full bg-amber-500 border border-sidebar-border transition-transform", theme === "default" ? "scale-125 ring-2 ring-amber-500 ring-offset-1 ring-offset-background" : "hover:scale-110")}
               />
               <button
                 title="Premium Black & Gold Shimmer"
                 onClick={() => setTheme("gold")}
-                className={cn("size-4 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-300 to-amber-950 border border-white/20 transition-transform", theme === "gold" ? "scale-125 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
+                className={cn("size-4 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-300 to-amber-950 border border-sidebar-border transition-transform", theme === "gold" ? "scale-125 ring-2 ring-amber-400 ring-offset-1 ring-offset-background" : "hover:scale-110")}
               />
               <button
                 title="Aesthetic Blue & Light"
                 onClick={() => setTheme("sapphire")}
-                className={cn("size-4 rounded-full bg-blue-600 border border-white/20 transition-transform", theme === "sapphire" ? "scale-125 ring-2 ring-blue-500 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
+                className={cn("size-4 rounded-full bg-blue-600 border border-sidebar-border transition-transform", theme === "sapphire" ? "scale-125 ring-2 ring-blue-500 ring-offset-1 ring-offset-background" : "hover:scale-110")}
               />
             </div>
           </div>
-          <div className="text-xs text-white/60 truncate px-1">{user?.email}</div>
+          <div className="text-xs text-sidebar-foreground/60 truncate px-1">{user?.email}</div>
           <button
             onClick={() => signOut()}
-            className="flex items-center justify-center w-full gap-2 px-3 py-1.5 text-xs font-medium rounded-md bg-white/5 hover:bg-white/10 text-white/90 transition-colors border border-white/10"
+            className="flex items-center justify-center w-full gap-2 px-3 py-1.5 text-xs font-medium rounded-md bg-sidebar-accent/40 hover:bg-sidebar-accent text-sidebar-foreground transition-colors border border-sidebar-border/60"
           >
             <LogOut className="size-3.5" /> {t.logout}
           </button>
