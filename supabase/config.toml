@@ -1,0 +1,4 @@
+project_id = "fabcqlyhpjnyifvxielq"
+
+[functions.fetch-metal-prices]
+verify_jwt = true
