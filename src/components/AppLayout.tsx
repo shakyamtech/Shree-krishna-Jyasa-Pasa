@@ -31,6 +31,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [shopName, setShopName] = useState("Shree Krishna Jyasa Pasa");
   const [logoUrl, setLogoUrl] = useState<string | null>("/logo.jpg");
   const [ownerName, setOwnerName] = useState(() => localStorage.getItem("custom_owner_name") || "Mahesh");
+  const [staffName, setStaffName] = useState(() => localStorage.getItem("custom_staff_name") || "");
   const [theme, setThemeState] = useState<string>(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("app_theme") || "default";
@@ -88,13 +89,25 @@ export function AppLayout({ children }: { children: ReactNode }) {
       }
     });
 
+    if (user?.id) {
+      supabase.from("profiles").select("full_name").eq("user_id", user.id).maybeSingle().then(({ data }) => {
+        if (data?.full_name) {
+          setStaffName(data.full_name);
+          localStorage.setItem("custom_staff_name", data.full_name);
+        }
+      });
+    }
+
     const handleStorage = () => {
       const stored = localStorage.getItem("custom_owner_name");
       if (stored) setOwnerName(stored);
+      setStaffName(localStorage.getItem("custom_staff_name") || "");
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, []);
+  }, [user?.id]);
+
+  const derivedStaffName = staffName || (user?.email ? user.email.split("@")[0].split(/[._]/).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ") : "Dipen");
 
   const displayShopName = lang === "ne" && shopName.toLowerCase().includes("shree krishna")
     ? "श्री कृष्ण ज्यास: पस"
@@ -132,6 +145,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
               {(!role || role.toLowerCase() === "owner") && ownerName && (
                 <span className="text-amber-600 dark:text-amber-500 font-bold ml-0.5 capitalize truncate max-w-[100px]">
                   • {ownerName}
+                </span>
+              )}
+              {role?.toLowerCase() === "staff" && (
+                <span className="text-amber-600 dark:text-amber-500 font-bold ml-0.5 capitalize truncate max-w-[100px]">
+                  • {derivedStaffName}
                 </span>
               )}
             </div>

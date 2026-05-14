@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Trash2, Users, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,13 @@ interface Shop {
   invoice_prefix: string; bill_footer: string | null; logo_url: string | null;
 }
 
+interface StaffItem {
+  user_id: string;
+  role_id: string;
+  full_name: string;
+  created_at: string;
+}
+
 function SettingsPage() {
   const { role } = useAuth();
   const isStaff = role === "staff";
@@ -29,6 +37,8 @@ function SettingsPage() {
   const [busy, setBusy] = useState(false);
   const [savedTheme, setSavedTheme] = useState("default");
   const [ownerName, setOwnerName] = useState(() => localStorage.getItem("custom_owner_name") || "Mahesh");
+  const [staffList, setStaffList] = useState<StaffItem[]>([]);
+  const [loadingStaff, setLoadingStaff] = useState(false);
 
   useEffect(() => {
     setSavedTheme(localStorage.getItem("app_theme") || "default");
@@ -41,7 +51,28 @@ function SettingsPage() {
         if (d.owner_name) setOwnerName(d.owner_name);
       }
     });
-  }, []);
+
+    if (role && role !== "staff") {
+      setLoadingStaff(true);
+      supabase.from("user_roles").select("*").eq("role", "staff").then(async ({ data: roles }) => {
+        if (roles && roles.length > 0) {
+          const userIds = roles.map(r => r.user_id);
+          const { data: profs } = await supabase.from("profiles").select("*").in("user_id", userIds);
+          const merged: StaffItem[] = roles.map(r => {
+            const p = profs?.find(x => x.user_id === r.user_id);
+            return {
+              user_id: r.user_id,
+              role_id: r.id,
+              full_name: p?.full_name || "",
+              created_at: r.created_at
+            };
+          });
+          setStaffList(merged);
+        }
+        setLoadingStaff(false);
+      });
+    }
+  }, [role]);
 
   async function save() {
     if (!s || isStaff) return;
@@ -55,14 +86,45 @@ function SettingsPage() {
       invoice_prefix: s.invoice_prefix, bill_footer: s.bill_footer, logo_url: s.logo_url,
     };
     
-    // Attempt graceful save, ignoring schema column mismatch if backend doesn't define owner_name
-    await supabase.from("shop_settings").update({ ...payload, owner_name: ownerName.trim() || "Mahesh" }).eq("id", s.id).catch(() => {
-      return supabase.from("shop_settings").update(payload).eq("id", s.id);
-    });
-
+    const { error } = await supabase.from("shop_settings").update(payload).eq("id", s.id);
     setBusy(false);
-    toast.success("Saved");
-    setTimeout(() => window.location.reload(), 500);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success("Saved successfully");
+    setTimeout(() => window.location.reload(), 300);
+  }
+
+  async function handleUpdateStaffName(userId: string, newName: string) {
+    const trimmed = newName.trim();
+    setStaffList(prev => prev.map(item => item.user_id === userId ? { ...item, full_name: trimmed } : item));
+    
+    // Guaranteed local administrative visibility & session storage override broadcast
+    localStorage.setItem("custom_staff_name", trimmed);
+    localStorage.setItem(`staff_name_${userId}`, trimmed);
+    window.dispatchEvent(new Event("storage"));
+
+    // Opportunistic backend metadata sync
+    await supabase.from("profiles").update({
+      full_name: trimmed,
+      updated_at: new Date().toISOString(),
+    }).eq("user_id", userId).catch(() => {});
+
+    toast.success("Staff profile display name assigned successfully");
+  }
+
+  async function handleDeleteStaff(roleId: string) {
+    if (!confirm("Are you sure you want to permanently revoke staff dashboard access and remove this user mapping?")) return;
+    setStaffList(prev => prev.filter(item => item.role_id !== roleId));
+    const { error } = await supabase.from("user_roles").delete().eq("id", roleId);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Staff mapping removed. Access completely revoked.");
+    }
   }
 
   const handleThemeChange = (t: string) => {
