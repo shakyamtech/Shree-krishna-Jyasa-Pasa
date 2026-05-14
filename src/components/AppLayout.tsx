@@ -3,7 +3,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard, Package, Users, Truck, Receipt, ShoppingBag,
-  BookOpen, Wallet, BarChart3, Settings, LogOut, Menu, X, Gem,
+  BookOpen, Wallet, BarChart3, Settings, LogOut, Menu, X, Gem, User,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -142,9 +142,24 @@ export function AppLayout({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
-        <div className="border-t border-sidebar-border p-3 space-y-2">
+        <div className="border-t border-sidebar-border p-3 space-y-2.5">
+          {/* User profile compact badge */}
+          {user?.email && (
+            <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-background/40 border border-sidebar-border/40">
+              <div className="flex size-6 items-center justify-center rounded-full bg-amber-500/10 text-amber-500 shrink-0">
+                <User className="size-3.5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[11px] font-medium text-sidebar-foreground truncate">{user.email}</div>
+              </div>
+            </div>
+          )}
+
+          {/* Language selector card */}
           <div className="flex items-center justify-between bg-sidebar-accent/50 px-2 py-1.5 rounded-md border border-sidebar-border/60">
-            <span className="text-xs font-medium text-sidebar-foreground/70">🌐 {lang === "ne" ? "भाषा" : "Language"}</span>
+            <span className="text-xs font-medium text-sidebar-foreground/70 flex items-center gap-1.5">
+              <span>🌐</span> {lang === "ne" ? "भाषा" : "Language"}
+            </span>
             <div className="flex bg-background/50 rounded-sm border border-sidebar-border/60 p-0.5 shadow-xs">
               <button
                 onClick={() => setLang("en")}
@@ -160,10 +175,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </button>
             </div>
           </div>
-          <div className="text-xs text-sidebar-foreground/60 truncate px-1">{user?.email}</div>
+
+          {/* Logout action */}
           <button
             onClick={() => signOut()}
-            className="flex items-center justify-center w-full gap-2 px-3 py-1.5 text-xs font-medium rounded-md bg-sidebar-accent/40 hover:bg-sidebar-accent text-sidebar-foreground transition-colors border border-sidebar-border/60"
+            className="flex items-center justify-center w-full gap-2 px-3 py-1.5 text-xs font-medium rounded-md bg-sidebar-accent/40 hover:bg-sidebar-accent hover:text-destructive text-sidebar-foreground transition-colors border border-sidebar-border/60 shadow-xs"
           >
             <LogOut className="size-3.5" /> {t.logout}
           </button>
