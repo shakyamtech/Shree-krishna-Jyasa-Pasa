@@ -139,18 +139,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
                 : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950"
             )}>{displayShopName}</div>
-            <div className="text-xs font-medium text-sidebar-foreground/70 flex items-center gap-1 mt-0.5 whitespace-nowrap truncate max-w-[190px]">
+            <div className="text-xs font-medium text-sidebar-foreground/80 flex items-center gap-1.5 mt-0.5 whitespace-nowrap truncate">
               <span className="size-1.5 rounded-full bg-green-500 animate-pulse shrink-0"></span>
-              <span className="capitalize truncate shrink-0">
-                {lang === "ne" ? ((role || "Staff").toLowerCase() === "owner" ? "मालिक" : "कर्मचारी") : (role || "Staff")} {lang === "ne" ? "खाता" : "Account"}
+              <span className="capitalize shrink-0 font-semibold">
+                {lang === "ne" ? ((role || "Staff").toLowerCase() === "owner" ? "मालिक" : "कर्मचारी") : (role || "Staff")}
               </span>
               {(!role || role.toLowerCase() === "owner") && ownerName && (
-                <span className="text-amber-600 dark:text-amber-500 font-bold capitalize truncate shrink-0">
+                <span className="text-amber-600 dark:text-amber-500 font-bold capitalize truncate">
                   • {ownerName}
                 </span>
               )}
               {role?.toLowerCase() === "staff" && (
-                <span className="text-amber-600 dark:text-amber-500 font-bold capitalize truncate shrink-0">
+                <span className="text-amber-600 dark:text-amber-500 font-bold capitalize truncate">
                   • {derivedStaffName}
                 </span>
               )}
