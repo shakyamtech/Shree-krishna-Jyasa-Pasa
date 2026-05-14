@@ -30,6 +30,27 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [shopName, setShopName] = useState("Shree Krishna Jyasa Pasa");
   const [logoUrl, setLogoUrl] = useState<string | null>("/logo.jpg");
+  const [theme, setThemeState] = useState<string>("default");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("app_theme") || "default";
+    setThemeState(saved);
+    const root = document.documentElement;
+    root.classList.remove("theme-emerald", "theme-sapphire", "theme-ruby");
+    if (saved !== "default") {
+      root.classList.add(`theme-${saved}`);
+    }
+  }, []);
+
+  const setTheme = (t: string) => {
+    setThemeState(t);
+    localStorage.setItem("app_theme", t);
+    const root = document.documentElement;
+    root.classList.remove("theme-emerald", "theme-sapphire", "theme-ruby");
+    if (t !== "default") {
+      root.classList.add(`theme-${t}`);
+    }
+  };
 
   const navItems = [
     { to: "/dashboard", label: t.dashboard, icon: LayoutDashboard },
@@ -114,6 +135,31 @@ export function AppLayout({ children }: { children: ReactNode }) {
               >
                 नेपाली
               </button>
+            </div>
+          </div>
+          <div className="flex items-center justify-between bg-accent/40 px-2 py-1.5 rounded-md border border-border/50">
+            <span className="text-xs font-medium text-muted-foreground">✨ {lang === "ne" ? "थिम" : "Theme"}</span>
+            <div className="flex items-center gap-2">
+              <button
+                title="Amber Gold"
+                onClick={() => setTheme("default")}
+                className={cn("size-3.5 rounded-full bg-amber-500 border border-border transition-transform", theme === "default" ? "scale-125 ring-2 ring-primary ring-offset-1 ring-offset-background" : "hover:scale-110")}
+              />
+              <button
+                title="Royal Emerald"
+                onClick={() => setTheme("emerald")}
+                className={cn("size-3.5 rounded-full bg-emerald-600 border border-border transition-transform", theme === "emerald" ? "scale-125 ring-2 ring-primary ring-offset-1 ring-offset-background" : "hover:scale-110")}
+              />
+              <button
+                title="Platinum Sapphire"
+                onClick={() => setTheme("sapphire")}
+                className={cn("size-3.5 rounded-full bg-blue-600 border border-border transition-transform", theme === "sapphire" ? "scale-125 ring-2 ring-primary ring-offset-1 ring-offset-background" : "hover:scale-110")}
+              />
+              <button
+                title="Luxury Ruby"
+                onClick={() => setTheme("ruby")}
+                className={cn("size-3.5 rounded-full bg-rose-700 border border-border transition-transform", theme === "ruby" ? "scale-125 ring-2 ring-primary ring-offset-1 ring-offset-background" : "hover:scale-110")}
+              />
             </div>
           </div>
           <div className="text-xs text-muted-foreground truncate px-1">{user?.email}</div>
