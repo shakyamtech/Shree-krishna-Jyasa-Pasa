@@ -397,8 +397,29 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
 
       <div className="grid gap-3 md:grid-cols-2 mt-2">
         <div className="space-y-2">
-          <Label>Notes</Label>
-          <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
+          <div className="flex items-center justify-between">
+            <Label>Notes</Label>
+            <Button
+              type="button"
+              variant="link"
+              className="h-auto p-0 text-[10px] font-medium text-amber-600 dark:text-amber-500"
+              onClick={() => {
+                const validLines = lines.filter((l) => l.description.trim());
+                if (!validLines.length) {
+                  toast.error("Add item descriptions first");
+                  return;
+                }
+                const totalWeight = validLines.reduce((s, l) => s + l.qty * l.weight_gram, 0);
+                const itemsDesc = validLines.map((l) => `${l.qty}x ${l.description} (${l.purity}, ${l.weight_gram}g)`).join(", ");
+                const text = `Sale items: ${itemsDesc}. Total metal weight: ${Math.round(totalWeight * 1000) / 1000}g. Payment mode: ${paymentMode.toUpperCase()}.`;
+                setNotes(text);
+                toast.success("Notes generated!");
+              }}
+            >
+              ✨ Auto-generate
+            </Button>
+          </div>
+          <Textarea className="h-28" placeholder="Special invoice notes or auto-generated description..." value={notes} onChange={(e) => setNotes(e.target.value)} />
         </div>
         <div className="space-y-2 text-sm">
           <Row label="Subtotal (metal)" value={formatNPR(totals.subtotal)} />
