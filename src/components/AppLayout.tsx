@@ -139,16 +139,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
                 : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950"
             )}>{displayShopName}</div>
-            <div className="text-xs font-medium text-sidebar-foreground/70 capitalize flex items-center gap-1 mt-0.5">
-              <span className="size-1.5 rounded-full bg-green-500 animate-pulse"></span>
-              {lang === "ne" ? ((role || "Staff").toLowerCase() === "owner" ? "मालिक" : "कर्मचारी") : (role || "Staff")} {lang === "ne" ? "खाता" : "Account"}
+            <div className="text-xs font-medium text-sidebar-foreground/70 flex items-center gap-1 mt-0.5 whitespace-nowrap truncate max-w-[190px]">
+              <span className="size-1.5 rounded-full bg-green-500 animate-pulse shrink-0"></span>
+              <span className="capitalize truncate shrink-0">
+                {lang === "ne" ? ((role || "Staff").toLowerCase() === "owner" ? "मालिक" : "कर्मचारी") : (role || "Staff")} {lang === "ne" ? "खाता" : "Account"}
+              </span>
               {(!role || role.toLowerCase() === "owner") && ownerName && (
-                <span className="text-amber-600 dark:text-amber-500 font-bold ml-0.5 capitalize truncate max-w-[100px]">
+                <span className="text-amber-600 dark:text-amber-500 font-bold capitalize truncate shrink-0">
                   • {ownerName}
                 </span>
               )}
               {role?.toLowerCase() === "staff" && (
-                <span className="text-amber-600 dark:text-amber-500 font-bold ml-0.5 capitalize truncate max-w-[100px]">
+                <span className="text-amber-600 dark:text-amber-500 font-bold capitalize truncate shrink-0">
                   • {derivedStaffName}
                 </span>
               )}
