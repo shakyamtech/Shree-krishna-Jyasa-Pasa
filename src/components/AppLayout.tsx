@@ -86,6 +86,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const displayShopName = lang === "ne" && shopName.toLowerCase().includes("shree krishna")
+    ? "श्री कृष्ण ज्यास: पस"
+    : shopName;
+
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
@@ -111,10 +115,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 : theme === "gold"
                 ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
                 : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950"
-            )}>{shopName}</div>
+            )}>{displayShopName}</div>
             <div className="text-xs font-medium text-sidebar-foreground/70 capitalize flex items-center gap-1 mt-0.5">
               <span className="size-1.5 rounded-full bg-green-500 animate-pulse"></span>
-              {role ?? "Staff"} {lang === "ne" ? "खाता" : "Account"}
+              {lang === "ne" ? ((role || "Staff").toLowerCase() === "owner" ? "मालिक" : "कर्मचारी") : (role || "Staff")} {lang === "ne" ? "खाता" : "Account"}
             </div>
           </div>
           <button className="ml-auto md:hidden text-sidebar-foreground hover:bg-sidebar-accent p-1 rounded-md transition-colors" onClick={() => setOpen(false)}>
@@ -188,7 +192,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
               : theme === "gold"
               ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
               : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950"
-          )}>{shopName}</span>
+          )}>{displayShopName}</span>
         </header>
         <main className="flex-1 p-4 md:p-6 overflow-x-hidden">{children}</main>
       </div>
