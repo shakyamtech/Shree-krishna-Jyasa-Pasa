@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/settings")({
@@ -22,6 +23,8 @@ interface Shop {
 }
 
 function SettingsPage() {
+  const { role } = useAuth();
+  const isStaff = role === "staff";
   const [s, setS] = useState<Shop | null>(null);
   const [busy, setBusy] = useState(false);
   const [savedTheme, setSavedTheme] = useState("default");
@@ -34,7 +37,7 @@ function SettingsPage() {
   }, []);
 
   async function save() {
-    if (!s) return;
+    if (!s || isStaff) return;
     setBusy(true);
     const { error } = await supabase.from("shop_settings").update({
       shop_name: s.shop_name, address: s.address, phone: s.phone, email: s.email,
@@ -68,15 +71,25 @@ function SettingsPage() {
         {/* Left Side: Business details (Takes 2 grid columns) */}
         <div className="lg:col-span-2 space-y-4">
           <Card>
-            <CardHeader><CardTitle>Business details</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between gap-2">
+                <span>Business details</span>
+                {isStaff && (
+                  <span className="text-xs font-normal px-2 py-0.5 bg-amber-500/10 text-amber-600 rounded border border-amber-500/20">
+                    Read-only (Owner Access Required)
+                  </span>
+                )}
+              </CardTitle>
+            </CardHeader>
             <CardContent className="grid gap-3 md:grid-cols-2">
-              <div className="md:col-span-2"><Label>Shop name</Label><Input value={s.shop_name} onChange={(e) => setS({ ...s, shop_name: e.target.value })} /></div>
+              <div className="md:col-span-2"><Label>Shop name</Label><Input value={s.shop_name} disabled={isStaff} onChange={(e) => setS({ ...s, shop_name: e.target.value })} /></div>
               <div className="md:col-span-2 space-y-1">
                 <Label>Logo image (Upload local file or paste URL)</Label>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <Input
                     type="file"
                     accept="image/*"
+                    disabled={isStaff}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
@@ -90,6 +103,7 @@ function SettingsPage() {
                   />
                   <Input
                     value={s.logo_url ?? ""}
+                    disabled={isStaff}
                     onChange={(e) => setS({ ...s, logo_url: e.target.value })}
                     placeholder="https://example.com/logo.png or base64"
                     className="flex-1"
@@ -102,14 +116,14 @@ function SettingsPage() {
                   </div>
                 )}
               </div>
-              <div className="md:col-span-2"><Label>Address</Label><Textarea value={s.address ?? ""} onChange={(e) => setS({ ...s, address: e.target.value })} /></div>
-              <div><Label>Phone</Label><Input value={s.phone ?? ""} onChange={(e) => setS({ ...s, phone: e.target.value })} /></div>
-              <div><Label>Email</Label><Input value={s.email ?? ""} onChange={(e) => setS({ ...s, email: e.target.value })} /></div>
-              <div><Label>PAN / VAT no.</Label><Input value={s.pan_vat ?? ""} onChange={(e) => setS({ ...s, pan_vat: e.target.value })} /></div>
-              <div><Label>VAT rate (%)</Label><Input type="number" step="0.01" value={s.vat_rate} onChange={(e) => setS({ ...s, vat_rate: Number(e.target.value) })} /></div>
-              <div><Label>Currency</Label><Input value={s.currency} onChange={(e) => setS({ ...s, currency: e.target.value })} /></div>
-              <div><Label>Invoice prefix</Label><Input value={s.invoice_prefix} onChange={(e) => setS({ ...s, invoice_prefix: e.target.value })} /></div>
-              <div className="md:col-span-2"><Label>Bill footer text</Label><Textarea value={s.bill_footer ?? ""} onChange={(e) => setS({ ...s, bill_footer: e.target.value })} placeholder="Thank you for shopping with us!" /></div>
+              <div className="md:col-span-2"><Label>Address</Label><Textarea value={s.address ?? ""} disabled={isStaff} onChange={(e) => setS({ ...s, address: e.target.value })} /></div>
+              <div><Label>Phone</Label><Input value={s.phone ?? ""} disabled={isStaff} onChange={(e) => setS({ ...s, phone: e.target.value })} /></div>
+              <div><Label>Email</Label><Input value={s.email ?? ""} disabled={isStaff} onChange={(e) => setS({ ...s, email: e.target.value })} /></div>
+              <div><Label>PAN / VAT no.</Label><Input value={s.pan_vat ?? ""} disabled={isStaff} onChange={(e) => setS({ ...s, pan_vat: e.target.value })} /></div>
+              <div><Label>VAT rate (%)</Label><Input type="number" step="0.01" value={s.vat_rate} disabled={isStaff} onChange={(e) => setS({ ...s, vat_rate: Number(e.target.value) })} /></div>
+              <div><Label>Currency</Label><Input value={s.currency} disabled={isStaff} onChange={(e) => setS({ ...s, currency: e.target.value })} /></div>
+              <div><Label>Invoice prefix</Label><Input value={s.invoice_prefix} disabled={isStaff} onChange={(e) => setS({ ...s, invoice_prefix: e.target.value })} /></div>
+              <div className="md:col-span-2"><Label>Bill footer text</Label><Textarea value={s.bill_footer ?? ""} disabled={isStaff} onChange={(e) => setS({ ...s, bill_footer: e.target.value })} placeholder="Thank you for shopping with us!" /></div>
             </CardContent>
           </Card>
         </div>
@@ -178,11 +192,13 @@ function SettingsPage() {
       </div>
 
       {/* Global Action Footer: Always positioned cleanly at the absolute end of the view */}
-      <div className="pt-2 pb-6">
-        <Button onClick={save} disabled={busy} className="w-full sm:w-auto">
-          {busy ? "Saving…" : "Save settings"}
-        </Button>
-      </div>
+      {!isStaff && (
+        <div className="pt-2 pb-6">
+          <Button onClick={save} disabled={busy} className="w-full sm:w-auto">
+            {busy ? "Saving…" : "Save settings"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

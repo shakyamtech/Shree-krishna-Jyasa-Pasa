@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { formatNPR, formatGram } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/products")({
   component: () => <AuthGuard><AppLayout><ProductsPage /></AppLayout></AuthGuard>,
@@ -85,40 +86,93 @@ function ProductsPage() {
         </div>
       </CardContent></Card>
 
-      <Card><CardContent className="p-0 overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>SKU</TableHead><TableHead>Name</TableHead><TableHead>Metal</TableHead>
-              <TableHead>Purity</TableHead><TableHead>Weight</TableHead><TableHead>Stock</TableHead>
-              <TableHead>Making</TableHead><TableHead>Cost</TableHead><TableHead></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((p) => (
-              <TableRow key={p.id}>
-                <TableCell className="font-mono text-xs">{p.sku ?? "—"}</TableCell>
-                <TableCell className="font-medium">{p.name}</TableCell>
-                <TableCell><Badge variant={p.metal === "gold" ? "default" : "secondary"} className="capitalize">{p.metal}</Badge></TableCell>
-                <TableCell>{p.purity ?? "—"}</TableCell>
-                <TableCell>{formatGram(p.weight_gram)}</TableCell>
-                <TableCell>
-                  <span className={p.stock_qty <= p.min_stock ? "text-destructive font-medium" : ""}>
-                    {p.stock_qty}
-                  </span>
-                </TableCell>
-                <TableCell>{formatNPR(p.making_charge)}</TableCell>
-                <TableCell>{formatNPR(p.cost_price)}</TableCell>
-                <TableCell className="text-right">
-                  <Button size="icon" variant="ghost" onClick={() => { setEditing(p); setOpen(true); }}><Pencil className="size-4" /></Button>
-                  <Button size="icon" variant="ghost" onClick={() => remove(p.id)}><Trash2 className="size-4" /></Button>
-                </TableCell>
+      {/* Desktop view: Standard Table */}
+      <div className="hidden md:block">
+        <Card><CardContent className="p-0 overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>SKU</TableHead><TableHead>Name</TableHead><TableHead>Metal</TableHead>
+                <TableHead>Purity</TableHead><TableHead>Weight</TableHead><TableHead>Stock</TableHead>
+                <TableHead>Making</TableHead><TableHead>Cost</TableHead><TableHead></TableHead>
               </TableRow>
-            ))}
-            {!filtered.length && <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">No products</TableCell></TableRow>}
-          </TableBody>
-        </Table>
-      </CardContent></Card>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((p) => (
+                <TableRow key={p.id}>
+                  <TableCell className="font-mono text-xs">{p.sku ?? "—"}</TableCell>
+                  <TableCell className="font-medium">{p.name}</TableCell>
+                  <TableCell><Badge variant={p.metal === "gold" ? "default" : "secondary"} className="capitalize">{p.metal}</Badge></TableCell>
+                  <TableCell>{p.purity ?? "—"}</TableCell>
+                  <TableCell>{formatGram(p.weight_gram)}</TableCell>
+                  <TableCell>
+                    <span className={p.stock_qty <= p.min_stock ? "text-destructive font-medium" : ""}>
+                      {p.stock_qty}
+                    </span>
+                  </TableCell>
+                  <TableCell>{formatNPR(p.making_charge)}</TableCell>
+                  <TableCell>{formatNPR(p.cost_price)}</TableCell>
+                  <TableCell className="text-right">
+                    <Button size="icon" variant="ghost" onClick={() => { setEditing(p); setOpen(true); }}><Pencil className="size-4" /></Button>
+                    <Button size="icon" variant="ghost" onClick={() => remove(p.id)}><Trash2 className="size-4" /></Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {!filtered.length && <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">No products</TableCell></TableRow>}
+            </TableBody>
+          </Table>
+        </CardContent></Card>
+      </div>
+
+      {/* Mobile view: Premium Touch-Optimized Stacked Cards */}
+      <div className="grid gap-3 md:hidden">
+        {filtered.map((p) => (
+          <Card key={p.id} className="overflow-hidden border border-border/80 shadow-xs">
+            <CardContent className="p-3.5 space-y-2.5">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="font-bold text-sm leading-tight text-foreground">{p.name}</div>
+                  <div className="text-[11px] text-muted-foreground font-mono mt-0.5">SKU: {p.sku ?? "—"}</div>
+                </div>
+                <Badge variant={p.metal === "gold" ? "default" : "secondary"} className="capitalize text-[10px] px-2 py-0.5 font-medium shrink-0">
+                  {p.metal} {p.purity && `• ${p.purity}`}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-1.5 border-t text-xs bg-muted/20 p-2.5 rounded-md">
+                <div>
+                  <span className="text-muted-foreground block text-[10px] uppercase font-semibold">Weight</span>
+                  <span className="font-medium">{formatGram(p.weight_gram)}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[10px] uppercase font-semibold">Stock</span>
+                  <span className={cn("font-medium", p.stock_qty <= p.min_stock && "text-destructive font-bold")}>
+                    {p.stock_qty} {p.stock_qty <= p.min_stock && "⚠️"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[10px] uppercase font-semibold">Making</span>
+                  <span className="font-medium">{formatNPR(p.making_charge)}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[10px] uppercase font-semibold">Cost</span>
+                  <span className="font-medium">{formatNPR(p.cost_price)}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-1 pt-0.5">
+                <Button size="sm" variant="ghost" className="h-8 px-2.5 text-xs font-medium" onClick={() => { setEditing(p); setOpen(true); }}>
+                  <Pencil className="size-3 mr-1.5" /> Edit
+                </Button>
+                <Button size="sm" variant="ghost" className="h-8 px-2.5 text-xs font-medium text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => remove(p.id)}>
+                  <Trash2 className="size-3 mr-1.5" /> Delete
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+        {!filtered.length && <div className="text-center text-muted-foreground py-8 border rounded-lg bg-card text-xs">No products found</div>}
+      </div>
     </div>
   );
 }
