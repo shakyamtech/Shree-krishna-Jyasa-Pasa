@@ -36,7 +36,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem("app_theme") || "default";
     setThemeState(saved);
     const root = document.documentElement;
-    root.classList.remove("theme-emerald", "theme-sapphire", "theme-ruby");
+    root.classList.remove("theme-emerald", "theme-sapphire", "theme-ruby", "theme-gold");
     if (saved !== "default") {
       root.classList.add(`theme-${saved}`);
     }
@@ -46,7 +46,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     setThemeState(t);
     localStorage.setItem("app_theme", t);
     const root = document.documentElement;
-    root.classList.remove("theme-emerald", "theme-sapphire", "theme-ruby");
+    root.classList.remove("theme-emerald", "theme-sapphire", "theme-ruby", "theme-gold");
     if (t !== "default") {
       root.classList.add(`theme-${t}`);
     }
@@ -139,11 +139,16 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </div>
           <div className="flex items-center justify-between bg-accent/40 px-2 py-1.5 rounded-md border border-border/50">
             <span className="text-xs font-medium text-muted-foreground">✨ {lang === "ne" ? "थिम" : "Theme"}</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <button
-                title="Amber Gold"
+                title="Amber Base"
                 onClick={() => setTheme("default")}
                 className={cn("size-3.5 rounded-full bg-amber-500 border border-border transition-transform", theme === "default" ? "scale-125 ring-2 ring-primary ring-offset-1 ring-offset-background" : "hover:scale-110")}
+              />
+              <button
+                title="Metallic Gold"
+                onClick={() => setTheme("gold")}
+                className={cn("size-3.5 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-300 to-amber-500 border border-border transition-transform", theme === "gold" ? "scale-125 ring-2 ring-primary ring-offset-1 ring-offset-background" : "hover:scale-110")}
               />
               <button
                 title="Royal Emerald"
