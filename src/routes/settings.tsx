@@ -38,6 +38,7 @@ function SettingsPage() {
   const [busy, setBusy] = useState(false);
   const [savedTheme, setSavedTheme] = useState("default");
   const [ownerName, setOwnerName] = useState(() => localStorage.getItem("custom_owner_name") || "Mahesh");
+  const [staffName, setStaffName] = useState(() => localStorage.getItem("custom_staff_name") || "");
   const [staffList, setStaffList] = useState<StaffItem[]>([]);
   const [loadingStaff, setLoadingStaff] = useState(false);
   const [openStaffModal, setOpenStaffModal] = useState(false);
@@ -100,7 +101,7 @@ function SettingsPage() {
     setTimeout(() => window.location.reload(), 300);
   }
 
-  async function handleUpdateStaffName(userId: string, newName: string) {
+  function handleUpdateStaffName(userId: string, newName: string) {
     const trimmed = newName.trim();
     setStaffList(prev => prev.map(item => item.user_id === userId ? { ...item, full_name: trimmed } : item));
     
@@ -109,11 +110,11 @@ function SettingsPage() {
     localStorage.setItem(`staff_name_${userId}`, trimmed);
     window.dispatchEvent(new Event("storage"));
 
-    // Opportunistic backend metadata sync
-    await supabase.from("profiles").update({
+    // Completely non-blocking background metadata sync
+    supabase.from("profiles").update({
       full_name: trimmed,
       updated_at: new Date().toISOString(),
-    }).eq("user_id", userId).catch(() => {});
+    }).eq("user_id", userId).then(() => {});
 
     toast.success("Staff profile display name assigned successfully");
   }
@@ -153,18 +154,7 @@ function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between gap-2">
                 <span>Business details</span>
-                {!isStaff ? (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 text-xs font-normal border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer"
-                    onClick={() => setOpenStaffModal(true)}
-                  >
-                    <Users className="size-3.5 mr-1.5 shrink-0" />
-                    Manage Staff Access & Names
-                  </Button>
-                ) : (
+                {isStaff && (
                   <span className="text-xs font-normal px-2 py-0.5 bg-amber-500/10 text-amber-600 rounded border border-amber-500/20">
                     Read-only (Owner Access Required)
                   </span>
@@ -224,6 +214,53 @@ function SettingsPage() {
 
         {/* Right Side: Appearance & Theme (Takes 1 grid column) */}
         <div className="space-y-4">
+          {isStaff && (
+            <Card className="border-amber-500/20 bg-amber-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-bold text-amber-800 dark:text-amber-400">Personal Display Credentials</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label className="text-xs">Your Staff Name</Label>
+                  <div className="flex items-center gap-2">
+                    <Input 
+                      className="h-8 text-xs bg-background flex-1" 
+                      placeholder="e.g. Mahesh Shakya" 
+                      value={staffName} 
+                      onChange={(e) => {
+                        setStaffName(e.target.value);
+                        localStorage.setItem("custom_staff_name", e.target.value);
+                        window.dispatchEvent(new Event("storage"));
+                      }} 
+                    />
+                    <Button 
+                      type="button" 
+                      size="sm" 
+                      className="h-8 px-3 text-xs bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+                      onClick={async () => {
+                        const trimmed = staffName.trim();
+                        localStorage.setItem("custom_staff_name", trimmed);
+                        window.dispatchEvent(new Event("storage"));
+                        
+                        const { data: { session } } = await supabase.auth.getSession();
+                        if (session?.user?.id) {
+                          await supabase.from("profiles").update({
+                            full_name: trimmed,
+                            updated_at: new Date().toISOString(),
+                          }).eq("user_id", session.user.id);
+                        }
+                        toast.success("Staff profile display name saved permanently!");
+                      }}
+                    >
+                      Save Name
+                    </Button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">Instantly updates your top header identity indicator</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle>Appearance & Theme</CardTitle>
@@ -284,84 +321,6 @@ function SettingsPage() {
           </Card>
         </div>
       </div>
-
-      {/* Discrete Owner Staff Access Popup Dialog Modal */}
-      <Dialog open={openStaffModal} onOpenChange={setOpenStaffModal}>
-        <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Users className="size-5 text-amber-600 dark:text-amber-400" />
-              <span>Staff Accounts Management</span>
-            </DialogTitle>
-            <DialogDescription>
-              Assign customized visual display names to active staff accounts or completely revoke their dashboard credentials.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="mt-2">
-            {loadingStaff ? (
-              <div className="text-xs text-muted-foreground py-4 text-center">Loading registered staff accounts…</div>
-            ) : staffList.length === 0 ? (
-              <div className="text-xs text-muted-foreground py-6 text-center border rounded-lg bg-accent/30">
-                No active staff roles registered mapping to this enterprise yet.
-              </div>
-            ) : (
-              <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
-                {staffList.map((st) => (
-                  <div key={st.role_id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border bg-accent/20">
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs font-bold text-foreground truncate">
-                        User ID: <span className="font-mono font-normal text-muted-foreground">{st.user_id.slice(0, 12)}…</span>
-                      </div>
-                      <div className="text-[10px] text-muted-foreground mt-0.5">Role registered: {new Date(st.created_at).toLocaleDateString()}</div>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <Input
-                        size="sm"
-                        className="h-8 w-36 text-xs bg-background"
-                        placeholder="Assign Staff Name…"
-                        defaultValue={st.full_name}
-                        id={`staff-input-${st.user_id}`}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleUpdateStaffName(st.user_id, e.currentTarget.value);
-                          }
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        className="h-8 px-2.5 bg-green-600 text-white hover:bg-green-700 cursor-pointer"
-                        onClick={() => {
-                          const input = document.getElementById(`staff-input-${st.user_id}`) as HTMLInputElement;
-                          if (input) {
-                            handleUpdateStaffName(st.user_id, input.value);
-                          }
-                        }}
-                        title="Save Assigned Name"
-                      >
-                        <Check className="size-3 mr-1 shrink-0" />
-                        Save
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        className="h-8 px-2.5 cursor-pointer"
-                        onClick={() => handleDeleteStaff(st.role_id)}
-                        title="Revoke dashboard access and delete mapping"
-                      >
-                        <Trash2 className="size-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Global Action Footer: Always positioned cleanly at the absolute end of the view */}
       {!isStaff && (
