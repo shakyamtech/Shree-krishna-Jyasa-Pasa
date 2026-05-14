@@ -139,31 +139,21 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </div>
           <div className="flex items-center justify-between bg-white/5 px-2 py-1.5 rounded-md border border-white/10">
             <span className="text-xs font-medium text-white/60">✨ {lang === "ne" ? "थिम" : "Theme"}</span>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <button
-                title="Amber Base"
+                title="Amber Base (Default)"
                 onClick={() => setTheme("default")}
-                className={cn("size-3.5 rounded-full bg-amber-500 border border-white/20 transition-transform", theme === "default" ? "scale-125 ring-2 ring-amber-500 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
+                className={cn("size-4 rounded-full bg-amber-500 border border-white/20 transition-transform", theme === "default" ? "scale-125 ring-2 ring-amber-500 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
               />
               <button
-                title="Metallic Gold"
+                title="Premium Black & Gold Shimmer"
                 onClick={() => setTheme("gold")}
-                className={cn("size-3.5 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-300 to-amber-500 border border-white/20 transition-transform", theme === "gold" ? "scale-125 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
+                className={cn("size-4 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-300 to-amber-950 border border-white/20 transition-transform", theme === "gold" ? "scale-125 ring-2 ring-amber-400 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
               />
               <button
-                title="Royal Emerald"
-                onClick={() => setTheme("emerald")}
-                className={cn("size-3.5 rounded-full bg-emerald-600 border border-white/20 transition-transform", theme === "emerald" ? "scale-125 ring-2 ring-emerald-500 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
-              />
-              <button
-                title="Platinum Sapphire"
+                title="Aesthetic Blue & Light"
                 onClick={() => setTheme("sapphire")}
-                className={cn("size-3.5 rounded-full bg-blue-600 border border-white/20 transition-transform", theme === "sapphire" ? "scale-125 ring-2 ring-blue-500 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
-              />
-              <button
-                title="Luxury Ruby"
-                onClick={() => setTheme("ruby")}
-                className={cn("size-3.5 rounded-full bg-rose-700 border border-white/20 transition-transform", theme === "ruby" ? "scale-125 ring-2 ring-rose-500 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
+                className={cn("size-4 rounded-full bg-blue-600 border border-white/20 transition-transform", theme === "sapphire" ? "scale-125 ring-2 ring-blue-500 ring-offset-1 ring-offset-slate-900" : "hover:scale-110")}
               />
             </div>
           </div>
