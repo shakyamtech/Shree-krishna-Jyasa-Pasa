@@ -107,14 +107,10 @@ function Dashboard() {
                       </span>
                     </div>
                     <div className="text-sm text-muted-foreground">{formatNPR(p.price_per_gram)} / gram</div>
-                    <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                       <div className="rounded border p-2 bg-amber-50/20 dark:bg-amber-950/10">
                         <div className="text-muted-foreground">22K {isGold ? "/ 10g" : "/ tola"}</div>
                         <div className="font-semibold text-foreground">{formatNPR(p.price_per_tola * 0.9167)}</div>
-                      </div>
-                      <div className="rounded border p-2 bg-amber-50/20 dark:bg-amber-950/10">
-                        <div className="text-muted-foreground">21K {isGold ? "/ 10g" : "/ tola"}</div>
-                        <div className="font-semibold text-foreground">{formatNPR(p.price_per_tola * 0.875)}</div>
                       </div>
                       <div className="rounded border p-2 bg-amber-50/20 dark:bg-amber-950/10">
                         <div className="text-muted-foreground">18K {isGold ? "/ 10g" : "/ tola"}</div>
@@ -133,8 +129,8 @@ function Dashboard() {
       {/* Silver Price Section */}
       {(() => {
         const sp = prices.find((x) => x.metal !== "gold" && x.metal !== "silver");
-        const perTola = sp ? sp.price_per_tola : 5710.00;
-        const perGram = sp ? sp.price_per_gram : 489.50;
+        const perTola = sp ? sp.price_per_tola : 1900.00;
+        const perGram = sp ? sp.price_per_gram : perTola / 11.6638;
         const lastUpdated = sp ? new Date(sp.fetched_at).toLocaleString() : new Date().toLocaleDateString();
 
         return (
