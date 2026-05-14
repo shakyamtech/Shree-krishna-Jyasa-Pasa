@@ -18,8 +18,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [needsBootstrap, setNeedsBootstrap] = useState(false);
-  const [checking, setChecking] = useState(true);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [shopName, setShopName] = useState("Shree Krishna Jyasa Pasa");
   const [logoUrl, setLogoUrl] = useState<string | null>("/logo.jpg");
 
@@ -34,32 +33,21 @@ function Login() {
 
   useEffect(() => { if (user) navigate({ to: "/dashboard", replace: true }); }, [user, navigate]);
 
-  // First-run bootstrap: if no owner exists yet, allow one-time signup
-  useEffect(() => {
-    (async () => {
-      const { count } = await supabase
-        .from("user_roles")
-        .select("*", { count: "exact", head: true })
-        .eq("role", "owner");
-      setNeedsBootstrap((count ?? 0) === 0);
-      setChecking(false);
-    })();
-  }, []);
+  // Default to Sign In mode since owner accounts are already configured
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      if (needsBootstrap) {
+      if (isSignUp) {
         const { error } = await signUp(email, password);
         if (error) return toast.error(error);
-        // Auto sign-in if email confirmation is off
         const { error: e2 } = await signIn(email, password);
         if (e2) {
-          toast.success("Owner account created. Please check email if confirmation is enabled, then sign in.");
-          setNeedsBootstrap(false);
+          toast.success("Account registered. Please check email confirmation if enabled, then sign in.");
+          setIsSignUp(false);
         } else {
-          toast.success("Welcome! Owner account ready.");
+          toast.success("Account successfully created and signed in!");
         }
       } else {
         const { error } = await signIn(email, password);
@@ -86,7 +74,7 @@ function Login() {
             {shopName}
           </CardTitle>
           <CardDescription className="text-xs font-medium">
-            {checking ? "Checking…" : needsBootstrap ? "Create the owner account (one-time setup)" : "Sign in to your shop account"}
+            {isSignUp ? "Register a new credentials account" : "Sign in to your shop account"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -118,9 +106,19 @@ function Login() {
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={busy || checking}>
-              {busy ? "Please wait…" : needsBootstrap ? "Create owner & sign in" : "Sign in"}
+            <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-white cursor-pointer" disabled={busy}>
+              {busy ? "Please wait…" : isSignUp ? "Create account & sign in" : "Sign in"}
             </Button>
+
+            <div className="text-center pt-2 border-t border-border/40">
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-xs text-muted-foreground hover:text-amber-600 dark:hover:text-amber-400 underline transition-colors cursor-pointer"
+              >
+                {isSignUp ? "Already registered? Sign in instead" : "Need to register a new staff/user account? Click here"}
+              </button>
+            </div>
           </form>
         </CardContent>
       </Card>
