@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
@@ -133,6 +133,32 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
     gold: 22235.03,
     silver: 489.50,
   });
+  const [localCustomers, setLocalCustomers] = useState<Customer[]>(customers);
+  const [newCustOpen, setNewCustOpen] = useState(false);
+  const [newCustName, setNewCustName] = useState("");
+  const [newCustPhone, setNewCustPhone] = useState("");
+  const [newCustAddress, setNewCustAddress] = useState("");
+
+  useEffect(() => { setLocalCustomers(customers); }, [customers]);
+
+  async function createCustomerInline() {
+    if (!newCustName.trim()) return toast.error("Enter customer name");
+    try {
+      const { data, error } = await supabase.from("customers").insert({
+        name: newCustName.trim(),
+        phone: newCustPhone.trim() || null,
+        address: newCustAddress.trim() || null,
+      }).select("id,name,phone,address,pan").single();
+      if (error) throw error;
+      setLocalCustomers((prev) => [...prev, data]);
+      setCustomerId(data.id);
+      setNewCustOpen(false);
+      setNewCustName(""); setNewCustPhone(""); setNewCustAddress("");
+      toast.success("Customer added & selected!");
+    } catch (e) {
+      toast.error("Failed to add customer: " + (e as Error).message);
+    }
+  }
 
   useEffect(() => {
     supabase.from("metal_prices").select("metal, price_per_gram").order("fetched_at", { ascending: false }).limit(20)
@@ -243,7 +269,7 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
 
       // Build & download PDF
       const { data: shop } = await supabase.from("shop_settings").select("*").limit(1).maybeSingle();
-      const customer = customerId === "walk-in" ? null : customers.find((c) => c.id === customerId) ?? null;
+      const customer = customerId === "walk-in" ? null : localCustomers.find((c) => c.id === customerId) ?? null;
       if (shop) {
         downloadBill({
           invoice_no: sale.invoice_no, sale_date: date, shop, customer,
@@ -270,12 +296,33 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
       <DialogHeader><DialogTitle>New sale</DialogTitle></DialogHeader>
       <div className="grid gap-3 md:grid-cols-3">
         <div>
-          <Label>Customer</Label>
+          <div className="flex items-center justify-between pb-1">
+            <Label>Customer</Label>
+            <Dialog open={newCustOpen} onOpenChange={setNewCustOpen}>
+              <DialogTrigger asChild>
+                <Button variant="link" className="h-auto p-0 text-xs font-medium text-amber-600 dark:text-amber-500">
+                  + Add new
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Quick add customer</DialogTitle>
+                  <DialogDescription>Register a new customer instantly during checkout</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3 pt-2">
+                  <div><Label>Name *</Label><Input placeholder="Customer name" value={newCustName} onChange={(e) => setNewCustName(e.target.value)} /></div>
+                  <div><Label>Phone</Label><Input placeholder="Phone number" value={newCustPhone} onChange={(e) => setNewCustPhone(e.target.value)} /></div>
+                  <div><Label>Address</Label><Input placeholder="City / location" value={newCustAddress} onChange={(e) => setNewCustAddress(e.target.value)} /></div>
+                  <Button className="w-full mt-2" onClick={createCustomerInline}>Save & select</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
           <Select value={customerId} onValueChange={setCustomerId}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="walk-in">Walk-in customer</SelectItem>
-              {customers.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}{c.phone ? ` — ${c.phone}` : ""}</SelectItem>)}
+              {localCustomers.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}{c.phone ? ` — ${c.phone}` : ""}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>

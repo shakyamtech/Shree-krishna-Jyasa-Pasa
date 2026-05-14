@@ -136,6 +136,23 @@ function ProductForm({ cats, editing, onDone }: { cats: Category[]; editing: Pro
     min_stock: editing?.min_stock ?? 1,
     cost_price: editing?.cost_price ?? 0,
   });
+  const [liveRates, setLiveRates] = useState<Record<string, number>>({
+    gold: 22235.03,
+    silver: 492.50,
+  });
+
+  useEffect(() => {
+    supabase.from("metal_prices").select("metal, price_per_gram, price_per_tola").order("fetched_at", { ascending: false }).limit(20)
+      .then(({ data }) => {
+        const map = { gold: 22235.03, silver: 492.50 };
+        const gp = data?.find((x) => x.metal === "gold");
+        if (gp?.price_per_gram) map.gold = Number(gp.price_per_gram);
+
+        const sp = data?.find((x) => x.metal === "silver" && x.price_per_tola < 10000);
+        if (sp?.price_per_gram) map.silver = Number(sp.price_per_gram);
+        setLiveRates(map);
+      });
+  }, []);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const payload = { ...f, category_id: f.category_id || null, sku: f.sku || null };
@@ -176,7 +193,32 @@ function ProductForm({ cats, editing, onDone }: { cats: Category[]; editing: Pro
         <div><Label>Purity</Label><Input value={f.purity} onChange={(e) => setF({ ...f, purity: e.target.value })} placeholder="24K / 22K / 999" /></div>
         <div><Label>Weight (gram)</Label><Input type="number" step="0.001" value={f.weight_gram} onChange={(e) => setF({ ...f, weight_gram: Number(e.target.value) })} /></div>
         <div><Label>Making charge (Rs)</Label><Input type="number" step="0.01" value={f.making_charge} onChange={(e) => setF({ ...f, making_charge: Number(e.target.value) })} /></div>
-        <div><Label>Cost price (Rs)</Label><Input type="number" step="0.01" value={f.cost_price} onChange={(e) => setF({ ...f, cost_price: Number(e.target.value) })} /></div>
+        <div>
+          <div className="flex items-center justify-between pb-1">
+            <Label>Cost price (Rs)</Label>
+            <Button
+              type="button"
+              variant="link"
+              className="h-auto p-0 text-[10px] font-medium text-amber-600 dark:text-amber-500"
+              onClick={() => {
+                const base = f.metal === "gold" ? liveRates.gold : liveRates.silver;
+                let mul = 1;
+                if (f.metal === "gold") {
+                  const p = f.purity.toUpperCase();
+                  if (p.includes("22K")) mul = 0.9167;
+                  else if (p.includes("21K")) mul = 0.875;
+                  else if (p.includes("18K")) mul = 0.75;
+                }
+                const est = Math.round(f.weight_gram * base * mul * 100) / 100;
+                setF({ ...f, cost_price: est });
+                toast.success(`Estimated cost set to Rs ${est}`);
+              }}
+            >
+              ✨ Auto-estimate
+            </Button>
+          </div>
+          <Input type="number" step="0.01" value={f.cost_price} onChange={(e) => setF({ ...f, cost_price: Number(e.target.value) })} />
+        </div>
         <div><Label>Stock qty</Label><Input type="number" value={f.stock_qty} onChange={(e) => setF({ ...f, stock_qty: Number(e.target.value) })} /></div>
         <div><Label>Min stock alert</Label><Input type="number" value={f.min_stock} onChange={(e) => setF({ ...f, min_stock: Number(e.target.value) })} /></div>
         <DialogFooter className="md:col-span-2"><Button type="submit">{editing ? "Update" : "Add"}</Button></DialogFooter>
