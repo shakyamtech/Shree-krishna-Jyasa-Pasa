@@ -92,8 +92,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <div className="font-extrabold text-base bg-gradient-to-r from-amber-600 via-amber-700 to-yellow-600 bg-clip-text text-transparent truncate tracking-tight">{shopName}</div>
-            <div className="text-xs font-medium text-muted-foreground capitalize flex items-center gap-1 mt-0.5">
+            <div className={cn(
+              "font-extrabold text-base bg-clip-text text-transparent truncate tracking-tight",
+              theme === "sapphire"
+                ? "bg-gradient-to-r from-cyan-200 via-blue-100 to-white"
+                : theme === "gold"
+                ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
+                : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950"
+            )}>{shopName}</div>
+            <div className="text-xs font-medium text-sidebar-foreground/70 capitalize flex items-center gap-1 mt-0.5">
               <span className="size-1.5 rounded-full bg-green-500 animate-pulse"></span>
               {role ?? "Staff"} {lang === "ne" ? "खाता" : "Account"}
             </div>
