@@ -179,7 +179,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
           {/* User profile compact badge */}
           {user?.email && (
             <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-background/40 border border-sidebar-border/40">
-              <div className="flex size-6 items-center justify-center rounded-full bg-amber-500/10 text-amber-500 shrink-0">
+              <div className={cn(
+                "flex size-6 items-center justify-center rounded-full shrink-0 border",
+                theme === "sapphire"
+                  ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
+                  : theme === "gold"
+                  ? "bg-amber-400/10 text-amber-300 border-amber-400/20"
+                  : "bg-amber-600/10 text-amber-600 dark:text-amber-500 border-amber-600/20"
+              )}>
                 <User className="size-3.5" />
               </div>
               <div className="min-w-0 flex-1">
@@ -196,13 +203,23 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <div className="flex bg-background/50 rounded-sm border border-sidebar-border/60 p-0.5 shadow-xs">
               <button
                 onClick={() => setLang("en")}
-                className={cn("px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors", lang === "en" ? "bg-amber-600 text-white" : "text-sidebar-foreground/50 hover:text-sidebar-foreground")}
+                className={cn(
+                  "px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors",
+                  lang === "en"
+                    ? theme === "sapphire" ? "bg-cyan-600 text-white" : theme === "gold" ? "bg-amber-500 text-black" : "bg-amber-600 text-white"
+                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground"
+                )}
               >
                 ENG
               </button>
               <button
                 onClick={() => setLang("ne")}
-                className={cn("px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors", lang === "ne" ? "bg-amber-600 text-white" : "text-sidebar-foreground/50 hover:text-sidebar-foreground")}
+                className={cn(
+                  "px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors",
+                  lang === "ne"
+                    ? theme === "sapphire" ? "bg-cyan-600 text-white" : theme === "gold" ? "bg-amber-500 text-black" : "bg-amber-600 text-white"
+                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground"
+                )}
               >
                 नेपाली
               </button>
