@@ -123,7 +123,8 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
   const [customerId, setCustomerId] = useState<string>("walk-in");
   const [date, setDate] = useState(todayISO());
   const [discount, setDiscount] = useState(0);
-  const [vatRate, setVatRate] = useState(13);
+  const [vatRate, setVatRate] = useState(0);
+  const [shopHasVat, setShopHasVat] = useState(false);
   const [paid, setPaid] = useState(0);
   const [paymentMode, setPaymentMode] = useState("cash");
   const [notes, setNotes] = useState("");
@@ -161,6 +162,12 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
   }
 
   useEffect(() => {
+    supabase.from("shop_settings").select("vat_rate").limit(1).maybeSingle().then(({ data }) => {
+      const v = Number(data?.vat_rate || 0);
+      setVatRate(v);
+      setShopHasVat(v > 0);
+    });
+
     supabase.from("metal_prices").select("metal, price_per_gram").order("fetched_at", { ascending: false }).limit(20)
       .then(({ data }) => {
         const map: Record<string, number> = { gold: 22235.03, silver: 489.50 };
@@ -428,11 +435,15 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
             <Label className="w-32">Discount</Label>
             <Input type="number" step="0.01" value={discount} onChange={(e) => setDiscount(Number(e.target.value))} />
           </div>
-          <div className="flex items-center gap-2">
-            <Label className="w-32">VAT %</Label>
-            <Input type="number" step="0.01" value={vatRate} onChange={(e) => setVatRate(Number(e.target.value))} />
-          </div>
-          <Row label="VAT amount" value={formatNPR(totals.vat)} />
+          {shopHasVat && (
+            <>
+              <div className="flex items-center gap-2">
+                <Label className="w-32">VAT %</Label>
+                <Input type="number" step="0.01" value={vatRate} onChange={(e) => setVatRate(Number(e.target.value))} />
+              </div>
+              <Row label="VAT amount" value={formatNPR(totals.vat)} />
+            </>
+          )}
           <Row label="TOTAL" value={formatNPR(totals.total)} bold />
           <div className="flex items-center gap-2">
             <Label className="w-32">Paid</Label>

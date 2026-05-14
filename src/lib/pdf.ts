@@ -55,7 +55,7 @@ export function generateBillPDF(d: BillData): jsPDF {
   y += 18;
   doc.setFont("helvetica", "normal").setFontSize(9);
   if (d.shop.address) { doc.text(d.shop.address, W / 2, y, { align: "center" }); y += 12; }
-  const meta = [d.shop.phone && "Tel: " + d.shop.phone, d.shop.email, d.shop.pan_vat && "PAN/VAT: " + d.shop.pan_vat]
+  const meta = [d.shop.phone && "Tel: " + d.shop.phone, d.shop.email, d.shop.pan_vat && (d.vat_rate ? "PAN/VAT: " : "PAN: ") + d.shop.pan_vat]
     .filter(Boolean).join("  |  ");
   if (meta) { doc.text(meta, W / 2, y, { align: "center" }); y += 14; }
 
@@ -63,7 +63,7 @@ export function generateBillPDF(d: BillData): jsPDF {
 
   // Invoice + customer block
   doc.setFontSize(13).setFont("helvetica", "bold");
-  doc.text("TAX INVOICE", 40, y);
+  doc.text(d.vat_rate ? "TAX INVOICE" : "INVOICE", 40, y);
   doc.setFontSize(10).setFont("helvetica", "normal");
   doc.text(`Invoice #: ${d.invoice_no}`, W - 40, y, { align: "right" }); y += 14;
   doc.text(`Date: ${d.sale_date}`, W - 40, y, { align: "right" });
