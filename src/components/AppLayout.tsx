@@ -168,8 +168,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b bg-background/95 backdrop-blur shadow-sm">
-          <button onClick={() => setOpen(true)} className="p-1 hover:bg-accent rounded-md transition-colors text-foreground">
+        <header className="md:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b border-sidebar-border bg-sidebar shadow-sm">
+          <button onClick={() => setOpen(true)} className="p-1 hover:bg-sidebar-accent rounded-md transition-colors text-sidebar-foreground">
             <Menu className="size-5" />
           </button>
           {logoUrl ? (
@@ -177,9 +177,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <img src={logoUrl} alt={shopName} className="size-8 rounded-full object-cover" />
             </div>
           ) : (
-            <Gem className="size-6 text-primary shrink-0" />
+            <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
+              <Gem className="size-4" />
+            </div>
           )}
-          <span className="font-bold text-base bg-gradient-to-r from-amber-600 to-amber-800 bg-clip-text text-transparent truncate tracking-tight">{shopName}</span>
+          <span className={cn(
+            "font-extrabold text-base bg-clip-text text-transparent truncate tracking-tight",
+            theme === "sapphire"
+              ? "bg-gradient-to-r from-cyan-200 via-blue-100 to-white"
+              : theme === "gold"
+              ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
+              : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950"
+          )}>{shopName}</span>
         </header>
         <main className="flex-1 p-4 md:p-6 overflow-x-hidden">{children}</main>
       </div>
