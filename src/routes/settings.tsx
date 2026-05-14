@@ -315,13 +315,13 @@ function SettingsPage() {
                       </div>
                       <div className="text-[10px] text-muted-foreground mt-0.5">Role registered: {new Date(st.created_at).toLocaleDateString()}</div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <Input
                         size="sm"
-                        className="h-8 w-40 text-xs bg-background"
+                        className="h-8 w-36 text-xs bg-background"
                         placeholder="Assign Staff Name…"
                         defaultValue={st.full_name}
-                        onBlur={(e) => handleUpdateStaffName(st.user_id, e.target.value)}
+                        id={`staff-input-${st.user_id}`}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             handleUpdateStaffName(st.user_id, e.currentTarget.value);
@@ -330,9 +330,25 @@ function SettingsPage() {
                       />
                       <Button
                         type="button"
+                        variant="secondary"
+                        size="sm"
+                        className="h-8 px-2.5 bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+                        onClick={() => {
+                          const input = document.getElementById(`staff-input-${st.user_id}`) as HTMLInputElement;
+                          if (input) {
+                            handleUpdateStaffName(st.user_id, input.value);
+                          }
+                        }}
+                        title="Save Assigned Name"
+                      >
+                        <Check className="size-3 mr-1 shrink-0" />
+                        Save
+                      </Button>
+                      <Button
+                        type="button"
                         variant="destructive"
                         size="sm"
-                        className="h-8 px-2.5"
+                        className="h-8 px-2.5 cursor-pointer"
                         onClick={() => handleDeleteStaff(st.role_id)}
                         title="Revoke dashboard access and delete mapping"
                       >
