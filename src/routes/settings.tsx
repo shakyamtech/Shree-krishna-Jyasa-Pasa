@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Users, Check } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,7 @@ function SettingsPage() {
   const [ownerName, setOwnerName] = useState(() => localStorage.getItem("custom_owner_name") || "Mahesh");
   const [staffList, setStaffList] = useState<StaffItem[]>([]);
   const [loadingStaff, setLoadingStaff] = useState(false);
+  const [openStaffModal, setOpenStaffModal] = useState(false);
 
   useEffect(() => {
     setSavedTheme(localStorage.getItem("app_theme") || "default");
@@ -151,7 +153,18 @@ function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between gap-2">
                 <span>Business details</span>
-                {isStaff && (
+                {!isStaff ? (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 text-xs font-normal border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 cursor-pointer"
+                    onClick={() => setOpenStaffModal(true)}
+                  >
+                    <Users className="size-3.5 mr-1.5 shrink-0" />
+                    Manage Staff Access & Names
+                  </Button>
+                ) : (
                   <span className="text-xs font-normal px-2 py-0.5 bg-amber-500/10 text-amber-600 rounded border border-amber-500/20">
                     Read-only (Owner Access Required)
                   </span>
@@ -271,6 +284,68 @@ function SettingsPage() {
           </Card>
         </div>
       </div>
+
+      {/* Discrete Owner Staff Access Popup Dialog Modal */}
+      <Dialog open={openStaffModal} onOpenChange={setOpenStaffModal}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="size-5 text-amber-600 dark:text-amber-400" />
+              <span>Staff Accounts Management</span>
+            </DialogTitle>
+            <DialogDescription>
+              Assign customized visual display names to active staff accounts or completely revoke their dashboard credentials.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-2">
+            {loadingStaff ? (
+              <div className="text-xs text-muted-foreground py-4 text-center">Loading registered staff accounts…</div>
+            ) : staffList.length === 0 ? (
+              <div className="text-xs text-muted-foreground py-6 text-center border rounded-lg bg-accent/30">
+                No active staff roles registered mapping to this enterprise yet.
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+                {staffList.map((st) => (
+                  <div key={st.role_id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-lg border bg-accent/20">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold text-foreground truncate">
+                        User ID: <span className="font-mono font-normal text-muted-foreground">{st.user_id.slice(0, 12)}…</span>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">Role registered: {new Date(st.created_at).toLocaleDateString()}</div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Input
+                        size="sm"
+                        className="h-8 w-40 text-xs bg-background"
+                        placeholder="Assign Staff Name…"
+                        defaultValue={st.full_name}
+                        onBlur={(e) => handleUpdateStaffName(st.user_id, e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleUpdateStaffName(st.user_id, e.currentTarget.value);
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="h-8 px-2.5"
+                        onClick={() => handleDeleteStaff(st.role_id)}
+                        title="Revoke dashboard access and delete mapping"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Global Action Footer: Always positioned cleanly at the absolute end of the view */}
       {!isStaff && (
