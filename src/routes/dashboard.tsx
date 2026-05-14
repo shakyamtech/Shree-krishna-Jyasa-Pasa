@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { formatNPR } from "@/lib/format";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/dashboard")({
   component: () => <AuthGuard><AppLayout><Dashboard /></AppLayout></AuthGuard>,
@@ -21,6 +22,7 @@ interface Price {
 }
 
 function Dashboard() {
+  const { t, lang } = useI18n();
   const [prices, setPrices] = useState<Price[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({ products: 0, customers: 0, salesToday: 0, totalToday: 0 });
@@ -77,10 +79,10 @@ function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold">{t.dashboard}</h1>
         <Button onClick={refreshPrices} disabled={refreshing} variant="outline">
           <RefreshCw className={"size-4 mr-2 " + (refreshing ? "animate-spin" : "")} />
-          Refresh prices
+          {t.refresh_prices}
         </Button>
       </div>
 
@@ -175,10 +177,10 @@ function Dashboard() {
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <StatCard icon={Package} label="Products" value={String(stats.products)} />
-        <StatCard icon={Users} label="Customers" value={String(stats.customers)} />
-        <StatCard icon={Receipt} label="Sales today" value={String(stats.salesToday)} />
-        <StatCard icon={TrendingUp} label="Revenue today" value={formatNPR(stats.totalToday)} />
+        <StatCard icon={Package} label={t.products_count} value={String(stats.products)} />
+        <StatCard icon={Users} label={t.customers_count} value={String(stats.customers)} />
+        <StatCard icon={Receipt} label={t.sales_today} value={String(stats.salesToday)} />
+        <StatCard icon={TrendingUp} label={t.total_today} value={formatNPR(stats.totalToday)} />
       </div>
 
       <Card>

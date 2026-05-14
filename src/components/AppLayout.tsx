@@ -8,6 +8,7 @@ import {
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -24,10 +25,24 @@ const nav = [
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const { user, role, signOut } = useAuth();
+  const { lang, setLang, t } = useI18n();
   const loc = useLocation();
   const [open, setOpen] = useState(false);
   const [shopName, setShopName] = useState("Shree Krishna Jyasa Pasa");
   const [logoUrl, setLogoUrl] = useState<string | null>("/logo.jpg");
+
+  const navItems = [
+    { to: "/dashboard", label: t.dashboard, icon: LayoutDashboard },
+    { to: "/products", label: t.products_stock, icon: Package },
+    { to: "/sales", label: t.sales_billing, icon: Receipt },
+    { to: "/purchases", label: t.purchases, icon: ShoppingBag },
+    { to: "/customers", label: t.customers, icon: Users },
+    { to: "/suppliers", label: t.suppliers, icon: Truck },
+    { to: "/credits", label: t.credits_dues, icon: BookOpen },
+    { to: "/cashbook", label: t.cashbook, icon: Wallet },
+    { to: "/reports", label: t.reports, icon: BarChart3 },
+    { to: "/settings", label: t.shop_settings, icon: Settings },
+  ];
 
   useEffect(() => {
     supabase.from("shop_settings").select("shop_name, logo_url").limit(1).maybeSingle().then(({ data }) => {
@@ -59,7 +74,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <div className="font-extrabold text-base bg-gradient-to-r from-amber-600 via-amber-700 to-yellow-600 bg-clip-text text-transparent truncate tracking-tight">{shopName}</div>
             <div className="text-xs font-medium text-muted-foreground capitalize flex items-center gap-1 mt-0.5">
               <span className="size-1.5 rounded-full bg-green-500 animate-pulse"></span>
-              {role ?? "Staff"} Account
+              {role ?? "Staff"} {lang === "ne" ? "खाता" : "Account"}
             </div>
           </div>
           <button className="ml-auto md:hidden text-sidebar-foreground hover:bg-sidebar-accent p-1 rounded-md transition-colors" onClick={() => setOpen(false)}>
@@ -67,7 +82,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </button>
         </div>
         <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
-          {nav.map((n) => {
+          {navItems.map((n) => {
             const active = loc.pathname.startsWith(n.to);
             return (
               <Link key={n.to} to={n.to} onClick={() => setOpen(false)}
@@ -83,10 +98,27 @@ export function AppLayout({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
-        <div className="border-t border-sidebar-border p-3">
-          <div className="text-xs text-muted-foreground truncate mb-2">{user?.email}</div>
+        <div className="border-t border-sidebar-border p-3 space-y-2">
+          <div className="flex items-center justify-between bg-accent/40 px-2 py-1.5 rounded-md border border-border/50">
+            <span className="text-xs font-medium text-muted-foreground">🌐 {lang === "ne" ? "भाषा" : "Language"}</span>
+            <div className="flex bg-background rounded-sm border p-0.5 shadow-xs">
+              <button
+                onClick={() => setLang("en")}
+                className={cn("px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors", lang === "en" ? "bg-amber-600 text-white" : "text-muted-foreground hover:text-foreground")}
+              >
+                ENG
+              </button>
+              <button
+                onClick={() => setLang("ne")}
+                className={cn("px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors", lang === "ne" ? "bg-amber-600 text-white" : "text-muted-foreground hover:text-foreground")}
+              >
+                नेपाली
+              </button>
+            </div>
+          </div>
+          <div className="text-xs text-muted-foreground truncate px-1">{user?.email}</div>
           <Button variant="outline" size="sm" className="w-full" onClick={() => signOut()}>
-            <LogOut className="size-4 mr-2" /> Sign out
+            <LogOut className="size-4 mr-2" /> {t.logout}
           </Button>
         </div>
       </aside>
