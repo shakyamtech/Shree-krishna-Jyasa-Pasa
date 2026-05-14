@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/AuthGuard";
@@ -32,6 +32,7 @@ interface StaffItem {
 }
 
 function SettingsPage() {
+  const navigate = useNavigate();
   const { role } = useAuth();
   const isStaff = role === "staff";
   const [s, setS] = useState<Shop | null>(null);
@@ -98,7 +99,10 @@ function SettingsPage() {
     }
 
     toast.success("Saved successfully");
-    setTimeout(() => window.location.reload(), 300);
+    window.dispatchEvent(new Event("storage"));
+    setTimeout(() => {
+      navigate({ to: "/dashboard" });
+    }, 150);
   }
 
   function handleUpdateStaffName(userId: string, newName: string) {
