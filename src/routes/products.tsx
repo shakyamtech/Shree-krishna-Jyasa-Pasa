@@ -23,7 +23,7 @@ export const Route = createFileRoute("/products")({
 interface Product {
   id: string; sku: string | null; name: string; metal: string; purity: string | null;
   weight_gram: number; making_charge: number; stock_qty: number; min_stock: number;
-  cost_price: number; category_id: string | null;
+  cost_price: number; category_id: string | null; jarti_percent: number;
 }
 interface Category { id: string; name: string; metal: string }
 
@@ -93,7 +93,7 @@ function ProductsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>SKU</TableHead><TableHead>Name</TableHead><TableHead>Metal</TableHead>
-                <TableHead>Purity</TableHead><TableHead>Weight</TableHead><TableHead>Stock</TableHead>
+                <TableHead>Purity</TableHead><TableHead>Weight</TableHead><TableHead>Jarti%</TableHead><TableHead>Stock</TableHead>
                 <TableHead>Making</TableHead><TableHead>Cost</TableHead><TableHead></TableHead>
               </TableRow>
             </TableHeader>
@@ -105,6 +105,7 @@ function ProductsPage() {
                   <TableCell><Badge variant={p.metal === "gold" ? "default" : "secondary"} className="capitalize">{p.metal}</Badge></TableCell>
                   <TableCell>{p.purity ?? "—"}</TableCell>
                   <TableCell>{formatGram(p.weight_gram)}</TableCell>
+                  <TableCell>{p.jarti_percent > 0 ? p.jarti_percent + "%" : "—"}</TableCell>
                   <TableCell>
                     <span className={p.stock_qty <= p.min_stock ? "text-destructive font-medium" : ""}>
                       {p.stock_qty}
@@ -151,6 +152,10 @@ function ProductsPage() {
                   </span>
                 </div>
                 <div>
+                  <span className="text-muted-foreground block text-[10px] uppercase font-semibold">Jarti (DOM)</span>
+                  <span className="font-medium">{p.jarti_percent}%</span>
+                </div>
+                <div>
                   <span className="text-muted-foreground block text-[10px] uppercase font-semibold">Making</span>
                   <span className="font-medium">{formatNPR(p.making_charge)}</span>
                 </div>
@@ -189,6 +194,7 @@ function ProductForm({ cats, editing, onDone }: { cats: Category[]; editing: Pro
     stock_qty: editing?.stock_qty ?? 1,
     min_stock: editing?.min_stock ?? 1,
     cost_price: editing?.cost_price ?? 0,
+    jarti_percent: editing?.jarti_percent ?? 0,
   });
   const [liveRates, setLiveRates] = useState<Record<string, number>>({
     gold: 22235.03,
@@ -259,6 +265,7 @@ function ProductForm({ cats, editing, onDone }: { cats: Category[]; editing: Pro
           </Select>
         </div>
         <div><Label>Weight (gram)</Label><Input type="number" step="0.001" value={f.weight_gram} onChange={(e) => setF({ ...f, weight_gram: Number(e.target.value) })} /></div>
+        <div><Label>Jarti (DOM) %</Label><Input type="number" step="0.01" value={f.jarti_percent} onChange={(e) => setF({ ...f, jarti_percent: Number(e.target.value) })} placeholder="e.g. 1.5" /></div>
         <div><Label>Making charge (Rs)</Label><Input type="number" step="0.01" value={f.making_charge} onChange={(e) => setF({ ...f, making_charge: Number(e.target.value) })} /></div>
         <div>
           <div className="flex items-center justify-between pb-1">

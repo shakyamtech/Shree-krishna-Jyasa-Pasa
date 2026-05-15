@@ -25,7 +25,7 @@ interface Sale {
   total: number; paid: number; due: number; payment_mode: string;
 }
 interface Customer { id: string; name: string; phone: string | null; address: string | null; pan: string | null }
-interface Product { id: string; name: string; sku: string | null; metal: string; purity: string | null; weight_gram: number; making_charge: number; stock_qty: number }
+interface Product { id: string; name: string; sku: string | null; metal: string; purity: string | null; weight_gram: number; making_charge: number; stock_qty: number; jarti_percent: number }
 
 function SalesPage() {
   const [sales, setSales] = useState<Sale[]>([]);
@@ -146,6 +146,7 @@ interface LineItem {
   weight_gram: number;
   rate_per_gram: number;
   making_charge: number;
+  jarti_percent: number;
 }
 
 function NewSaleDialog({ customers, products, onDone }: { customers: Customer[]; products: Product[]; onDone: () => void }) {
@@ -211,7 +212,7 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
   }, []);
 
   function blankLine(): LineItem {
-    return { product_id: null, description: "", metal: "gold", purity: "22K", qty: 1, weight_gram: 0, rate_per_gram: 0, making_charge: 0 };
+    return { product_id: null, description: "", metal: "gold", purity: "22K", qty: 1, weight_gram: 0, rate_per_gram: 0, making_charge: 0, jarti_percent: 0 };
   }
   function pickProduct(idx: number, pid: string) {
     if (pid === "_") {
@@ -236,11 +237,15 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
       ...l, product_id: p.id, description: p.name + (p.sku ? ` (${p.sku})` : ""),
       metal: p.metal as LineItem["metal"], purity: p.purity ?? "",
       weight_gram: Number(p.weight_gram), making_charge: Number(p.making_charge),
+      jarti_percent: Number(p.jarti_percent || 0),
       rate_per_gram: Math.round(finalRate * 100) / 100,
     } : l));
   }
   const totals = useMemo(() => {
-    const subtotal = lines.reduce((s, l) => s + l.qty * l.weight_gram * l.rate_per_gram, 0);
+    const subtotal = lines.reduce((s, l) => {
+      const jartiWeight = l.weight_gram * (l.jarti_percent / 100);
+      return s + l.qty * (l.weight_gram + jartiWeight) * l.rate_per_gram;
+    }, 0);
     const making = lines.reduce((s, l) => s + l.qty * l.making_charge, 0);
     const taxable = Math.max(0, subtotal + making - discount);
     const vat = taxable * (vatRate / 100);
@@ -269,12 +274,15 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
 
     setBusy(true);
     try {
-      const itemsPayload = lines.map((l) => ({
-        product_id: l.product_id, description: l.description, metal: l.metal, purity: l.purity || null,
-        qty: l.qty, weight_gram: l.weight_gram, rate_per_gram: l.rate_per_gram,
-        making_charge: l.making_charge,
-        amount: l.qty * (l.weight_gram * l.rate_per_gram + l.making_charge),
-      }));
+      const itemsPayload = lines.map((l) => {
+        const jartiWeight = l.weight_gram * (l.jarti_percent / 100);
+        return {
+          product_id: l.product_id, description: l.description, metal: l.metal, purity: l.purity || null,
+          qty: l.qty, weight_gram: l.weight_gram, rate_per_gram: l.rate_per_gram,
+          making_charge: l.making_charge, jarti_percent: l.jarti_percent,
+          amount: l.qty * ((l.weight_gram + jartiWeight) * l.rate_per_gram + l.making_charge),
+        };
+      });
 
       const { data: sale, error } = await supabase.from("sales").insert({
         customer_id: customerId === "walk-in" ? null : customerId,
@@ -330,7 +338,7 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
           items: itemsPayload.map((it) => ({
             description: it.description, metal: it.metal, purity: it.purity,
             qty: it.qty, weight_gram: it.weight_gram, rate_per_gram: it.rate_per_gram,
-            making_charge: it.making_charge, amount: it.amount,
+            making_charge: it.making_charge, jarti_percent: it.jarti_percent, amount: it.amount,
           })),
           subtotal: totals.subtotal, making_total: totals.making, discount, vat_rate: vatRate,
           vat_amount: totals.vat, total: totals.total, paid, due: totals.due,
@@ -404,6 +412,7 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
             <TableHead className="w-[80px] h-9 px-2">Purity</TableHead>
             <TableHead className="w-[70px] h-9 px-2">Qty</TableHead>
             <TableHead className="w-[100px] h-9 px-2">Wt(g)</TableHead>
+            <TableHead className="w-[70px] h-9 px-2">Jarti%</TableHead>
             <TableHead className="w-[120px] h-9 px-2">Rate/g</TableHead>
             <TableHead className="w-[110px] h-9 px-2">Making</TableHead>
             <TableHead className="w-[110px] h-9 px-2 text-right">Amount</TableHead>
@@ -437,6 +446,7 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
                   <TableCell className="p-1.5"><Input className="w-full h-8 px-2 text-xs text-center" value={l.purity} onChange={(e) => updateLine(i, { purity: e.target.value })} /></TableCell>
                   <TableCell className="p-1.5"><Input className="w-full h-8 px-2 text-xs text-center" type="number" min="1" value={l.qty} onChange={(e) => updateLine(i, { qty: Number(e.target.value) })} /></TableCell>
                   <TableCell className="p-1.5"><Input className="w-full h-8 px-2 text-xs text-right font-mono" type="number" step="0.001" value={l.weight_gram} onChange={(e) => updateLine(i, { weight_gram: Number(e.target.value) })} /></TableCell>
+                  <TableCell className="p-1.5"><Input className="w-full h-8 px-2 text-xs text-right font-mono" type="number" step="0.01" value={l.jarti_percent} onChange={(e) => updateLine(i, { jarti_percent: Number(e.target.value) })} /></TableCell>
                   <TableCell className="p-1.5"><Input className="w-full h-8 px-2 text-xs text-right font-mono" type="number" step="0.01" value={l.rate_per_gram} onChange={(e) => updateLine(i, { rate_per_gram: Number(e.target.value) })} /></TableCell>
                   <TableCell className="p-1.5"><Input className="w-full h-8 px-2 text-xs text-right font-mono" type="number" step="0.01" value={l.making_charge} onChange={(e) => updateLine(i, { making_charge: Number(e.target.value) })} /></TableCell>
                   <TableCell className="p-1.5 text-right font-semibold text-xs font-mono align-middle">{formatNPR(amt)}</TableCell>

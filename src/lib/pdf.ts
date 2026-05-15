@@ -24,6 +24,7 @@ export interface BillItem {
   weight_gram: number;
   rate_per_gram: number;
   making_charge: number;
+  jarti_percent: number;
   amount: number;
 }
 export interface BillData {
@@ -205,13 +206,14 @@ export async function generateBillPDF(d: BillData): Promise<jsPDF> {
 
   autoTable(doc, {
     startY: y,
-    head: [["#", "Description", "Metal/Purity", "Qty", "Wt (g)", "Rate/g", "Making", "Amount"]],
+    head: [["#", "Description", "Metal/Purity", "Qty", "Wt (g)", "Jarti%", "Rate/g", "Making", "Amount"]],
     body: d.items.map((it, i) => [
       String(i + 1),
       it.description,
       `${it.metal}${it.purity ? " " + it.purity : ""}`,
       String(it.qty),
       Number(it.weight_gram).toFixed(3),
+      it.jarti_percent > 0 ? it.jarti_percent + "%" : "0",
       formatNPR(it.rate_per_gram),
       formatNPR(it.making_charge),
       formatNPR(it.amount),
@@ -222,7 +224,8 @@ export async function generateBillPDF(d: BillData): Promise<jsPDF> {
       0: { cellWidth: 25 },
       5: { halign: 'right' },
       6: { halign: 'right' },
-      7: { halign: 'right' }
+      7: { halign: 'right' },
+      8: { halign: 'right' }
     },
     margin: { left: 40, right: 40 },
     didParseCell: (data) => {
