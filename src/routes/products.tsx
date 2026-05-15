@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/AuthGuard";
@@ -108,20 +108,44 @@ function ProductsPage() {
     return cat.name;
   }
 
-  const filtered = items.filter((i) => {
-    if (selectedCat !== "all") {
-      const isMatch = i.category_id === selectedCat;
-      const cat = cats.find((c) => c.id === i.category_id);
-      const isChildMatch = cat?.parent_id === selectedCat;
-      if (!isMatch && !isChildMatch) return false;
-    }
-    const catName = cats.find((c) => c.id === i.category_id)?.name ?? "";
-    return [i.name, i.sku, i.purity, catName]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase()
-      .includes(search.toLowerCase());
-  });
+  const filtered = useMemo(() => {
+    return items.filter((i) => {
+      // 1. Category Filter
+      if (selectedCat !== "all") {
+        const isMatch = i.category_id === selectedCat;
+        const cat = cats.find((c) => c.id === i.category_id);
+        const isChildMatch = cat?.parent_id === selectedCat;
+        if (!isMatch && !isChildMatch) return false;
+      }
+
+      // 2. Search Filter
+      if (!search) return true;
+      const catName = getCategoryName(i.category_id);
+      return [i.name, i.sku, i.purity, catName]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(search.toLowerCase());
+    });
+  }, [items, cats, selectedCat, search]);
+
+  // Group products by their main category
+  const groupedProducts = useMemo(() => {
+    const groups: Record<string, { name: string; items: Product[] }> = {};
+
+    filtered.forEach((p) => {
+      const cat = cats.find((c) => c.id === p.category_id);
+      const parent = cat?.parent_id ? cats.find((c) => c.id === cat.parent_id) : null;
+      const mainCat = parent || cat;
+      const mainId = mainCat?.id || "unclassified";
+      const mainName = mainCat?.name || "Unclassified";
+
+      if (!groups[mainId]) groups[mainId] = { name: mainName, items: [] };
+      groups[mainId].items.push(p);
+    });
+
+    return Object.entries(groups).sort((a, b) => a[1].name.localeCompare(b[1].name));
+  }, [filtered, cats]);
 
   return (
     <div className="space-y-4">
@@ -191,88 +215,107 @@ function ProductsPage() {
         </CardContent>
       </Card>
 
-      {/* Product Grid View (Desktop & Mobile) */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filtered.map((p) => (
-          <Card key={p.id} className="overflow-hidden border border-border/80 shadow-xs flex flex-col group hover:border-amber-500/50 transition-colors">
-            <CardContent className="p-4 flex-1 space-y-3">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <div className="font-bold text-base leading-tight text-foreground truncate group-hover:text-amber-600 transition-colors">
-                    {p.name}
-                  </div>
-                  <div className="text-[10px] text-amber-600 dark:text-amber-500 font-semibold mt-0.5 truncate">
-                    {getCategoryName(p.category_id)}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground font-mono mt-1">
-                    SKU: {p.sku ?? "—"}
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1 shrink-0">
-                  <Badge
-                    variant={p.metal === "gold" ? "default" : "secondary"}
-                    className="capitalize text-[10px] px-2 py-0.5 font-medium"
-                  >
-                    {p.metal}
-                  </Badge>
-                  {p.purity && (
-                    <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                      {p.purity}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t text-xs">
-                <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
-                    Weight
-                  </span>
-                  <span className="font-semibold text-sm">{formatGram(p.weight_gram)}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
-                    In Stock
-                  </span>
-                  <span
-                    className={cn(
-                      "font-semibold text-sm",
-                      p.stock_qty <= p.min_stock && "text-destructive font-black animate-pulse",
-                    )}
-                  >
-                    {p.stock_qty} {p.stock_qty <= p.min_stock && "⚠️"}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-
-            <div className="bg-muted/30 p-2 border-t flex items-center justify-end gap-1">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-8 px-3 text-xs gap-1.5 hover:bg-amber-500/10 hover:text-amber-600"
-                onClick={() => {
-                  setEditing(p);
-                  setOpen(true);
-                }}
-              >
-                <Pencil className="size-3.5" />
-                Edit
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-8 px-3 text-xs gap-1.5 hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => remove(p.id)}
-              >
-                <Trash2 className="size-3.5" />
-                Delete
-              </Button>
+      {/* Product Grouped View */}
+      <div className="space-y-8 pb-12">
+        {groupedProducts.map(([id, group]) => (
+          <div key={id} className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-border/60"></div>
+              <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-border/50">
+                {group.name}
+              </h2>
+              <div className="h-px flex-1 bg-border/60"></div>
             </div>
-          </Card>
+
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {group.items.map((p) => (
+                <Card
+                  key={p.id}
+                  className="overflow-hidden border border-border/80 shadow-xs flex flex-col group hover:border-amber-500/50 transition-all hover:shadow-md"
+                >
+                  <CardContent className="p-4 flex-1 space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-bold text-base leading-tight text-foreground truncate group-hover:text-amber-600 transition-colors">
+                          {p.name}
+                        </div>
+                        <div className="text-[10px] text-amber-600 dark:text-amber-500 font-semibold mt-0.5 truncate">
+                          {getCategoryName(p.category_id)}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground font-mono mt-1">
+                          SKU: {p.sku ?? "—"}
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <Badge
+                          variant={p.metal === "gold" ? "default" : "secondary"}
+                          className="capitalize text-[10px] px-2 py-0.5 font-medium"
+                        >
+                          {p.metal}
+                        </Badge>
+                        {p.purity && (
+                          <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                            {p.purity}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 pt-3 border-t text-xs">
+                      <div>
+                        <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
+                          Weight
+                        </span>
+                        <span className="font-semibold text-sm">{formatGram(p.weight_gram)}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
+                          In Stock
+                        </span>
+                        <span
+                          className={cn(
+                            "font-semibold text-sm",
+                            p.stock_qty <= p.min_stock &&
+                              "text-destructive font-black animate-pulse",
+                          )}
+                        >
+                          {p.stock_qty} {p.stock_qty <= p.min_stock && "⚠️"}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+
+                  <div className="bg-muted/30 p-2 border-t flex items-center justify-end gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 px-3 text-xs gap-1.5 hover:bg-amber-500/10 hover:text-amber-600"
+                      onClick={() => {
+                        setEditing(p);
+                        setOpen(true);
+                      }}
+                    >
+                      <Pencil className="size-3.5" />
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 px-3 text-xs gap-1.5 hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => remove(p.id)}
+                    >
+                      <Trash2 className="size-3.5" />
+                      Delete
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
         ))}
-        {!filtered.length && (
-          <div className="col-span-full py-12 text-center text-muted-foreground bg-muted/20 rounded-lg border-2 border-dashed">
+
+        {!groupedProducts.length && (
+          <div className="py-12 text-center text-muted-foreground bg-muted/20 rounded-lg border-2 border-dashed">
             <div className="text-lg font-medium">No products found</div>
             <p className="text-sm">Try adjusting your search or filters</p>
           </div>
