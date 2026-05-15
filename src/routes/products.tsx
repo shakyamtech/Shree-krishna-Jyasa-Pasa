@@ -251,7 +251,7 @@ function ProductsPage() {
                 <div className="flex flex-col items-center gap-1">
                   <div
                     className={cn(
-                      "flex items-center gap-4 sm:gap-6 md:gap-6 px-6 sm:px-8 md:px-8 py-3 md:py-3 rounded-full border border-border/80 shadow-sm transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99]",
+                      "flex items-center gap-4 sm:gap-6 md:gap-6 px-6 sm:px-8 md:px-8 py-3 md:py-3 rounded-full border border-border/80 shadow-sm transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99] w-full max-w-[850px]",
                       theme === "gold"
                         ? effectivelyExpanded
                           ? "bg-zinc-950 text-amber-500 border-amber-500/30 shadow-xl shadow-black/40"
@@ -261,7 +261,7 @@ function ProductsPage() {
                   >
                     <span
                       className={cn(
-                        "text-[12px] md:text-xs font-black uppercase tracking-widest whitespace-nowrap",
+                        "text-[12px] md:text-xs font-black uppercase tracking-widest whitespace-nowrap min-w-[80px] md:min-w-[120px]",
                         theme === "gold" && !effectivelyExpanded ? "text-black" : "gold-shimmer",
                       )}
                     >
@@ -273,7 +273,7 @@ function ProductsPage() {
                         theme === "gold" && !effectivelyExpanded ? "bg-black/20" : "bg-border/60",
                       )}
                     ></div>
-                    <div className="flex flex-col items-center leading-none md:leading-tight min-w-0">
+                    <div className="flex flex-col items-center leading-none md:leading-tight min-w-[80px] md:min-w-[100px]">
                       <span
                         className={cn(
                           "text-base md:text-sm font-bold whitespace-nowrap",
@@ -299,22 +299,24 @@ function ProductsPage() {
                         {formatTola(group.totalWeight)}
                       </span>
                     </div>
-                    <span
-                      className={cn(
-                        "hidden sm:block text-sm md:text-[11px] font-black uppercase tracking-tighter",
-                        theme === "gold"
-                          ? effectivelyExpanded
-                            ? "text-amber-400/40"
-                            : "text-black/60"
-                          : "text-amber-600/40 dark:text-amber-400/40",
-                      )}
-                    >
-                      Total
-                    </span>
-                    <div className="flex items-center gap-4 md:gap-4 ml-auto sm:ml-3">
+                    <div className="hidden sm:flex flex-1 items-center justify-center">
                       <span
                         className={cn(
-                          "text-[11px] md:text-[11px] font-bold px-4 md:px-3 py-1.5 md:py-1 rounded-full whitespace-nowrap border",
+                          "text-sm md:text-[11px] font-black uppercase tracking-tighter",
+                          theme === "gold"
+                            ? effectivelyExpanded
+                              ? "text-amber-400/40"
+                              : "text-black/60"
+                            : "text-amber-600/40 dark:text-amber-400/40",
+                        )}
+                      >
+                        Total
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 md:gap-4 ml-auto sm:ml-0">
+                      <span
+                        className={cn(
+                          "text-[11px] md:text-[11px] font-bold px-4 md:px-3 py-1.5 md:py-1 rounded-full whitespace-nowrap border min-w-[70px] md:min-w-[80px] text-center",
                           theme === "gold"
                             ? effectivelyExpanded
                               ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
