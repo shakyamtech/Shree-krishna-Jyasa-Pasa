@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React, { useEffect, useState, useMemo } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AppLayout } from "@/components/AppLayout";
@@ -74,6 +74,7 @@ function ProductsPage() {
   const [selectedCat, setSelectedCat] = useState("all");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
+  const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>({});
 
   async function load() {
     const [{ data: p }, { data: c }] = await Promise.all([
@@ -131,7 +132,10 @@ function ProductsPage() {
 
   // Group products by their main category
   const groupedProducts = useMemo(() => {
-    const groups: Record<string, { name: string; items: Product[] }> = {};
+    const groups: Record<
+      string,
+      { name: string; items: Product[]; totalWeight: number; totalStock: number }
+    > = {};
 
     filtered.forEach((p) => {
       const cat = cats.find((c) => c.id === p.category_id);
@@ -140,8 +144,12 @@ function ProductsPage() {
       const mainId = mainCat?.id || "unclassified";
       const mainName = mainCat?.name || "Unclassified";
 
-      if (!groups[mainId]) groups[mainId] = { name: mainName, items: [] };
+      if (!groups[mainId]) {
+        groups[mainId] = { name: mainName, items: [], totalWeight: 0, totalStock: 0 };
+      }
       groups[mainId].items.push(p);
+      groups[mainId].totalWeight += p.weight_gram * p.stock_qty;
+      groups[mainId].totalStock += p.stock_qty;
     });
 
     return Object.entries(groups).sort((a, b) => a[1].name.localeCompare(b[1].name));
@@ -216,103 +224,134 @@ function ProductsPage() {
       </Card>
 
       {/* Product Grouped View */}
-      <div className="space-y-8 pb-12">
-        {groupedProducts.map(([id, group]) => (
-          <div key={id} className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="h-px flex-1 bg-border/60"></div>
-              <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-border/50">
-                {group.name}
-              </h2>
-              <div className="h-px flex-1 bg-border/60"></div>
-            </div>
+      <div className="space-y-6 pb-12">
+        {groupedProducts.map(([id, group]) => {
+          const isExpanded = expandedCats[id] !== false; // Default to expanded? Or collapsed?
+          // User said "when click this neclace card it will show these childrens", implying collapsed by default or at least interactive.
+          // Usually, for inventory, seeing everything is good, but user wants it hidden.
+          // Let's go with collapsed by default if not searched.
+          const effectivelyExpanded = search.length > 0 || expandedCats[id] === true;
 
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {group.items.map((p) => (
-                <Card
-                  key={p.id}
-                  className="overflow-hidden border border-border/80 shadow-xs flex flex-col group hover:border-amber-500/50 transition-all hover:shadow-md"
-                >
-                  <CardContent className="p-4 flex-1 space-y-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="font-bold text-base leading-tight text-foreground truncate group-hover:text-amber-600 transition-colors">
-                          {p.name}
-                        </div>
-                        <div className="text-[10px] text-amber-600 dark:text-amber-500 font-semibold mt-0.5 truncate">
-                          {getCategoryName(p.category_id)}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground font-mono mt-1">
-                          SKU: {p.sku ?? "—"}
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-1 shrink-0">
-                        <Badge
-                          variant={p.metal === "gold" ? "default" : "secondary"}
-                          className="capitalize text-[10px] px-2 py-0.5 font-medium"
-                        >
-                          {p.metal}
-                        </Badge>
-                        {p.purity && (
-                          <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                            {p.purity}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 pt-3 border-t text-xs">
-                      <div>
-                        <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
-                          Weight
-                        </span>
-                        <span className="font-semibold text-sm">{formatGram(p.weight_gram)}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
-                          In Stock
-                        </span>
-                        <span
-                          className={cn(
-                            "font-semibold text-sm",
-                            p.stock_qty <= p.min_stock &&
-                              "text-destructive font-black animate-pulse",
-                          )}
-                        >
-                          {p.stock_qty} {p.stock_qty <= p.min_stock && "⚠️"}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-
-                  <div className="bg-muted/30 p-2 border-t flex items-center justify-end gap-1">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 px-3 text-xs gap-1.5 hover:bg-amber-500/10 hover:text-amber-600"
-                      onClick={() => {
-                        setEditing(p);
-                        setOpen(true);
-                      }}
-                    >
-                      <Pencil className="size-3.5" />
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 px-3 text-xs gap-1.5 hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => remove(p.id)}
-                    >
-                      <Trash2 className="size-3.5" />
-                      Delete
-                    </Button>
+          return (
+            <div key={id} className="space-y-4">
+              <button
+                onClick={() => setExpandedCats((prev) => ({ ...prev, [id]: !effectivelyExpanded }))}
+                className="w-full flex items-center gap-4 group/header"
+              >
+                <div className="h-px flex-1 bg-border/60 group-hover/header:bg-amber-500/30 transition-colors"></div>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-border/80 bg-white shadow-sm group-hover/header:border-amber-500/50 transition-all">
+                    <span className="text-xs font-black uppercase tracking-widest text-foreground">
+                      {group.name}
+                    </span>
+                    <div className="w-px h-3 bg-border mx-1"></div>
+                    <span className="text-[10px] font-bold text-amber-600">
+                      {formatGram(group.totalWeight)} Total
+                    </span>
+                    <span className="text-[10px] text-muted-foreground ml-1">
+                      ({group.totalStock} units)
+                    </span>
+                    {effectivelyExpanded ? (
+                      <ChevronUp className="size-3.5 text-muted-foreground group-hover/header:text-amber-500" />
+                    ) : (
+                      <ChevronDown className="size-3.5 text-muted-foreground group-hover/header:text-amber-500" />
+                    )}
                   </div>
-                </Card>
-              ))}
+                </div>
+                <div className="h-px flex-1 bg-border/60 group-hover/header:bg-amber-500/30 transition-colors"></div>
+              </button>
+
+              {effectivelyExpanded && (
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  {group.items.map((p) => (
+                    <Card
+                      key={p.id}
+                      className="overflow-hidden border border-border/80 shadow-xs flex flex-col group hover:border-amber-500/50 transition-all hover:shadow-md"
+                    >
+                      <CardContent className="p-4 flex-1 space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-bold text-base leading-tight text-foreground truncate group-hover:text-amber-600 transition-colors">
+                              {p.name}
+                            </div>
+                            <div className="text-[10px] text-amber-600 dark:text-amber-500 font-semibold mt-0.5 truncate">
+                              {getCategoryName(p.category_id)}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground font-mono mt-1">
+                              SKU: {p.sku ?? "—"}
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-1 shrink-0">
+                            <Badge
+                              variant={p.metal === "gold" ? "default" : "secondary"}
+                              className="capitalize text-[10px] px-2 py-0.5 font-medium"
+                            >
+                              {p.metal}
+                            </Badge>
+                            {p.purity && (
+                              <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                                {p.purity}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 pt-3 border-t text-xs">
+                          <div>
+                            <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
+                              Weight
+                            </span>
+                            <span className="font-semibold text-sm">
+                              {formatGram(p.weight_gram)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
+                              In Stock
+                            </span>
+                            <span
+                              className={cn(
+                                "font-semibold text-sm",
+                                p.stock_qty <= p.min_stock &&
+                                  "text-destructive font-black animate-pulse",
+                              )}
+                            >
+                              {p.stock_qty} {p.stock_qty <= p.min_stock && "⚠️"}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+
+                      <div className="bg-muted/30 p-2 border-t flex items-center justify-end gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 px-3 text-xs gap-1.5 hover:bg-amber-500/10 hover:text-amber-600"
+                          onClick={() => {
+                            setEditing(p);
+                            setOpen(true);
+                          }}
+                        >
+                          <Pencil className="size-3.5" />
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 px-3 text-xs gap-1.5 hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => remove(p.id)}
+                        >
+                          <Trash2 className="size-3.5" />
+                          Delete
+                        </Button>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {!groupedProducts.length && (
           <div className="py-12 text-center text-muted-foreground bg-muted/20 rounded-lg border-2 border-dashed">
