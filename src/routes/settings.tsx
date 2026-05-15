@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Plus, Trash2, Users, Check, Sparkles } from "lucide-react";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,12 @@ interface StaffItem {
   created_at: string;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  metal: "gold" | "silver" | "other";
+}
+
 function SettingsPage() {
   const navigate = useNavigate();
   const { role } = useAuth();
@@ -66,6 +73,71 @@ function SettingsPage() {
   const [loadingStaff, setLoadingStaff] = useState(false);
   const [openStaffModal, setOpenStaffModal] = useState(false);
   const [wiping, setWiping] = useState(false);
+
+  // Category management state
+  const [cats, setCats] = useState<Category[]>([]);
+  const [newCat, setNewCat] = useState({ name: "", metal: "gold" as const });
+  const [busyCat, setBusyCat] = useState(false);
+
+  async function loadCategories() {
+    const { data } = await supabase.from("categories").select("*").order("name");
+    setCats((data || []) as Category[]);
+  }
+
+  async function addCategory() {
+    if (!newCat.name.trim()) return toast.error("Enter category name");
+    setBusyCat(true);
+    const { error } = await supabase.from("categories").insert({
+      name: newCat.name.trim(),
+      metal: newCat.metal,
+    });
+    setBusyCat(false);
+    if (error) toast.error(error.message);
+    else {
+      setNewCat({ name: "", metal: "gold" });
+      loadCategories();
+      toast.success("Category added");
+    }
+  }
+
+  async function deleteCategory(id: string) {
+    if (!confirm("Are you sure? Products using this category will have it unassigned.")) return;
+    const { error } = await supabase.from("categories").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else {
+      loadCategories();
+      toast.success("Category deleted");
+    }
+  }
+
+  async function seedCategories() {
+    const list = [
+      "Magal Sutra",
+      "Top",
+      "Tilhari",
+      "Jhumka",
+      "Bracelet",
+      "Mundra",
+      "Rani Haar",
+      "Pure Gold",
+    ];
+    setBusyCat(true);
+    try {
+      for (const name of list) {
+        // Only insert if it doesn't exist
+        const exists = cats.some((c) => c.name.toLowerCase() === name.toLowerCase());
+        if (!exists) {
+          await supabase.from("categories").insert({ name, metal: "gold" });
+        }
+      }
+      loadCategories();
+      toast.success("Categories seeded!");
+    } catch (e) {
+      toast.error("Failed to seed");
+    } finally {
+      setBusyCat(false);
+    }
+  }
 
   async function wipeAllSales() {
     const code = prompt("DANGER: Type 'DELETE' to wipe all sales records and reverse inventory.");
@@ -112,6 +184,7 @@ function SettingsPage() {
     setSavedTheme(localStorage.getItem("app_theme") || "default");
     const stored = localStorage.getItem("custom_owner_name");
     if (stored) setOwnerName(stored);
+    loadCategories();
     supabase
       .from("shop_settings")
       .select("*")
@@ -380,6 +453,92 @@ function SettingsPage() {
                   onChange={(e) => setS({ ...s, bill_footer: e.target.value })}
                   placeholder="Thank you for shopping with us!"
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mt-6">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Manage Categories</CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  Add or remove product categories like Magal Sutra, Jhumka, etc.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={seedCategories}
+                disabled={busyCat}
+                className="text-amber-600 border-amber-200 hover:bg-amber-50"
+              >
+                <Sparkles className="size-3.5 mr-1" /> Quick add requested
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex-1">
+                  <Input
+                    placeholder="New category name..."
+                    value={newCat.name}
+                    onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
+                  />
+                </div>
+                <div className="w-full sm:w-32">
+                  <select
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    value={newCat.metal}
+                    onChange={(e) =>
+                      setNewCat({ ...newCat, metal: e.target.value as any })
+                    }
+                  >
+                    <option value="gold">Gold</option>
+                    <option value="silver">Silver</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <Button onClick={addCategory} disabled={busyCat} size="sm" className="shrink-0">
+                  <Plus className="size-4 mr-1" /> Add
+                </Button>
+              </div>
+
+              <div className="border rounded-md overflow-hidden">
+                <div className="max-h-[300px] overflow-y-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50 sticky top-0">
+                      <tr>
+                        <th className="text-left p-2 font-medium">Name</th>
+                        <th className="text-left p-2 font-medium">Metal</th>
+                        <th className="w-10"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {cats.map((c) => (
+                        <tr key={c.id} className="hover:bg-muted/30">
+                          <td className="p-2 font-medium">{c.name}</td>
+                          <td className="p-2 capitalize text-muted-foreground">{c.metal}</td>
+                          <td className="p-1 text-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-7 text-muted-foreground hover:text-destructive"
+                              onClick={() => deleteCategory(c.id)}
+                            >
+                              <Trash2 className="size-3.5" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                      {!cats.length && (
+                        <tr>
+                          <td colSpan={3} className="p-4 text-center text-muted-foreground">
+                            No categories defined yet.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </CardContent>
           </Card>
