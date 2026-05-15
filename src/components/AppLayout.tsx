@@ -176,7 +176,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 "font-extrabold text-base truncate tracking-tight",
                 theme === "gold"
                   ? "text-black"
-                  : "bg-clip-text text-transparent bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950",
+                  : theme === "sapphire"
+                    ? "text-white"
+                    : "bg-clip-text text-transparent bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950",
               )}
             >
               {displayShopName}
@@ -196,7 +198,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
               {(!role || role.toLowerCase() === "owner") && ownerName && (
                 <span className={cn(
                   "font-bold capitalize truncate",
-                  theme === "gold" ? "text-black" : "text-amber-500"
+                  theme === "gold" ? "text-black" : theme === "sapphire" ? "text-white" : "text-amber-500"
                 )}>
                   • {ownerName}
                 </span>
@@ -204,7 +206,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
               {role?.toLowerCase() === "staff" && (
                 <span className={cn(
                   "font-bold capitalize truncate",
-                  theme === "gold" ? "text-black" : "text-amber-500"
+                  theme === "gold" ? "text-black" : theme === "sapphire" ? "text-white" : "text-amber-500"
                 )}>
                   • {derivedStaffName}
                 </span>
@@ -250,27 +252,29 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <div className="px-2 flex items-center justify-between">
                 <span className={cn(
                   "text-[9px] font-bold uppercase tracking-widest",
-                  theme === "gold" ? "text-black/60" : "text-sidebar-foreground/30"
+                  theme === "gold" ? "text-black/60" : theme === "sapphire" ? "text-white/60" : "text-sidebar-foreground/30"
                 )}>
                   System Status
                 </span>
                 <span className={cn(
                   "text-[9px] font-bold",
-                  theme === "gold" ? "text-black/80" : "text-amber-600/60 dark:text-amber-500/60"
+                  theme === "gold" ? "text-black/80" : theme === "sapphire" ? "text-white/80" : "text-amber-600/60 dark:text-amber-500/60"
                 )}>
                   v1.0.0
                 </span>
               </div>
               <div className={cn(
                 "flex items-center gap-2 px-2 py-1.5 rounded-md border",
-                theme === "gold" ? "bg-black/5 border-black/10" : "bg-background/40 border-sidebar-border/40"
+                theme === "gold" ? "bg-black/5 border-black/10" : theme === "sapphire" ? "bg-white/5 border-white/10" : "bg-background/40 border-sidebar-border/40"
               )}>
                 <div
                   className={cn(
                     "flex size-6 items-center justify-center rounded-full shrink-0 border",
                     theme === "gold"
                       ? "bg-black/10 text-black border-black/20"
-                      : "bg-amber-600/10 text-amber-600 dark:text-amber-500 border-amber-600/20",
+                      : theme === "sapphire"
+                        ? "bg-white/10 text-white border-white/20"
+                        : "bg-amber-600/10 text-amber-600 dark:text-amber-500 border-amber-600/20",
                   )}
                 >
                   <User className="size-3.5" />
@@ -278,7 +282,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <div className="min-w-0 flex-1">
                   <div className={cn(
                     "text-[11px] font-medium truncate",
-                    theme === "gold" ? "text-black" : "text-sidebar-foreground"
+                    theme === "gold" ? "text-black" : theme === "sapphire" ? "text-white" : "text-sidebar-foreground"
                   )}>
                     {user.email}
                   </div>
