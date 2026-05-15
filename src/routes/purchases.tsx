@@ -235,7 +235,7 @@ function NewPurchaseDialog({
       product_id: null,
       description: "",
       metal: "gold",
-      purity: "22K",
+      purity: "24K",
       qty: 1,
       weight_gram: 0,
       rate_per_gram: 0,
