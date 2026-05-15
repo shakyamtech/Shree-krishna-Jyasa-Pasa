@@ -43,6 +43,41 @@ function SettingsPage() {
   const [staffList, setStaffList] = useState<StaffItem[]>([]);
   const [loadingStaff, setLoadingStaff] = useState(false);
   const [openStaffModal, setOpenStaffModal] = useState(false);
+  const [wiping, setWiping] = useState(false);
+
+  async function wipeAllSales() {
+    const code = prompt("DANGER: Type 'DELETE' to wipe all sales records and reverse inventory.");
+    if (code !== "DELETE") return;
+    setWiping(true);
+    try {
+      const { data: items } = await supabase.from("sale_items").select("product_id, qty");
+      const { data: products } = await supabase.from("products").select("id, stock_qty");
+      if (items && products) {
+        const restoreMap: Record<string, number> = {};
+        for(const it of items) {
+          if(it.product_id) restoreMap[it.product_id] = (restoreMap[it.product_id] || 0) + it.qty;
+        }
+        for (const pid of Object.keys(restoreMap)) {
+          const prod = products.find((p) => p.id === pid);
+          if (prod) {
+            await supabase.from("products").update({ stock_qty: prod.stock_qty + restoreMap[pid] }).eq("id", pid);
+          }
+        }
+      }
+      await supabase.from("stock_movements").delete().eq("ref_table", "sales").not("id", "is", null);
+      await supabase.from("cashbook").delete().eq("ref_table", "sales").not("id", "is", null);
+      await supabase.from("credits").delete().eq("ref_table", "sales").not("id", "is", null);
+      await supabase.from("sale_items").delete().not("id", "is", null);
+      const { error } = await supabase.from("sales").delete().not("id", "is", null);
+
+      if (error) throw error;
+      toast.success("All sales records have been wiped.");
+    } catch(e: any) {
+      toast.error(e.message);
+    } finally {
+      setWiping(false);
+    }
+  }
 
   useEffect(() => {
     setSavedTheme(localStorage.getItem("app_theme") || "default");
@@ -321,6 +356,26 @@ function SettingsPage() {
                   <div className="text-[10px] text-muted-foreground truncate">Crisp light & deep indigo</div>
                 </div>
               </button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-red-500/30 bg-red-500/5 shadow-none mt-6">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-red-600 flex items-center gap-2 text-lg">
+                <Trash2 className="size-5" />
+                Danger Zone
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Wipe All Sales Records</p>
+                  <p className="text-xs text-muted-foreground mt-1 max-w-xl">Permanently delete all generated invoices, reverse stock quantities, and remove associated ledger entries. This is used to clear test data before going live.</p>
+                </div>
+                <Button variant="destructive" onClick={wipeAllSales} disabled={wiping} className="shrink-0">
+                  {wiping ? "Wiping..." : "Delete All Sales"}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
