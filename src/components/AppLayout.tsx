@@ -248,28 +248,38 @@ export function AppLayout({ children }: { children: ReactNode }) {
           {user?.email && (
             <div className="space-y-1">
               <div className="px-2 flex items-center justify-between">
-                <span className="text-[9px] font-bold text-sidebar-foreground/30 uppercase tracking-widest">
+                <span className={cn(
+                  "text-[9px] font-bold uppercase tracking-widest",
+                  theme === "gold" ? "text-black/60" : "text-sidebar-foreground/30"
+                )}>
                   System Status
                 </span>
-                <span className="text-[9px] font-bold text-amber-600/60 dark:text-amber-500/60">
+                <span className={cn(
+                  "text-[9px] font-bold",
+                  theme === "gold" ? "text-black/80" : "text-amber-600/60 dark:text-amber-500/60"
+                )}>
                   v1.0.0
                 </span>
               </div>
-              <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-background/40 border border-sidebar-border/40">
+              <div className={cn(
+                "flex items-center gap-2 px-2 py-1.5 rounded-md border",
+                theme === "gold" ? "bg-black/5 border-black/10" : "bg-background/40 border-sidebar-border/40"
+              )}>
                 <div
                   className={cn(
                     "flex size-6 items-center justify-center rounded-full shrink-0 border",
-                    theme === "sapphire"
-                      ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
-                      : theme === "gold"
-                        ? "bg-amber-400/10 text-amber-300 border-amber-400/20"
-                        : "bg-amber-600/10 text-amber-600 dark:text-amber-500 border-amber-600/20",
+                    theme === "gold"
+                      ? "bg-black/10 text-black border-black/20"
+                      : "bg-amber-600/10 text-amber-600 dark:text-amber-500 border-amber-600/20",
                   )}
                 >
                   <User className="size-3.5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[11px] font-medium text-sidebar-foreground truncate">
+                  <div className={cn(
+                    "text-[11px] font-medium truncate",
+                    theme === "gold" ? "text-black" : "text-sidebar-foreground"
+                  )}>
                     {user.email}
                   </div>
                 </div>
@@ -283,10 +293,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
             theme === "gold" ? "bg-black/5 border-black/10" : "bg-sidebar-accent/50 border-sidebar-border/60"
           )}>
             <span className={cn(
-              "text-xs font-medium flex items-center gap-1.5",
-              theme === "gold" ? "text-black/70" : "text-sidebar-foreground/70"
+              "text-xs font-bold flex items-center gap-1.5",
+              theme === "gold" ? "text-black" : "text-sidebar-foreground/70"
             )}>
-              <span>🌐</span> {lang === "ne" ? "भाषा" : "Language"}
+              <span className={theme === "gold" ? "opacity-100" : "opacity-70"}>🌐</span> {lang === "ne" ? "भाषा" : "Language"}
             </span>
             <div className={cn(
               "flex rounded-sm border p-0.5 shadow-xs",
@@ -313,7 +323,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     ? theme === "gold"
                       ? "bg-black text-amber-500"
                       : "bg-amber-600 text-white"
-                    : theme === "gold" ? "text-black/40 hover:text-black" : "text-sidebar-foreground/50 hover:text-sidebar-foreground",
+                    : theme === "gold" ? "text-black hover:text-black font-extrabold" : "text-sidebar-foreground/50 hover:text-sidebar-foreground",
                 )}
               >
                 नेपाली
