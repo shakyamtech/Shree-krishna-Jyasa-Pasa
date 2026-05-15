@@ -75,6 +75,15 @@ function ProductsPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>({});
+  const [theme, setTheme] = useState(() =>
+    typeof window !== "undefined" ? localStorage.getItem("app_theme") || "default" : "default",
+  );
+
+  useEffect(() => {
+    const syncTheme = () => setTheme(localStorage.getItem("app_theme") || "default");
+    window.addEventListener("storage", syncTheme);
+    return () => window.removeEventListener("storage", syncTheme);
+  }, []);
 
   async function load() {
     const [{ data: p }, { data: c }] = await Promise.all([
@@ -240,30 +249,99 @@ function ProductsPage() {
               >
                 <div className="h-px flex-1 bg-border/60 group-hover/header:bg-amber-500/30 transition-colors"></div>
                 <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-6 px-8 py-3 rounded-full border border-border/80 bg-white dark:bg-card/50 backdrop-blur-md shadow-sm group-hover/header:border-amber-500/50 transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99] gold-glow">
-                    <span className="text-xs font-black uppercase tracking-widest text-foreground whitespace-nowrap gold-shimmer">
+                  <div
+                    className={cn(
+                      "flex items-center gap-6 px-8 py-3 rounded-full border border-border/80 shadow-sm transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99] gold-glow",
+                      theme === "gold"
+                        ? effectivelyExpanded
+                          ? "bg-zinc-950 text-amber-500 border-amber-500/30"
+                          : "bg-amber-500 text-black border-amber-600"
+                        : "bg-white dark:bg-card/50 backdrop-blur-md text-foreground",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "text-xs font-black uppercase tracking-widest whitespace-nowrap",
+                        theme === "gold" && !effectivelyExpanded ? "" : "gold-shimmer",
+                      )}
+                    >
                       {group.name}
                     </span>
-                    <div className="w-px h-5 bg-border/60 mx-1"></div>
+                    <div
+                      className={cn(
+                        "w-px h-5 mx-1",
+                        theme === "gold" && !effectivelyExpanded ? "bg-black/20" : "bg-border/60",
+                      )}
+                    ></div>
                     <div className="flex flex-col items-center leading-tight">
-                      <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
+                      <span
+                        className={cn(
+                          "text-sm font-bold",
+                          theme === "gold"
+                            ? effectivelyExpanded
+                              ? "text-amber-400"
+                              : "text-black"
+                            : "text-amber-600 dark:text-amber-400",
+                        )}
+                      >
                         {formatGram(group.totalWeight)}
                       </span>
-                      <span className="text-[11px] font-medium text-amber-600/70 dark:text-amber-400/70">
+                      <span
+                        className={cn(
+                          "text-[11px] font-medium",
+                          theme === "gold"
+                            ? effectivelyExpanded
+                              ? "text-amber-400/70"
+                              : "text-black/70"
+                            : "text-amber-600/70 dark:text-amber-400/70",
+                        )}
+                      >
                         {formatTola(group.totalWeight)}
                       </span>
                     </div>
-                    <span className="text-[11px] font-black uppercase text-amber-600/40 dark:text-amber-400/40 tracking-tighter">
+                    <span
+                      className={cn(
+                        "text-[11px] font-black uppercase tracking-tighter",
+                        theme === "gold"
+                          ? effectivelyExpanded
+                            ? "text-amber-400/40"
+                            : "text-black/40"
+                          : "text-amber-600/40 dark:text-amber-400/40",
+                      )}
+                    >
                       Total
                     </span>
                     <div className="flex items-center gap-4 ml-1">
-                      <span className="text-[11px] font-bold text-muted-foreground bg-muted/50 px-3 py-1 rounded-full whitespace-nowrap border border-border/40">
+                      <span
+                        className={cn(
+                          "text-[11px] font-bold px-3 py-1 rounded-full whitespace-nowrap border",
+                          theme === "gold"
+                            ? effectivelyExpanded
+                              ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                              : "bg-black/10 text-black border-black/20"
+                            : "bg-muted/50 text-muted-foreground border-border/40",
+                        )}
+                      >
                         {group.totalStock} units
                       </span>
                       {effectivelyExpanded ? (
-                        <ChevronUp className="size-5 text-muted-foreground group-hover/header:text-amber-500" />
+                        <ChevronUp
+                          className={cn(
+                            "size-5",
+                            theme === "gold" && !effectivelyExpanded
+                              ? "text-black"
+                              : "text-muted-foreground",
+                          )}
+                        />
                       ) : (
-                        <ChevronDown className="size-5 text-muted-foreground group-hover/header:text-amber-500" />
+                        <ChevronDown
+                          className={cn(
+                            "size-5",
+                            theme === "gold" && !effectivelyExpanded
+                              ? "text-black"
+                              : "text-muted-foreground",
+                          )}
+                        />
                       )}
                     </div>
                   </div>
@@ -276,57 +354,106 @@ function ProductsPage() {
                   {group.items.map((p) => (
                     <Card
                       key={p.id}
-                      className="overflow-hidden border border-border/80 dark:border-amber-500/20 shadow-xs flex flex-col group hover:border-amber-500/50 transition-all hover:shadow-md hover:shadow-amber-500/5 dark:bg-card/40"
+                      className={cn(
+                        "overflow-hidden border border-border/80 shadow-xs flex flex-col group transition-all hover:shadow-md",
+                        theme === "gold"
+                          ? "bg-amber-500 text-black border-amber-600 shadow-amber-500/10"
+                          : "dark:border-amber-500/20 dark:bg-card/40 hover:border-amber-500/50 hover:shadow-amber-500/5",
+                      )}
                     >
                       <CardContent className="p-4 flex-1 space-y-3">
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0 flex-1">
-                            <div className="font-bold text-base leading-tight text-foreground truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                            <div
+                              className={cn(
+                                "font-bold text-base leading-tight truncate transition-colors",
+                                theme === "gold" ? "text-black" : "text-foreground group-hover:text-amber-600 dark:group-hover:text-amber-400",
+                              )}
+                            >
                               {p.name}
                             </div>
-                            <div className="text-[10px] text-amber-600 dark:text-amber-500 font-semibold mt-0.5 truncate">
+                            <div
+                              className={cn(
+                                "text-[10px] font-semibold mt-0.5 truncate",
+                                theme === "gold" ? "text-black/60" : "text-amber-600 dark:text-amber-500",
+                              )}
+                            >
                               {getCategoryName(p.category_id)}
                             </div>
-                            <div className="text-[10px] text-muted-foreground font-mono mt-1">
+                            <div
+                              className={cn(
+                                "text-[10px] font-mono mt-1",
+                                theme === "gold" ? "text-black/40" : "text-muted-foreground",
+                              )}
+                            >
                               SKU: {p.sku ?? "—"}
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-1 shrink-0">
                             <Badge
                               variant={p.metal === "gold" ? "default" : "secondary"}
-                              className="capitalize text-[10px] px-2 py-0.5 font-medium"
+                              className={cn(
+                                "capitalize text-[10px] px-2 py-0.5 font-medium",
+                                theme === "gold" && "bg-black text-amber-500 border-none",
+                              )}
                             >
                               {p.metal}
                             </Badge>
                             {p.purity && (
-                              <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                              <span
+                                className={cn(
+                                  "text-[10px] font-bold px-1.5 py-0.5 rounded",
+                                  theme === "gold" ? "bg-black/10 text-black" : "bg-muted text-muted-foreground",
+                                )}
+                              >
                                 {p.purity}
                               </span>
                             )}
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 pt-3 border-t text-xs">
+                        <div
+                          className={cn(
+                            "grid grid-cols-2 gap-3 pt-3 border-t text-xs",
+                            theme === "gold" ? "border-black/10" : "border-border/80",
+                          )}
+                        >
                           <div>
-                            <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
+                            <span
+                              className={cn(
+                                "block text-[10px] uppercase font-bold tracking-tight",
+                                theme === "gold" ? "text-black/50" : "text-muted-foreground",
+                              )}
+                            >
                               Weight
                             </span>
                             <span className="font-semibold text-sm">
                               {formatGram(p.weight_gram)}
                             </span>
-                            <div className="text-[10px] text-muted-foreground font-medium italic mt-0.5">
+                            <div
+                              className={cn(
+                                "text-[10px] font-medium italic mt-0.5",
+                                theme === "gold" ? "text-black/60" : "text-muted-foreground",
+                              )}
+                            >
                               {formatTola(p.weight_gram)}
                             </div>
                           </div>
                           <div>
-                            <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
+                            <span
+                              className={cn(
+                                "block text-[10px] uppercase font-bold tracking-tight",
+                                theme === "gold" ? "text-black/50" : "text-muted-foreground",
+                              )}
+                            >
                               In Stock
                             </span>
                             <span
                               className={cn(
                                 "font-semibold text-sm",
-                                p.stock_qty <= p.min_stock &&
-                                  "text-destructive font-black animate-pulse",
+                                theme === "gold"
+                                  ? "text-black"
+                                  : p.stock_qty <= p.min_stock && "text-destructive font-black animate-pulse",
                               )}
                             >
                               {p.stock_qty} {p.stock_qty <= p.min_stock && "⚠️"}
@@ -335,11 +462,21 @@ function ProductsPage() {
                         </div>
                       </CardContent>
 
-                      <div className="bg-muted/30 p-2 border-t flex items-center justify-end gap-1">
+                      <div
+                        className={cn(
+                          "p-2 border-t flex items-center justify-end gap-1",
+                          theme === "gold" ? "bg-black/5 border-black/10" : "bg-muted/30 border-border/80",
+                        )}
+                      >
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-8 px-3 text-xs gap-1.5 hover:bg-amber-500/10 hover:text-amber-600"
+                          className={cn(
+                            "h-8 px-3 text-xs gap-1.5",
+                            theme === "gold"
+                              ? "text-black hover:bg-black/10"
+                              : "hover:bg-amber-500/10 hover:text-amber-600",
+                          )}
                           onClick={() => {
                             setEditing(p);
                             setOpen(true);
@@ -351,7 +488,12 @@ function ProductsPage() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="h-8 px-3 text-xs gap-1.5 hover:bg-destructive/10 hover:text-destructive"
+                          className={cn(
+                            "h-8 px-3 text-xs gap-1.5",
+                            theme === "gold"
+                              ? "text-black hover:bg-black/10"
+                              : "hover:bg-destructive/10 hover:text-destructive",
+                          )}
                           onClick={() => remove(p.id)}
                         >
                           <Trash2 className="size-3.5" />
