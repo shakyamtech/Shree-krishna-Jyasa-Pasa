@@ -23,10 +23,38 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 
+const ReceiptRs = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z" />
+    <path d="M12 8.5v7" className="opacity-0" />
+    <text 
+      x="12" 
+      y="14.5" 
+      textAnchor="middle" 
+      fontSize="8" 
+      fontWeight="900" 
+      stroke="none" 
+      fill="currentColor"
+      className="font-sans"
+    >
+      Rs
+    </text>
+  </svg>
+);
+
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/products", label: "Products & Stock", icon: Package },
-  { to: "/sales", label: "Sales / Billing", icon: Receipt },
+  { to: "/sales", label: "Sales / Billing", icon: ReceiptRs },
   { to: "/purchases", label: "Purchases", icon: ShoppingBag },
   { to: "/customers", label: "Customers", icon: Users },
   { to: "/suppliers", label: "Suppliers", icon: Truck },
@@ -352,7 +380,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b border-sidebar-border bg-sidebar shadow-sm">
+        <header className={cn(
+          "md:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b shadow-sm",
+          theme === "gold" 
+            ? "bg-zinc-950/80 backdrop-blur-md border-amber-500/10" 
+            : "border-sidebar-border bg-sidebar"
+        )}>
           <button
             onClick={() => setOpen(true)}
             className={cn(
