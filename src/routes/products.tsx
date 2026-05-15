@@ -240,24 +240,24 @@ function ProductsPage() {
               >
                 <div className="h-px flex-1 bg-border/60 group-hover/header:bg-amber-500/30 transition-colors"></div>
                 <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-6 px-8 py-3 rounded-full border border-border/80 bg-white shadow-sm group-hover/header:border-amber-500/50 transition-all hover:shadow-md">
-                    <span className="text-xs font-black uppercase tracking-widest text-foreground whitespace-nowrap">
+                  <div className="flex items-center gap-6 px-8 py-3 rounded-full border border-border/80 bg-white dark:bg-card/50 backdrop-blur-md shadow-sm group-hover/header:border-amber-500/50 transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99] gold-glow">
+                    <span className="text-xs font-black uppercase tracking-widest text-foreground whitespace-nowrap gold-shimmer">
                       {group.name}
                     </span>
                     <div className="w-px h-5 bg-border/60 mx-1"></div>
                     <div className="flex flex-col items-center leading-tight">
-                      <span className="text-sm font-bold text-amber-600">
+                      <span className="text-sm font-bold text-amber-600 dark:text-amber-400">
                         {formatGram(group.totalWeight)}
                       </span>
-                      <span className="text-[11px] font-medium text-amber-600/70">
+                      <span className="text-[11px] font-medium text-amber-600/70 dark:text-amber-400/70">
                         {formatTola(group.totalWeight)}
                       </span>
                     </div>
-                    <span className="text-[11px] font-black uppercase text-amber-600/40 tracking-tighter">
+                    <span className="text-[11px] font-black uppercase text-amber-600/40 dark:text-amber-400/40 tracking-tighter">
                       Total
                     </span>
                     <div className="flex items-center gap-4 ml-1">
-                      <span className="text-[11px] font-bold text-muted-foreground bg-muted/50 px-3 py-1 rounded-full whitespace-nowrap">
+                      <span className="text-[11px] font-bold text-muted-foreground bg-muted/50 px-3 py-1 rounded-full whitespace-nowrap border border-border/40">
                         {group.totalStock} units
                       </span>
                       {effectivelyExpanded ? (
@@ -276,12 +276,12 @@ function ProductsPage() {
                   {group.items.map((p) => (
                     <Card
                       key={p.id}
-                      className="overflow-hidden border border-border/80 shadow-xs flex flex-col group hover:border-amber-500/50 transition-all hover:shadow-md"
+                      className="overflow-hidden border border-border/80 dark:border-amber-500/20 shadow-xs flex flex-col group hover:border-amber-500/50 transition-all hover:shadow-md hover:shadow-amber-500/5 dark:bg-card/40"
                     >
                       <CardContent className="p-4 flex-1 space-y-3">
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0 flex-1">
-                            <div className="font-bold text-base leading-tight text-foreground truncate group-hover:text-amber-600 transition-colors">
+                            <div className="font-bold text-base leading-tight text-foreground truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                               {p.name}
                             </div>
                             <div className="text-[10px] text-amber-600 dark:text-amber-500 font-semibold mt-0.5 truncate">

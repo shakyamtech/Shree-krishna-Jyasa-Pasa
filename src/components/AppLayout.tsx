@@ -218,7 +218,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition",
                   active
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                    ? theme === "gold"
+                      ? "gold-gradient-bg text-black shadow-lg shadow-amber-500/20 font-bold"
+                      : "bg-sidebar-primary text-sidebar-primary-foreground"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 )}
               >

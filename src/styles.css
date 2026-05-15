@@ -151,17 +151,17 @@
 }
 
 .theme-gold {
-  --sidebar: oklch(0.24 0.05 80);
-  --background: oklch(0.12 0 0);
+  --sidebar: oklch(0.12 0 0);
+  --background: oklch(0.08 0 0);
   --card: oklch(0.16 0.005 80);
   --popover: oklch(0.16 0.005 80);
   --border: oklch(0.25 0.04 80);
   --input: oklch(0.25 0.04 80);
-  --primary: oklch(0.78 0.18 82);
+  --primary: oklch(0.82 0.16 82);
   --primary-foreground: oklch(0.15 0.02 60);
-  --sidebar-primary: oklch(0.78 0.18 82);
+  --sidebar-primary: oklch(0.82 0.16 82);
   --sidebar-primary-foreground: oklch(0.15 0.02 60);
-  --sidebar-accent: oklch(0.30 0.06 80);
+  --sidebar-accent: oklch(0.22 0.04 80);
   --sidebar-accent-foreground: oklch(0.98 0.02 80);
   --secondary: oklch(0.22 0.04 80);
   --secondary-foreground: oklch(0.96 0.02 80);
@@ -169,15 +169,44 @@
   --muted-foreground: oklch(0.65 0.05 80);
   --accent: oklch(0.22 0.04 80);
   --accent-foreground: oklch(0.96 0.02 80);
-  --ring: oklch(0.78 0.18 82);
+  --ring: oklch(0.82 0.16 82);
   --sidebar-foreground: oklch(0.96 0.02 80);
-  --sidebar-border: oklch(0.32 0.05 80);
-  --sidebar-ring: oklch(0.78 0.18 82);
+  --sidebar-border: oklch(0.28 0.05 80);
+  --sidebar-ring: oklch(0.82 0.16 82);
   --foreground: oklch(0.96 0.02 80);
   --card-foreground: oklch(0.96 0.02 80);
   --popover-foreground: oklch(0.96 0.02 80);
-  --bg-pattern: radial-gradient(circle at 100% 100%, oklch(0.78 0.18 82 / 0.04) 0, oklch(0.78 0.18 82 / 0.04) 2px, transparent 2px), radial-gradient(circle at 0 0, oklch(0.78 0.18 82 / 0.04) 0, oklch(0.78 0.18 82 / 0.04) 2px, transparent 2px);
-  --bg-pattern-size: 32px 32px, 32px 32px;
+  --bg-pattern: radial-gradient(circle at 100% 100%, oklch(0.82 0.16 82 / 0.03) 0, oklch(0.82 0.16 82 / 0.03) 2px, transparent 2px);
+  --bg-pattern-size: 40px 40px;
+}
+
+@keyframes gold-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(0.75 0.15 80) 0%,
+    oklch(0.85 0.18 85) 25%,
+    oklch(0.95 0.2 90) 50%,
+    oklch(0.85 0.18 85) 75%,
+    oklch(0.75 0.15 80) 100%
+  );
+  background-size: 200% 100%;
+  animation: gold-shimmer 3s infinite linear;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gold-gradient-bg {
+  background: linear-gradient(135deg, oklch(0.82 0.16 82) 0%, oklch(0.7 0.14 80) 100%);
+}
+
+.gold-glow {
+  box-shadow: 0 0 15px oklch(0.82 0.16 82 / 0.2);
 }
 
 :root {
