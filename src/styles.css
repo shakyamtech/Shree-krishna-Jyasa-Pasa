@@ -151,18 +151,19 @@
 }
 
 .theme-gold {
-  --sidebar: oklch(0.12 0 0);
+  --sidebar: linear-gradient(135deg, #fbf2c0 0%, #d4af37 45%, #b8860b 100%);
+  --sidebar-foreground: oklch(0.12 0 0);
   --background: oklch(0.08 0 0);
   --card: oklch(0.16 0.005 80);
   --popover: oklch(0.16 0.005 80);
   --border: oklch(0.25 0.04 80);
   --input: oklch(0.25 0.04 80);
   --primary: oklch(0.82 0.16 82);
-  --primary-foreground: oklch(0.15 0.02 60);
-  --sidebar-primary: oklch(0.82 0.16 82);
-  --sidebar-primary-foreground: oklch(0.15 0.02 60);
-  --sidebar-accent: oklch(0.22 0.04 80);
-  --sidebar-accent-foreground: oklch(0.98 0.02 80);
+  --primary-foreground: oklch(0.12 0 0);
+  --sidebar-primary: oklch(0.12 0 0);
+  --sidebar-primary-foreground: oklch(0.82 0.16 82);
+  --sidebar-accent: oklch(0.12 0 0 / 0.1);
+  --sidebar-accent-foreground: oklch(0.12 0 0);
   --secondary: oklch(0.22 0.04 80);
   --secondary-foreground: oklch(0.96 0.02 80);
   --muted: oklch(0.18 0.02 80);
@@ -170,9 +171,8 @@
   --accent: oklch(0.22 0.04 80);
   --accent-foreground: oklch(0.96 0.02 80);
   --ring: oklch(0.82 0.16 82);
-  --sidebar-foreground: oklch(0.96 0.02 80);
-  --sidebar-border: oklch(0.28 0.05 80);
-  --sidebar-ring: oklch(0.82 0.16 82);
+  --sidebar-border: oklch(0.75 0.12 80);
+  --sidebar-ring: oklch(0.12 0 0);
   --foreground: oklch(0.96 0.02 80);
   --card-foreground: oklch(0.96 0.02 80);
   --popover-foreground: oklch(0.96 0.02 80);
@@ -188,11 +188,11 @@
 .gold-shimmer {
   background: linear-gradient(
     90deg,
-    oklch(0.75 0.15 80) 0%,
-    oklch(0.85 0.18 85) 25%,
-    oklch(0.95 0.2 90) 50%,
-    oklch(0.85 0.18 85) 75%,
-    oklch(0.75 0.15 80) 100%
+    #b8860b 0%,
+    #d4af37 25%,
+    #fbf2c0 50%,
+    #d4af37 75%,
+    #b8860b 100%
   );
   background-size: 200% 100%;
   animation: gold-shimmer 3s infinite linear;
@@ -202,7 +202,14 @@
 }
 
 .gold-gradient-bg {
-  background: linear-gradient(135deg, oklch(0.82 0.16 82) 0%, oklch(0.7 0.14 80) 100%);
+  background: linear-gradient(
+    135deg,
+    #fbf2c0 0%,
+    #f8e58a 20%,
+    #d4af37 45%,
+    #b8860b 80%,
+    #8b6d05 100%
+  );
 }
 
 .gold-glow {

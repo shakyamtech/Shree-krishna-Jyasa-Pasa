@@ -152,11 +152,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border flex flex-col transition-transform md:static md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-64 border-r border-sidebar-border flex flex-col transition-transform md:static md:translate-x-0 shadow-2xl",
+          theme === "gold" ? "gold-gradient-bg" : "bg-sidebar",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-sidebar-border bg-sidebar/50 backdrop-blur-sm">
+        <div className={cn(
+          "flex items-center gap-3 px-5 py-4 border-b border-sidebar-border backdrop-blur-sm",
+          theme === "gold" ? "bg-black/5" : "bg-sidebar/50"
+        )}>
           {logoUrl ? (
             <div className="relative shrink-0 rounded-full p-0.5 bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 shadow-md">
               <img src={logoUrl} alt={shopName} className="size-10 rounded-full object-cover" />
@@ -169,17 +173,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <div className="min-w-0 flex-1">
             <div
               className={cn(
-                "font-extrabold text-base bg-clip-text text-transparent truncate tracking-tight",
-                theme === "sapphire"
-                  ? "bg-gradient-to-r from-cyan-200 via-blue-100 to-white"
-                  : theme === "gold"
-                    ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
-                    : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950",
+                "font-extrabold text-base truncate tracking-tight",
+                theme === "gold"
+                  ? "text-black"
+                  : "bg-clip-text text-transparent bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950",
               )}
             >
               {displayShopName}
             </div>
-            <div className="text-xs font-medium text-sidebar-foreground/80 flex items-center gap-1.5 mt-0.5 whitespace-nowrap truncate">
+            <div className={cn(
+              "text-xs font-medium flex items-center gap-1.5 mt-0.5 whitespace-nowrap truncate",
+              theme === "gold" ? "text-black/80" : "text-sidebar-foreground/80"
+            )}>
               <span className="size-1.5 rounded-full bg-green-500 animate-pulse shrink-0"></span>
               <span className="capitalize shrink-0 font-semibold">
                 {lang === "ne"
@@ -189,12 +194,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   : role || "Staff"}
               </span>
               {(!role || role.toLowerCase() === "owner") && ownerName && (
-                <span className="text-amber-600 dark:text-amber-500 font-bold capitalize truncate">
+                <span className={cn(
+                  "font-bold capitalize truncate",
+                  theme === "gold" ? "text-black" : "text-amber-500"
+                )}>
                   • {ownerName}
                 </span>
               )}
               {role?.toLowerCase() === "staff" && (
-                <span className="text-amber-600 dark:text-amber-500 font-bold capitalize truncate">
+                <span className={cn(
+                  "font-bold capitalize truncate",
+                  theme === "gold" ? "text-black" : "text-amber-500"
+                )}>
                   • {derivedStaffName}
                 </span>
               )}
@@ -219,9 +230,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition",
                   active
                     ? theme === "gold"
-                      ? "gold-gradient-bg text-black shadow-lg shadow-amber-500/20 font-bold"
+                      ? "bg-zinc-950 text-amber-500 shadow-xl shadow-black/30 font-bold scale-[1.02]"
                       : "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    : theme === "gold"
+                      ? "text-black/90 hover:bg-black/10 hover:text-black"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 )}
               >
                 <n.icon className="size-4" />
@@ -265,22 +278,29 @@ export function AppLayout({ children }: { children: ReactNode }) {
           )}
 
           {/* Language selector card */}
-          <div className="flex items-center justify-between bg-sidebar-accent/50 px-2 py-1.5 rounded-md border border-sidebar-border/60">
-            <span className="text-xs font-medium text-sidebar-foreground/70 flex items-center gap-1.5">
+          <div className={cn(
+            "flex items-center justify-between px-2 py-1.5 rounded-md border",
+            theme === "gold" ? "bg-black/5 border-black/10" : "bg-sidebar-accent/50 border-sidebar-border/60"
+          )}>
+            <span className={cn(
+              "text-xs font-medium flex items-center gap-1.5",
+              theme === "gold" ? "text-black/70" : "text-sidebar-foreground/70"
+            )}>
               <span>🌐</span> {lang === "ne" ? "भाषा" : "Language"}
             </span>
-            <div className="flex bg-background/50 rounded-sm border border-sidebar-border/60 p-0.5 shadow-xs">
+            <div className={cn(
+              "flex rounded-sm border p-0.5 shadow-xs",
+              theme === "gold" ? "bg-black/10 border-black/10" : "bg-background/50 border-sidebar-border/60"
+            )}>
               <button
                 onClick={() => setLang("en")}
                 className={cn(
                   "px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors",
                   lang === "en"
-                    ? theme === "sapphire"
-                      ? "bg-cyan-600 text-white"
-                      : theme === "gold"
-                        ? "bg-amber-500 text-black"
-                        : "bg-amber-600 text-white"
-                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground",
+                    ? theme === "gold"
+                      ? "bg-black text-amber-500"
+                      : "bg-amber-600 text-white"
+                    : theme === "gold" ? "text-black/40 hover:text-black" : "text-sidebar-foreground/50 hover:text-sidebar-foreground",
                 )}
               >
                 ENG
@@ -290,12 +310,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 className={cn(
                   "px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors",
                   lang === "ne"
-                    ? theme === "sapphire"
-                      ? "bg-cyan-600 text-white"
-                      : theme === "gold"
-                        ? "bg-amber-500 text-black"
-                        : "bg-amber-600 text-white"
-                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground",
+                    ? theme === "gold"
+                      ? "bg-black text-amber-500"
+                      : "bg-amber-600 text-white"
+                    : theme === "gold" ? "text-black/40 hover:text-black" : "text-sidebar-foreground/50 hover:text-sidebar-foreground",
                 )}
               >
                 नेपाली
@@ -306,7 +324,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
           {/* Logout action */}
           <button
             onClick={() => signOut()}
-            className="flex items-center justify-center w-full gap-2 px-3 py-1.5 text-xs font-medium rounded-md bg-sidebar-accent/40 hover:bg-sidebar-accent hover:text-destructive text-sidebar-foreground transition-colors border border-sidebar-border/60 shadow-xs"
+            className={cn(
+              "flex items-center justify-center w-full gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors border shadow-xs",
+              theme === "gold"
+                ? "bg-black text-amber-500 border-black/20 hover:bg-zinc-900"
+                : "bg-sidebar-accent/40 hover:bg-sidebar-accent hover:text-destructive text-sidebar-foreground border-sidebar-border/60"
+            )}
           >
             <LogOut className="size-3.5" /> {t.logout}
           </button>
