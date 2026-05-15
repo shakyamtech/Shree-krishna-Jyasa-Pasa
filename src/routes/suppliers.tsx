@@ -4,5 +4,11 @@ import { AppLayout } from "@/components/AppLayout";
 import { PartiesPage } from "./customers";
 
 export const Route = createFileRoute("/suppliers")({
-  component: () => <AuthGuard><AppLayout><PartiesPage table="suppliers" title="Suppliers" /></AppLayout></AuthGuard>,
+  component: () => (
+    <AuthGuard>
+      <AppLayout>
+        <PartiesPage table="suppliers" title="Suppliers" />
+      </AppLayout>
+    </AuthGuard>
+  ),
 });

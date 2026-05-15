@@ -11,7 +11,13 @@ import { formatNPR } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/dashboard")({
-  component: () => <AuthGuard><AppLayout><Dashboard /></AppLayout></AuthGuard>,
+  component: () => (
+    <AuthGuard>
+      <AppLayout>
+        <Dashboard />
+      </AppLayout>
+    </AuthGuard>
+  ),
 });
 
 interface Price {
@@ -36,7 +42,10 @@ function Dashboard() {
     const seen = new Set<string>();
     const latest: Price[] = [];
     for (const p of data ?? []) {
-      if (!seen.has(p.metal)) { seen.add(p.metal); latest.push(p as Price); }
+      if (!seen.has(p.metal)) {
+        seen.add(p.metal);
+        latest.push(p as Price);
+      }
     }
     setPrices(latest);
   }
@@ -49,7 +58,9 @@ function Dashboard() {
       await loadPrices();
     } catch (e) {
       toast.error("Failed to fetch prices: " + (e as Error).message);
-    } finally { setRefreshing(false); }
+    } finally {
+      setRefreshing(false);
+    }
   }
   async function loadStats() {
     const today = new Date().toISOString().slice(0, 10);
@@ -66,11 +77,17 @@ function Dashboard() {
     });
   }
   useEffect(() => {
-    loadPrices(); loadStats();
+    loadPrices();
+    loadStats();
     // Auto-refresh once on mount if prices stale (>1h)
-    supabase.from("metal_prices").select("fetched_at").order("fetched_at", { ascending: false }).limit(1).maybeSingle()
+    supabase
+      .from("metal_prices")
+      .select("fetched_at")
+      .order("fetched_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
       .then(({ data }) => {
-        const stale = !data || (Date.now() - new Date(data.fetched_at).getTime()) > 3600_000;
+        const stale = !data || Date.now() - new Date(data.fetched_at).getTime() > 3600_000;
         if (stale) refreshPrices();
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,20 +125,34 @@ function Dashboard() {
                         {isGold ? "/ 10 gram (24K Fine)" : "/ tola (24K Fine)"}
                       </span>
                     </div>
-                    <div className="text-sm text-muted-foreground">{formatNPR(p.price_per_gram)} / gram</div>
+                    <div className="text-sm text-muted-foreground">
+                      {formatNPR(p.price_per_gram)} / gram
+                    </div>
                     <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                       <div className="rounded border p-2 bg-amber-50/20 dark:bg-amber-950/10">
-                        <div className="text-muted-foreground">22K {isGold ? "/ 10g" : "/ tola"}</div>
-                        <div className="font-semibold text-foreground">{formatNPR(p.price_per_tola * 0.9167)}</div>
+                        <div className="text-muted-foreground">
+                          22K {isGold ? "/ 10g" : "/ tola"}
+                        </div>
+                        <div className="font-semibold text-foreground">
+                          {formatNPR(p.price_per_tola * 0.9167)}
+                        </div>
                       </div>
                       <div className="rounded border p-2 bg-amber-50/20 dark:bg-amber-950/10">
-                        <div className="text-muted-foreground">18K {isGold ? "/ 10g" : "/ tola"}</div>
-                        <div className="font-semibold text-foreground">{formatNPR(p.price_per_tola * 0.75)}</div>
+                        <div className="text-muted-foreground">
+                          18K {isGold ? "/ 10g" : "/ tola"}
+                        </div>
+                        <div className="font-semibold text-foreground">
+                          {formatNPR(p.price_per_tola * 0.75)}
+                        </div>
                       </div>
                     </div>
-                    <div className="text-xs text-muted-foreground pt-1">Updated {new Date(p.fetched_at).toLocaleString()}</div>
+                    <div className="text-xs text-muted-foreground pt-1">
+                      Updated {new Date(p.fetched_at).toLocaleString()}
+                    </div>
                   </div>
-                ) : <div className="text-sm text-muted-foreground">No price yet — click Refresh</div>}
+                ) : (
+                  <div className="text-sm text-muted-foreground">No price yet — click Refresh</div>
+                )}
               </CardContent>
             </Card>
           );
@@ -131,9 +162,11 @@ function Dashboard() {
       {/* Silver Price Section */}
       {(() => {
         const sp = prices.find((x) => x.metal === "silver" && x.price_per_tola < 10000);
-        const perTola = sp ? sp.price_per_tola : 5745.00;
-        const perGram = sp ? sp.price_per_gram : 492.50;
-        const lastUpdated = sp ? new Date(sp.fetched_at).toLocaleString() : new Date().toLocaleDateString();
+        const perTola = sp ? sp.price_per_tola : 5745.0;
+        const perGram = sp ? sp.price_per_gram : 492.5;
+        const lastUpdated = sp
+          ? new Date(sp.fetched_at).toLocaleString()
+          : new Date().toLocaleDateString();
 
         return (
           <Card className="border-slate-400/30 dark:border-slate-500/20 shadow-sm">
@@ -148,21 +181,19 @@ function Dashboard() {
                 <div>
                   <div className="text-2xl font-bold text-foreground">
                     {formatNPR(perTola)}{" "}
-                    <span className="text-sm font-normal text-muted-foreground">
-                      / tola
-                    </span>
+                    <span className="text-sm font-normal text-muted-foreground">/ tola</span>
                   </div>
                   <div className="text-sm text-muted-foreground mt-0.5">
                     {formatNPR(perGram)} / gram
                   </div>
-                  <div className="text-xs text-muted-foreground pt-2">
-                    Updated {lastUpdated}
-                  </div>
+                  <div className="text-xs text-muted-foreground pt-2">Updated {lastUpdated}</div>
                 </div>
                 <div className="flex flex-wrap gap-3 border-t md:border-t-0 md:border-l pt-3 md:pt-0 md:pl-4 text-xs">
                   <div className="flex-1 min-w-[100px] rounded border p-2 bg-slate-50/5 dark:bg-slate-950/10">
                     <div className="text-muted-foreground">Per 10 Grams</div>
-                    <div className="font-semibold text-foreground text-sm mt-0.5">{formatNPR(perGram * 10)}</div>
+                    <div className="font-semibold text-foreground text-sm mt-0.5">
+                      {formatNPR(perGram * 10)}
+                    </div>
                   </div>
                   <div className="flex-1 min-w-[100px] rounded border p-2 bg-slate-50/5 dark:bg-slate-950/10">
                     <div className="text-muted-foreground">Purity Standard</div>
@@ -184,22 +215,40 @@ function Dashboard() {
       </div>
 
       <Card>
-        <CardHeader><CardTitle>Quick actions</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle>Quick actions</CardTitle>
+        </CardHeader>
         <CardContent className="grid gap-2 md:grid-cols-3">
-          <a href="/sales" className="rounded-md border p-4 hover:bg-accent transition">New sale & bill</a>
-          <a href="/products" className="rounded-md border p-4 hover:bg-accent transition">Add product / stock</a>
-          <a href="/cashbook" className="rounded-md border p-4 hover:bg-accent transition">Record cash entry</a>
+          <a href="/sales" className="rounded-md border p-4 hover:bg-accent transition">
+            New sale & bill
+          </a>
+          <a href="/products" className="rounded-md border p-4 hover:bg-accent transition">
+            Add product / stock
+          </a>
+          <a href="/cashbook" className="rounded-md border p-4 hover:bg-accent transition">
+            Record cash entry
+          </a>
         </CardContent>
       </Card>
     </div>
   );
 }
 
-function StatCard({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+}) {
   return (
     <Card>
       <CardContent className="p-4 flex items-center gap-3">
-        <div className="rounded-md bg-primary/10 p-2"><Icon className="size-5 text-primary" /></div>
+        <div className="rounded-md bg-primary/10 p-2">
+          <Icon className="size-5 text-primary" />
+        </div>
         <div>
           <div className="text-xs text-muted-foreground">{label}</div>
           <div className="text-lg font-semibold">{value}</div>

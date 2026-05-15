@@ -13,25 +13,31 @@ export function toBS(adDateStr: string): string {
   try {
     const date = new Date(adDateStr);
     if (isNaN(date.getTime())) return adDateStr;
-    
+
     // Reference: 2080-01-01 BS is 2023-04-14 AD
     const refDate = new Date("2023-04-14");
     let diff = Math.floor((date.getTime() - refDate.getTime()) / (24 * 60 * 60 * 1000));
-    
+
     let year = 2080;
     let month = 0; // Baishakh
-    
+
     while (diff > 0) {
       const daysInMonth = bsData[year]?.[month] || 30;
       if (diff < daysInMonth) break;
       diff -= daysInMonth;
       month++;
-      if (month > 11) { month = 0; year++; }
+      if (month > 11) {
+        month = 0;
+        year++;
+      }
     }
-    
+
     while (diff < 0) {
       month--;
-      if (month < 0) { month = 11; year--; }
+      if (month < 0) {
+        month = 11;
+        year--;
+      }
       const daysInMonth = bsData[year]?.[month] || 30;
       diff += daysInMonth;
     }
@@ -69,7 +75,19 @@ export function todayISO(): string {
 
 export function toNepaliNums(num: string | number): string {
   const map: Record<string, string> = {
-    "0": "०", "1": "१", "2": "२", "3": "३", "4": "४", "5": "५", "6": "६", "7": "७", "8": "८", "9": "९"
+    "0": "०",
+    "1": "१",
+    "2": "२",
+    "3": "३",
+    "4": "४",
+    "5": "५",
+    "6": "६",
+    "7": "७",
+    "8": "८",
+    "9": "९",
   };
-  return String(num).split("").map(c => map[c] || c).join("");
+  return String(num)
+    .split("")
+    .map((c) => map[c] || c)
+    .join("");
 }

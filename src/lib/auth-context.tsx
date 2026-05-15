@@ -57,14 +57,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider
       value={{
-        user, session, role, loading,
+        user,
+        session,
+        role,
+        loading,
         signIn: async (email, password) => {
           const { error } = await supabase.auth.signInWithPassword({ email, password });
           return { error: error?.message ?? null };
         },
         signUp: async (email, password, fullName) => {
           const { error } = await supabase.auth.signUp({
-            email, password,
+            email,
+            password,
             options: {
               emailRedirectTo: `${window.location.origin}/`,
               data: fullName ? { full_name: fullName } : undefined,
@@ -72,7 +76,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
           return { error: error?.message ?? null };
         },
-        signOut: async () => { await supabase.auth.signOut(); },
+        signOut: async () => {
+          await supabase.auth.signOut();
+        },
       }}
     >
       {children}

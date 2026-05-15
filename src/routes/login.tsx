@@ -23,15 +23,22 @@ function Login() {
   const [logoUrl, setLogoUrl] = useState<string | null>("/logo.jpg");
 
   useEffect(() => {
-    supabase.from("shop_settings").select("shop_name, logo_url").limit(1).maybeSingle().then(({ data }) => {
-      if (data) {
-        if (data.shop_name) setShopName(data.shop_name);
-        if (data.logo_url) setLogoUrl(data.logo_url);
-      }
-    });
+    supabase
+      .from("shop_settings")
+      .select("shop_name, logo_url")
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          if (data.shop_name) setShopName(data.shop_name);
+          if (data.logo_url) setLogoUrl(data.logo_url);
+        }
+      });
   }, []);
 
-  useEffect(() => { if (user) navigate({ to: "/dashboard", replace: true }); }, [user, navigate]);
+  useEffect(() => {
+    if (user) navigate({ to: "/dashboard", replace: true });
+  }, [user, navigate]);
 
   // Default to Sign In mode since owner accounts are already configured
 
@@ -44,7 +51,9 @@ function Login() {
         if (error) return toast.error(error);
         const { error: e2 } = await signIn(email, password);
         if (e2) {
-          toast.success("Account registered. Please check email confirmation if enabled, then sign in.");
+          toast.success(
+            "Account registered. Please check email confirmation if enabled, then sign in.",
+          );
           setIsSignUp(false);
         } else {
           toast.success("Account successfully created and signed in!");
@@ -54,7 +63,9 @@ function Login() {
         if (error) return toast.error(error);
         toast.success("Signed in");
       }
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -81,7 +92,14 @@ function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="owner@shop.com" />
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="owner@shop.com"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -106,7 +124,11 @@ function Login() {
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-white cursor-pointer" disabled={busy}>
+            <Button
+              type="submit"
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+              disabled={busy}
+            >
               {busy ? "Please wait…" : isSignUp ? "Create account & sign in" : "Sign in"}
             </Button>
 
@@ -116,7 +138,9 @@ function Login() {
                 onClick={() => setIsSignUp(!isSignUp)}
                 className="text-xs text-muted-foreground hover:text-amber-600 dark:hover:text-amber-400 underline transition-colors cursor-pointer"
               >
-                {isSignUp ? "Already registered? Sign in instead" : "Need to register a new staff/user account? Click here"}
+                {isSignUp
+                  ? "Already registered? Sign in instead"
+                  : "Need to register a new staff/user account? Click here"}
               </button>
             </div>
           </form>

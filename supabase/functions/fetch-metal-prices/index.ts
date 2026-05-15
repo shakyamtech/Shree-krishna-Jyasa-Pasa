@@ -11,11 +11,12 @@ const TOLA = 11.6638;
 const OZ_TO_G = 31.1034768;
 
 const browserHeaders = {
-  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-  "Accept": "application/json, text/plain, */*",
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  Accept: "application/json, text/plain, */*",
   "Accept-Language": "en-US,en;q=0.9",
-  "Referer": "https://goldprice.org/",
-  "Origin": "https://goldprice.org",
+  Referer: "https://goldprice.org/",
+  Origin: "https://goldprice.org",
 };
 
 function jsonResponse(body: unknown, status = 200) {
@@ -34,11 +35,15 @@ async function fetchJson(url: string, init?: RequestInit) {
 async function getUsdToNpr() {
   const providers = [
     async () => {
-      const fx = await fetchJson("https://open.er-api.com/v6/latest/USD", { headers: { "Accept": "application/json" } });
+      const fx = await fetchJson("https://open.er-api.com/v6/latest/USD", {
+        headers: { Accept: "application/json" },
+      });
       return Number(fx.rates?.NPR);
     },
     async () => {
-      const fx = await fetchJson("https://latest.currency-api.pages.dev/v1/currencies/usd.json", { headers: { "Accept": "application/json" } });
+      const fx = await fetchJson("https://latest.currency-api.pages.dev/v1/currencies/usd.json", {
+        headers: { Accept: "application/json" },
+      });
       return Number(fx.usd?.npr);
     },
   ];
@@ -64,7 +69,7 @@ Deno.serve(async (req) => {
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-      { global: { headers: { Authorization: auth } } }
+      { global: { headers: { Authorization: auth } } },
     );
 
     let goldPerTola_NPR: number;
@@ -74,12 +79,14 @@ Deno.serve(async (req) => {
     // Primary: scrape FENEGOSIDA (official Nepal gold/silver rate, Fine Gold 9999 = 24K)
     try {
       const r = await fetch("https://www.fenegosida.org/", {
-        headers: { "User-Agent": browserHeaders["User-Agent"], "Accept": "text/html" },
+        headers: { "User-Agent": browserHeaders["User-Agent"], Accept: "text/html" },
       });
       if (!r.ok) throw new Error(`fenegosida ${r.status}`);
       const html = await r.text();
       const goldMatch = html.match(/FINE GOLD[^<]*<[^>]*>[\s\S]*?<b>\s*(\d[\d,]*)\s*<\/b>/i);
-      const silverMatch = html.match(/SILVER[^<]*<[^>]*>[\s\S]*?per 1 tola[\s\S]*?<b>\s*(\d[\d,]*)\s*<\/b>/i);
+      const silverMatch = html.match(
+        /SILVER[^<]*<[^>]*>[\s\S]*?per 1 tola[\s\S]*?<b>\s*(\d[\d,]*)\s*<\/b>/i,
+      );
       const gold = goldMatch ? Number(goldMatch[1].replace(/,/g, "")) : NaN;
       const silver = silverMatch ? Number(silverMatch[1].replace(/,/g, "")) : NaN;
       if (!Number.isFinite(gold) || gold <= 0) throw new Error("no gold rate");
@@ -91,8 +98,12 @@ Deno.serve(async (req) => {
       // Fallback: international spot (gold-api.com) + USD->NPR FX. Spot rate ≈ 24K pure.
       source = "gold-api.com+open-er-api";
       const [gold, silver, usdToNpr] = await Promise.all([
-        fetchJson("https://api.gold-api.com/price/XAU", { headers: { "Accept": "application/json" } }),
-        fetchJson("https://api.gold-api.com/price/XAG", { headers: { "Accept": "application/json" } }),
+        fetchJson("https://api.gold-api.com/price/XAU", {
+          headers: { Accept: "application/json" },
+        }),
+        fetchJson("https://api.gold-api.com/price/XAG", {
+          headers: { Accept: "application/json" },
+        }),
         getUsdToNpr(),
       ]);
       goldPerTola_NPR = (Number(gold.price) / OZ_TO_G) * usdToNpr * TOLA;

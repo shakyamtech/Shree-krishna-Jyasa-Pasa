@@ -9,19 +9,39 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Users, Check } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/settings")({
-  component: () => <AuthGuard><AppLayout><SettingsPage /></AppLayout></AuthGuard>,
+  component: () => (
+    <AuthGuard>
+      <AppLayout>
+        <SettingsPage />
+      </AppLayout>
+    </AuthGuard>
+  ),
 });
 
 interface Shop {
-  id: string; shop_name: string; address: string | null; phone: string | null;
-  email: string | null; pan_vat: string | null; vat_rate: number; currency: string;
-  invoice_prefix: string; bill_footer: string | null; logo_url: string | null;
+  id: string;
+  shop_name: string;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  pan_vat: string | null;
+  vat_rate: number;
+  currency: string;
+  invoice_prefix: string;
+  bill_footer: string | null;
+  logo_url: string | null;
 }
 
 interface StaffItem {
@@ -38,7 +58,9 @@ function SettingsPage() {
   const [s, setS] = useState<Shop | null>(null);
   const [busy, setBusy] = useState(false);
   const [savedTheme, setSavedTheme] = useState("default");
-  const [ownerName, setOwnerName] = useState(() => localStorage.getItem("custom_owner_name") || "Mahesh");
+  const [ownerName, setOwnerName] = useState(
+    () => localStorage.getItem("custom_owner_name") || "Mahesh",
+  );
   const [staffName, setStaffName] = useState(() => localStorage.getItem("custom_staff_name") || "");
   const [staffList, setStaffList] = useState<StaffItem[]>([]);
   const [loadingStaff, setLoadingStaff] = useState(false);
@@ -54,17 +76,24 @@ function SettingsPage() {
       const { data: products } = await supabase.from("products").select("id, stock_qty");
       if (items && products) {
         const restoreMap: Record<string, number> = {};
-        for(const it of items) {
-          if(it.product_id) restoreMap[it.product_id] = (restoreMap[it.product_id] || 0) + it.qty;
+        for (const it of items) {
+          if (it.product_id) restoreMap[it.product_id] = (restoreMap[it.product_id] || 0) + it.qty;
         }
         for (const pid of Object.keys(restoreMap)) {
           const prod = products.find((p) => p.id === pid);
           if (prod) {
-            await supabase.from("products").update({ stock_qty: prod.stock_qty + restoreMap[pid] }).eq("id", pid);
+            await supabase
+              .from("products")
+              .update({ stock_qty: prod.stock_qty + restoreMap[pid] })
+              .eq("id", pid);
           }
         }
       }
-      await supabase.from("stock_movements").delete().eq("ref_table", "sales").not("id", "is", null);
+      await supabase
+        .from("stock_movements")
+        .delete()
+        .eq("ref_table", "sales")
+        .not("id", "is", null);
       await supabase.from("cashbook").delete().eq("ref_table", "sales").not("id", "is", null);
       await supabase.from("credits").delete().eq("ref_table", "sales").not("id", "is", null);
       await supabase.from("sale_items").delete().not("id", "is", null);
@@ -72,8 +101,8 @@ function SettingsPage() {
 
       if (error) throw error;
       toast.success("All sales records have been wiped.");
-    } catch(e: any) {
-      toast.error(e.message);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "An unexpected error occurred");
     } finally {
       setWiping(false);
     }
@@ -83,33 +112,45 @@ function SettingsPage() {
     setSavedTheme(localStorage.getItem("app_theme") || "default");
     const stored = localStorage.getItem("custom_owner_name");
     if (stored) setOwnerName(stored);
-    supabase.from("shop_settings").select("*").limit(1).maybeSingle().then(({ data }) => {
-      if (data) {
-        const d = data as Shop & { owner_name?: string };
-        setS(d);
-        if (d.owner_name) setOwnerName(d.owner_name);
-      }
-    });
+    supabase
+      .from("shop_settings")
+      .select("*")
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          const d = data as Shop & { owner_name?: string };
+          setS(d);
+          if (d.owner_name) setOwnerName(d.owner_name);
+        }
+      });
 
     if (role && role !== "staff") {
       setLoadingStaff(true);
-      supabase.from("user_roles").select("*").eq("role", "staff").then(async ({ data: roles }) => {
-        if (roles && roles.length > 0) {
-          const userIds = roles.map(r => r.user_id);
-          const { data: profs } = await supabase.from("profiles").select("*").in("user_id", userIds);
-          const merged: StaffItem[] = roles.map(r => {
-            const p = profs?.find(x => x.user_id === r.user_id);
-            return {
-              user_id: r.user_id,
-              role_id: r.id,
-              full_name: p?.full_name || "",
-              created_at: r.created_at
-            };
-          });
-          setStaffList(merged);
-        }
-        setLoadingStaff(false);
-      });
+      supabase
+        .from("user_roles")
+        .select("*")
+        .eq("role", "staff")
+        .then(async ({ data: roles }) => {
+          if (roles && roles.length > 0) {
+            const userIds = roles.map((r) => r.user_id);
+            const { data: profs } = await supabase
+              .from("profiles")
+              .select("*")
+              .in("user_id", userIds);
+            const merged: StaffItem[] = roles.map((r) => {
+              const p = profs?.find((x) => x.user_id === r.user_id);
+              return {
+                user_id: r.user_id,
+                role_id: r.id,
+                full_name: p?.full_name || "",
+                created_at: r.created_at,
+              };
+            });
+            setStaffList(merged);
+          }
+          setLoadingStaff(false);
+        });
     }
   }, [role]);
 
@@ -120,11 +161,18 @@ function SettingsPage() {
     window.dispatchEvent(new Event("storage"));
 
     const payload: Partial<Shop> = {
-      shop_name: s.shop_name, address: s.address, phone: s.phone, email: s.email,
-      pan_vat: s.pan_vat, vat_rate: s.vat_rate, currency: s.currency,
-      invoice_prefix: s.invoice_prefix, bill_footer: s.bill_footer, logo_url: s.logo_url,
+      shop_name: s.shop_name,
+      address: s.address,
+      phone: s.phone,
+      email: s.email,
+      pan_vat: s.pan_vat,
+      vat_rate: s.vat_rate,
+      currency: s.currency,
+      invoice_prefix: s.invoice_prefix,
+      bill_footer: s.bill_footer,
+      logo_url: s.logo_url,
     };
-    
+
     const { error } = await supabase.from("shop_settings").update(payload).eq("id", s.id);
     setBusy(false);
 
@@ -142,25 +190,36 @@ function SettingsPage() {
 
   function handleUpdateStaffName(userId: string, newName: string) {
     const trimmed = newName.trim();
-    setStaffList(prev => prev.map(item => item.user_id === userId ? { ...item, full_name: trimmed } : item));
-    
+    setStaffList((prev) =>
+      prev.map((item) => (item.user_id === userId ? { ...item, full_name: trimmed } : item)),
+    );
+
     // Guaranteed local administrative visibility & session storage override broadcast
     localStorage.setItem("custom_staff_name", trimmed);
     localStorage.setItem(`staff_name_${userId}`, trimmed);
     window.dispatchEvent(new Event("storage"));
 
     // Completely non-blocking background metadata sync
-    supabase.from("profiles").update({
-      full_name: trimmed,
-      updated_at: new Date().toISOString(),
-    }).eq("user_id", userId).then(() => {});
+    supabase
+      .from("profiles")
+      .update({
+        full_name: trimmed,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", userId)
+      .then(() => {});
 
     toast.success("Staff profile display name assigned successfully");
   }
 
   async function handleDeleteStaff(roleId: string) {
-    if (!confirm("Are you sure you want to permanently revoke staff dashboard access and remove this user mapping?")) return;
-    setStaffList(prev => prev.filter(item => item.role_id !== roleId));
+    if (
+      !confirm(
+        "Are you sure you want to permanently revoke staff dashboard access and remove this user mapping?",
+      )
+    )
+      return;
+    setStaffList((prev) => prev.filter((item) => item.role_id !== roleId));
     const { error } = await supabase.from("user_roles").delete().eq("id", roleId);
     if (error) {
       toast.error(error.message);
@@ -203,9 +262,21 @@ function SettingsPage() {
             <CardContent className="grid gap-3 md:grid-cols-2">
               <div className="md:col-span-2">
                 <Label>Owner name</Label>
-                <Input value={ownerName} disabled={isStaff} onChange={(e) => setOwnerName(e.target.value)} placeholder="e.g. Mahesh" />
+                <Input
+                  value={ownerName}
+                  disabled={isStaff}
+                  onChange={(e) => setOwnerName(e.target.value)}
+                  placeholder="e.g. Mahesh"
+                />
               </div>
-              <div className="md:col-span-2"><Label>Shop name</Label><Input value={s.shop_name} disabled={isStaff} onChange={(e) => setS({ ...s, shop_name: e.target.value })} /></div>
+              <div className="md:col-span-2">
+                <Label>Shop name</Label>
+                <Input
+                  value={s.shop_name}
+                  disabled={isStaff}
+                  onChange={(e) => setS({ ...s, shop_name: e.target.value })}
+                />
+              </div>
               <div className="md:col-span-2 space-y-1">
                 <Label>Logo image (Upload local file or paste URL)</Label>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -235,18 +306,81 @@ function SettingsPage() {
                 {s.logo_url && (
                   <div className="mt-2 flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">Preview:</span>
-                    <img src={s.logo_url} alt="Logo preview" className="h-10 w-auto object-contain rounded border p-1 bg-background" />
+                    <img
+                      src={s.logo_url}
+                      alt="Logo preview"
+                      className="h-10 w-auto object-contain rounded border p-1 bg-background"
+                    />
                   </div>
                 )}
               </div>
-              <div className="md:col-span-2"><Label>Address</Label><Textarea value={s.address ?? ""} disabled={isStaff} onChange={(e) => setS({ ...s, address: e.target.value })} /></div>
-              <div><Label>Phone</Label><Input value={s.phone ?? ""} disabled={isStaff} onChange={(e) => setS({ ...s, phone: e.target.value })} /></div>
-              <div><Label>Email</Label><Input value={s.email ?? ""} disabled={isStaff} onChange={(e) => setS({ ...s, email: e.target.value })} /></div>
-              <div><Label>PAN / VAT no.</Label><Input value={s.pan_vat ?? ""} disabled={isStaff} onChange={(e) => setS({ ...s, pan_vat: e.target.value })} /></div>
-              <div><Label>VAT rate (%)</Label><Input type="number" step="0.01" value={s.vat_rate} disabled={isStaff} onChange={(e) => setS({ ...s, vat_rate: Number(e.target.value) })} /></div>
-              <div><Label>Currency</Label><Input value={s.currency} disabled={isStaff} onChange={(e) => setS({ ...s, currency: e.target.value })} /></div>
-              <div><Label>Invoice prefix</Label><Input value={s.invoice_prefix} disabled={isStaff} onChange={(e) => setS({ ...s, invoice_prefix: e.target.value })} /></div>
-              <div className="md:col-span-2"><Label>Bill footer text</Label><Textarea value={s.bill_footer ?? ""} disabled={isStaff} onChange={(e) => setS({ ...s, bill_footer: e.target.value })} placeholder="Thank you for shopping with us!" /></div>
+              <div className="md:col-span-2">
+                <Label>Address</Label>
+                <Textarea
+                  value={s.address ?? ""}
+                  disabled={isStaff}
+                  onChange={(e) => setS({ ...s, address: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Phone</Label>
+                <Input
+                  value={s.phone ?? ""}
+                  disabled={isStaff}
+                  onChange={(e) => setS({ ...s, phone: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Email</Label>
+                <Input
+                  value={s.email ?? ""}
+                  disabled={isStaff}
+                  onChange={(e) => setS({ ...s, email: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>PAN / VAT no.</Label>
+                <Input
+                  value={s.pan_vat ?? ""}
+                  disabled={isStaff}
+                  onChange={(e) => setS({ ...s, pan_vat: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>VAT rate (%)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={s.vat_rate}
+                  disabled={isStaff}
+                  onChange={(e) => setS({ ...s, vat_rate: Number(e.target.value) })}
+                />
+              </div>
+              <div>
+                <Label>Currency</Label>
+                <Input
+                  value={s.currency}
+                  disabled={isStaff}
+                  onChange={(e) => setS({ ...s, currency: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Invoice prefix</Label>
+                <Input
+                  value={s.invoice_prefix}
+                  disabled={isStaff}
+                  onChange={(e) => setS({ ...s, invoice_prefix: e.target.value })}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label>Bill footer text</Label>
+                <Textarea
+                  value={s.bill_footer ?? ""}
+                  disabled={isStaff}
+                  onChange={(e) => setS({ ...s, bill_footer: e.target.value })}
+                  placeholder="Thank you for shopping with us!"
+                />
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -256,37 +390,44 @@ function SettingsPage() {
           {isStaff && (
             <Card className="border-amber-500/20 bg-amber-500/5">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold text-amber-800 dark:text-amber-400">Personal Display Credentials</CardTitle>
+                <CardTitle className="text-sm font-bold text-amber-800 dark:text-amber-400">
+                  Personal Display Credentials
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   <Label className="text-xs">Your Staff Name</Label>
                   <div className="flex items-center gap-2">
-                    <Input 
-                      className="h-8 text-xs bg-background flex-1" 
-                      placeholder="e.g. Mahesh Shakya" 
-                      value={staffName} 
+                    <Input
+                      className="h-8 text-xs bg-background flex-1"
+                      placeholder="e.g. Mahesh Shakya"
+                      value={staffName}
                       onChange={(e) => {
                         setStaffName(e.target.value);
                         localStorage.setItem("custom_staff_name", e.target.value);
                         window.dispatchEvent(new Event("storage"));
-                      }} 
+                      }}
                     />
-                    <Button 
-                      type="button" 
-                      size="sm" 
+                    <Button
+                      type="button"
+                      size="sm"
                       className="h-8 px-3 text-xs bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
                       onClick={async () => {
                         const trimmed = staffName.trim();
                         localStorage.setItem("custom_staff_name", trimmed);
                         window.dispatchEvent(new Event("storage"));
-                        
-                        const { data: { session } } = await supabase.auth.getSession();
+
+                        const {
+                          data: { session },
+                        } = await supabase.auth.getSession();
                         if (session?.user?.id) {
-                          await supabase.from("profiles").update({
-                            full_name: trimmed,
-                            updated_at: new Date().toISOString(),
-                          }).eq("user_id", session.user.id);
+                          await supabase
+                            .from("profiles")
+                            .update({
+                              full_name: trimmed,
+                              updated_at: new Date().toISOString(),
+                            })
+                            .eq("user_id", session.user.id);
                         }
                         toast.success("Staff profile display name saved permanently!");
                       }}
@@ -294,7 +435,9 @@ function SettingsPage() {
                       Save Name
                     </Button>
                   </div>
-                  <p className="text-[10px] text-muted-foreground">Instantly updates your top header identity indicator</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    Instantly updates your top header identity indicator
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -303,7 +446,9 @@ function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Appearance & Theme</CardTitle>
-              <p className="text-xs text-muted-foreground">Select your premium brand interface profile</p>
+              <p className="text-xs text-muted-foreground">
+                Select your premium brand interface profile
+              </p>
             </CardHeader>
             <CardContent className="space-y-3">
               <button
@@ -311,7 +456,9 @@ function SettingsPage() {
                 onClick={() => handleThemeChange("default")}
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-lg border text-left transition-all relative overflow-hidden w-full cursor-pointer",
-                  savedTheme === "default" ? "border-amber-500 ring-2 ring-amber-500/20 bg-amber-500/5" : "hover:bg-accent"
+                  savedTheme === "default"
+                    ? "border-amber-500 ring-2 ring-amber-500/20 bg-amber-500/5"
+                    : "hover:bg-accent",
                 )}
               >
                 <div className="size-10 rounded-md bg-[#fbf8f3] border flex items-center justify-center shrink-0">
@@ -319,7 +466,9 @@ function SettingsPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-bold truncate">Amber Base</div>
-                  <div className="text-[10px] text-muted-foreground truncate">Warm classic workflow</div>
+                  <div className="text-[10px] text-muted-foreground truncate">
+                    Warm classic workflow
+                  </div>
                 </div>
               </button>
 
@@ -328,7 +477,9 @@ function SettingsPage() {
                 onClick={() => handleThemeChange("gold")}
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-lg border text-left transition-all relative overflow-hidden w-full cursor-pointer",
-                  savedTheme === "gold" ? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-400/5" : "hover:bg-accent"
+                  savedTheme === "gold"
+                    ? "border-amber-400 ring-2 ring-amber-400/20 bg-amber-400/5"
+                    : "hover:bg-accent",
                 )}
               >
                 <div className="size-10 rounded-md bg-[#120000] border border-white/10 flex items-center justify-center shrink-0">
@@ -336,7 +487,9 @@ function SettingsPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-bold truncate">Gold Shimmer</div>
-                  <div className="text-[10px] text-muted-foreground truncate">Obsidian premium luxury</div>
+                  <div className="text-[10px] text-muted-foreground truncate">
+                    Obsidian premium luxury
+                  </div>
                 </div>
               </button>
 
@@ -345,7 +498,9 @@ function SettingsPage() {
                 onClick={() => handleThemeChange("sapphire")}
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-lg border text-left transition-all relative overflow-hidden w-full cursor-pointer",
-                  savedTheme === "sapphire" ? "border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/5" : "hover:bg-accent"
+                  savedTheme === "sapphire"
+                    ? "border-blue-500 ring-2 ring-blue-500/20 bg-blue-500/5"
+                    : "hover:bg-accent",
                 )}
               >
                 <div className="size-10 rounded-md bg-[#f2f6fc] border flex items-center justify-center shrink-0">
@@ -353,7 +508,9 @@ function SettingsPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-bold truncate">Aesthetic Blue</div>
-                  <div className="text-[10px] text-muted-foreground truncate">Crisp light & deep indigo</div>
+                  <div className="text-[10px] text-muted-foreground truncate">
+                    Crisp light & deep indigo
+                  </div>
                 </div>
               </button>
             </CardContent>
@@ -370,9 +527,17 @@ function SettingsPage() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-foreground">Wipe All Sales Records</p>
-                  <p className="text-xs text-muted-foreground mt-1 max-w-xl">Permanently delete all generated invoices, reverse stock quantities, and remove associated ledger entries. This is used to clear test data before going live.</p>
+                  <p className="text-xs text-muted-foreground mt-1 max-w-xl">
+                    Permanently delete all generated invoices, reverse stock quantities, and remove
+                    associated ledger entries. This is used to clear test data before going live.
+                  </p>
                 </div>
-                <Button variant="destructive" onClick={wipeAllSales} disabled={wiping} className="shrink-0">
+                <Button
+                  variant="destructive"
+                  onClick={wipeAllSales}
+                  disabled={wiping}
+                  className="shrink-0"
+                >
                   {wiping ? "Wiping..." : "Delete All Sales"}
                 </Button>
               </div>

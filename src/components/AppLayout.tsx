@@ -2,8 +2,21 @@ import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  LayoutDashboard, Package, Users, Truck, Receipt, ShoppingBag,
-  BookOpen, Wallet, BarChart3, Settings, LogOut, Menu, X, Gem, User,
+  LayoutDashboard,
+  Package,
+  Users,
+  Truck,
+  Receipt,
+  ShoppingBag,
+  BookOpen,
+  Wallet,
+  BarChart3,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  Gem,
+  User,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -30,7 +43,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [shopName, setShopName] = useState("Shree Krishna Jyasa Pasa");
   const [logoUrl, setLogoUrl] = useState<string | null>("/logo.jpg");
-  const [ownerName, setOwnerName] = useState(() => localStorage.getItem("custom_owner_name") || "Mahesh");
+  const [ownerName, setOwnerName] = useState(
+    () => localStorage.getItem("custom_owner_name") || "Mahesh",
+  );
   const [staffName, setStaffName] = useState(() => localStorage.getItem("custom_staff_name") || "");
   const [theme, setThemeState] = useState<string>(() => {
     if (typeof window !== "undefined") {
@@ -80,22 +95,32 @@ export function AppLayout({ children }: { children: ReactNode }) {
   ];
 
   useEffect(() => {
-    supabase.from("shop_settings").select("*").limit(1).maybeSingle().then(({ data }) => {
-      if (data) {
-        const d = data as { shop_name?: string; logo_url?: string; owner_name?: string };
-        if (d.shop_name) setShopName(d.shop_name);
-        if (d.logo_url) setLogoUrl(d.logo_url);
-        if (d.owner_name) setOwnerName(d.owner_name);
-      }
-    });
-
-    if (user?.id) {
-      supabase.from("profiles").select("full_name").eq("user_id", user.id).maybeSingle().then(({ data }) => {
-        if (data?.full_name) {
-          setStaffName(data.full_name);
-          localStorage.setItem("custom_staff_name", data.full_name);
+    supabase
+      .from("shop_settings")
+      .select("*")
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          const d = data as { shop_name?: string; logo_url?: string; owner_name?: string };
+          if (d.shop_name) setShopName(d.shop_name);
+          if (d.logo_url) setLogoUrl(d.logo_url);
+          if (d.owner_name) setOwnerName(d.owner_name);
         }
       });
+
+    if (user?.id) {
+      supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("user_id", user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data?.full_name) {
+            setStaffName(data.full_name);
+            localStorage.setItem("custom_staff_name", data.full_name);
+          }
+        });
     }
 
     const handleStorage = () => {
@@ -107,19 +132,30 @@ export function AppLayout({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("storage", handleStorage);
   }, [user?.id]);
 
-  const derivedStaffName = staffName || (user?.email ? user.email.split("@")[0].split(/[._]/).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ") : "Dipen");
+  const derivedStaffName =
+    staffName ||
+    (user?.email
+      ? user.email
+          .split("@")[0]
+          .split(/[._]/)
+          .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+          .join(" ")
+      : "Dipen");
 
-  const displayShopName = lang === "ne" && shopName.toLowerCase().includes("shree krishna")
-    ? "श्री कृष्ण ज्यास: पस"
-    : shopName;
+  const displayShopName =
+    lang === "ne" && shopName.toLowerCase().includes("shree krishna")
+      ? "श्री कृष्ण ज्यास: पस"
+      : shopName;
 
   return (
     <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className={cn(
-        "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border flex flex-col transition-transform md:static md:translate-x-0",
-        open ? "translate-x-0" : "-translate-x-full"
-      )}>
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border flex flex-col transition-transform md:static md:translate-x-0",
+          open ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
         <div className="flex items-center gap-3 px-5 py-4 border-b border-sidebar-border bg-sidebar/50 backdrop-blur-sm">
           {logoUrl ? (
             <div className="relative shrink-0 rounded-full p-0.5 bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 shadow-md">
@@ -131,18 +167,26 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <div className={cn(
-              "font-extrabold text-base bg-clip-text text-transparent truncate tracking-tight",
-              theme === "sapphire"
-                ? "bg-gradient-to-r from-cyan-200 via-blue-100 to-white"
-                : theme === "gold"
-                ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
-                : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950"
-            )}>{displayShopName}</div>
+            <div
+              className={cn(
+                "font-extrabold text-base bg-clip-text text-transparent truncate tracking-tight",
+                theme === "sapphire"
+                  ? "bg-gradient-to-r from-cyan-200 via-blue-100 to-white"
+                  : theme === "gold"
+                    ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
+                    : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950",
+              )}
+            >
+              {displayShopName}
+            </div>
             <div className="text-xs font-medium text-sidebar-foreground/80 flex items-center gap-1.5 mt-0.5 whitespace-nowrap truncate">
               <span className="size-1.5 rounded-full bg-green-500 animate-pulse shrink-0"></span>
               <span className="capitalize shrink-0 font-semibold">
-                {lang === "ne" ? ((role || "Staff").toLowerCase() === "owner" ? "मालिक" : "कर्मचारी") : (role || "Staff")}
+                {lang === "ne"
+                  ? (role || "Staff").toLowerCase() === "owner"
+                    ? "मालिक"
+                    : "कर्मचारी"
+                  : role || "Staff"}
               </span>
               {(!role || role.toLowerCase() === "owner") && ownerName && (
                 <span className="text-amber-600 dark:text-amber-500 font-bold capitalize truncate">
@@ -156,7 +200,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
               )}
             </div>
           </div>
-          <button className="ml-auto md:hidden text-sidebar-foreground hover:bg-sidebar-accent p-1 rounded-md transition-colors" onClick={() => setOpen(false)}>
+          <button
+            className="ml-auto md:hidden text-sidebar-foreground hover:bg-sidebar-accent p-1 rounded-md transition-colors"
+            onClick={() => setOpen(false)}
+          >
             <X className="size-5" />
           </button>
         </div>
@@ -164,13 +211,17 @@ export function AppLayout({ children }: { children: ReactNode }) {
           {navItems.map((n) => {
             const active = loc.pathname.startsWith(n.to);
             return (
-              <Link key={n.to} to={n.to} onClick={() => setOpen(false)}
+              <Link
+                key={n.to}
+                to={n.to}
+                onClick={() => setOpen(false)}
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition",
                   active
                     ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                )}>
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                )}
+              >
                 <n.icon className="size-4" />
                 {n.label}
               </Link>
@@ -178,21 +229,35 @@ export function AppLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
         <div className="border-t border-sidebar-border p-3 space-y-2.5">
-          {/* User profile compact badge */}
+          {/* User profile compact badge with version info */}
           {user?.email && (
-            <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-background/40 border border-sidebar-border/40">
-              <div className={cn(
-                "flex size-6 items-center justify-center rounded-full shrink-0 border",
-                theme === "sapphire"
-                  ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
-                  : theme === "gold"
-                  ? "bg-amber-400/10 text-amber-300 border-amber-400/20"
-                  : "bg-amber-600/10 text-amber-600 dark:text-amber-500 border-amber-600/20"
-              )}>
-                <User className="size-3.5" />
+            <div className="space-y-1">
+              <div className="px-2 flex items-center justify-between">
+                <span className="text-[9px] font-bold text-sidebar-foreground/30 uppercase tracking-widest">
+                  System Status
+                </span>
+                <span className="text-[9px] font-bold text-amber-600/60 dark:text-amber-500/60">
+                  v1.0.0
+                </span>
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-[11px] font-medium text-sidebar-foreground truncate">{user.email}</div>
+              <div className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-background/40 border border-sidebar-border/40">
+                <div
+                  className={cn(
+                    "flex size-6 items-center justify-center rounded-full shrink-0 border",
+                    theme === "sapphire"
+                      ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
+                      : theme === "gold"
+                        ? "bg-amber-400/10 text-amber-300 border-amber-400/20"
+                        : "bg-amber-600/10 text-amber-600 dark:text-amber-500 border-amber-600/20",
+                  )}
+                >
+                  <User className="size-3.5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[11px] font-medium text-sidebar-foreground truncate">
+                    {user.email}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -208,8 +273,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 className={cn(
                   "px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors",
                   lang === "en"
-                    ? theme === "sapphire" ? "bg-cyan-600 text-white" : theme === "gold" ? "bg-amber-500 text-black" : "bg-amber-600 text-white"
-                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground"
+                    ? theme === "sapphire"
+                      ? "bg-cyan-600 text-white"
+                      : theme === "gold"
+                        ? "bg-amber-500 text-black"
+                        : "bg-amber-600 text-white"
+                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground",
                 )}
               >
                 ENG
@@ -219,8 +288,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 className={cn(
                   "px-2 py-0.5 text-[10px] font-bold rounded-xs transition-colors",
                   lang === "ne"
-                    ? theme === "sapphire" ? "bg-cyan-600 text-white" : theme === "gold" ? "bg-amber-500 text-black" : "bg-amber-600 text-white"
-                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground"
+                    ? theme === "sapphire"
+                      ? "bg-cyan-600 text-white"
+                      : theme === "gold"
+                        ? "bg-amber-500 text-black"
+                        : "bg-amber-600 text-white"
+                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground",
                 )}
               >
                 नेपाली
@@ -241,7 +314,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="md:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b border-sidebar-border bg-sidebar shadow-sm">
-          <button onClick={() => setOpen(true)} className="p-1 hover:bg-sidebar-accent rounded-md transition-colors text-sidebar-foreground">
+          <button
+            onClick={() => setOpen(true)}
+            className="p-1 hover:bg-sidebar-accent rounded-md transition-colors text-sidebar-foreground"
+          >
             <Menu className="size-5" />
           </button>
           {logoUrl ? (
@@ -253,14 +329,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <Gem className="size-4" />
             </div>
           )}
-          <span className={cn(
-            "font-extrabold text-base bg-clip-text text-transparent truncate tracking-tight",
-            theme === "sapphire"
-              ? "bg-gradient-to-r from-cyan-200 via-blue-100 to-white"
-              : theme === "gold"
-              ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
-              : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950"
-          )}>{displayShopName}</span>
+          <span
+            className={cn(
+              "font-extrabold text-base bg-clip-text text-transparent truncate tracking-tight",
+              theme === "sapphire"
+                ? "bg-gradient-to-r from-cyan-200 via-blue-100 to-white"
+                : theme === "gold"
+                  ? "bg-gradient-to-r from-yellow-100 via-amber-100 to-yellow-200"
+                  : "bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950",
+            )}
+          >
+            {displayShopName}
+          </span>
         </header>
         <main className="flex-1 p-4 md:p-6 overflow-x-hidden">{children}</main>
       </div>

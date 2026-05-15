@@ -1,4 +1,3 @@
-
 import { supabase } from "./src/integrations/supabase/client";
 
 async function check() {
