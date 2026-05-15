@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/AuthGuard";
@@ -63,7 +63,8 @@ interface Product {
 interface Category {
   id: string;
   name: string;
-  metal: string;
+  metal: "gold" | "silver" | "other";
+  parent_id: string | null;
 }
 
 function ProductsPage() {
@@ -340,6 +341,15 @@ function ProductForm({
   editing: Product | null;
   onDone: () => void;
 }) {
+  // Derived main category ID for UI selection
+  const initialMainCatId = useMemo(() => {
+    if (!editing?.category_id) return "";
+    const cat = cats.find((c) => c.id === editing.category_id);
+    return cat?.parent_id || cat?.id || "";
+  }, [editing, cats]);
+
+  const [mainCatId, setMainCatId] = useState(initialMainCatId);
+
   const [f, setF] = useState({
     sku: editing?.sku ?? "",
     name: editing?.name ?? "",
@@ -353,6 +363,16 @@ function ProductForm({
     cost_price: editing?.cost_price ?? 0,
     jarti_percent: editing?.jarti_percent ?? 0,
   });
+
+  // Re-sync mainCatId when editing changes (if not remounted by key)
+  useEffect(() => {
+    setMainCatId(initialMainCatId);
+  }, [initialMainCatId]);
+
+  const subCategories = useMemo(() => {
+    if (!mainCatId) return [];
+    return cats.filter((c) => c.parent_id === mainCatId);
+  }, [mainCatId, cats]);
   const [liveRates, setLiveRates] = useState<Record<string, number>>({
     gold: 22235.03,
     silver: 492.5,
@@ -408,20 +428,51 @@ function ProductForm({
           <Input required value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
         </div>
         <div>
-          <Label>Category</Label>
-          <Select value={f.category_id} onValueChange={(v) => setF({ ...f, category_id: v })}>
+          <Label>Main Category</Label>
+          <Select
+            value={mainCatId}
+            onValueChange={(v) => {
+              setMainCatId(v);
+              // If we pick a new main category, set product to the main category by default
+              // unless sub-categories exist
+              setF({ ...f, category_id: v });
+            }}
+          >
             <SelectTrigger>
-              <SelectValue placeholder="Select" />
+              <SelectValue placeholder="Select Main Category" />
             </SelectTrigger>
             <SelectContent>
-              {cats.map((c) => (
-                <SelectItem key={c.id} value={c.id}>
-                  {c.name}
-                </SelectItem>
-              ))}
+              {cats
+                .filter((c) => !c.parent_id)
+                .map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
+        {subCategories.length > 0 && (
+          <div>
+            <Label>Sub-category (Design/Type)</Label>
+            <Select
+              value={f.category_id === mainCatId ? "" : f.category_id || ""}
+              onValueChange={(v) => setF({ ...f, category_id: v || mainCatId })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Generic Design" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="GENERIC">Generic / Standard</SelectItem>
+                {subCategories.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         <div>
           <Label>Metal</Label>
           <Select

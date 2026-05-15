@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2, Users, Check, Sparkles } from "lucide-react";
 import { AuthGuard } from "@/components/AuthGuard";
@@ -55,6 +55,7 @@ interface Category {
   id: string;
   name: string;
   metal: "gold" | "silver" | "other";
+  parent_id: string | null;
 }
 
 function SettingsPage() {
@@ -75,7 +76,7 @@ function SettingsPage() {
 
   // Category management state
   const [cats, setCats] = useState<Category[]>([]);
-  const [newCat, setNewCat] = useState({ name: "", metal: "gold" as const });
+  const [newCat, setNewCat] = useState({ name: "", metal: "gold" as const, parent_id: "" });
   const [busyCat, setBusyCat] = useState(false);
 
   async function loadCategories() {
@@ -89,11 +90,12 @@ function SettingsPage() {
     const { error } = await supabase.from("categories").insert({
       name: newCat.name.trim(),
       metal: newCat.metal,
+      parent_id: newCat.parent_id || null,
     });
     setBusyCat(false);
     if (error) toast.error(error.message);
     else {
-      setNewCat({ name: "", metal: "gold" });
+      setNewCat({ ...newCat, name: "", parent_id: "" });
       loadCategories();
       toast.success("Category added");
     }
@@ -475,59 +477,108 @@ function SettingsPage() {
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <div className="flex-1">
-                  <Input
-                    placeholder="New category name..."
-                    value={newCat.name}
-                    onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
-                  />
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Category name (e.g. Fulbutte)..."
+                      value={newCat.name}
+                      onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
+                    />
+                  </div>
+                  <div className="w-full sm:w-48">
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      value={newCat.parent_id}
+                      onChange={(e) => setNewCat({ ...newCat, parent_id: e.target.value })}
+                    >
+                      <option value="">Main category (None)</option>
+                      {cats
+                        .filter((c) => !c.parent_id)
+                        .map((pc) => (
+                          <option key={pc.id} value={pc.id}>
+                            Under: {pc.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
                 </div>
-                <div className="w-full sm:w-32">
-                  <select
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={newCat.metal}
-                    onChange={(e) =>
-                      setNewCat({ ...newCat, metal: e.target.value as any })
-                    }
-                  >
-                    <option value="gold">Gold</option>
-                    <option value="silver">Silver</option>
-                    <option value="other">Other</option>
-                  </select>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex-1">
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      value={newCat.metal}
+                      onChange={(e) =>
+                        setNewCat({ ...newCat, metal: e.target.value as any })
+                      }
+                    >
+                      <option value="gold">Metal: Gold</option>
+                      <option value="silver">Metal: Silver</option>
+                      <option value="other">Metal: Other</option>
+                    </select>
+                  </div>
+                  <Button onClick={addCategory} disabled={busyCat} size="sm" className="shrink-0 sm:w-32">
+                    <Plus className="size-4 mr-1" /> Create
+                  </Button>
                 </div>
-                <Button onClick={addCategory} disabled={busyCat} size="sm" className="shrink-0">
-                  <Plus className="size-4 mr-1" /> Add
-                </Button>
               </div>
 
               <div className="border rounded-md overflow-hidden">
-                <div className="max-h-[300px] overflow-y-auto">
+                <div className="max-h-[400px] overflow-y-auto">
                   <table className="w-full text-sm">
                     <thead className="bg-muted/50 sticky top-0">
                       <tr>
-                        <th className="text-left p-2 font-medium">Name</th>
-                        <th className="text-left p-2 font-medium">Metal</th>
+                        <th className="text-left p-2 font-medium">Category Name</th>
+                        <th className="text-left p-2 font-medium">Type</th>
                         <th className="w-10"></th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {cats.map((c) => (
-                        <tr key={c.id} className="hover:bg-muted/30">
-                          <td className="p-2 font-medium">{c.name}</td>
-                          <td className="p-2 capitalize text-muted-foreground">{c.metal}</td>
-                          <td className="p-1 text-center">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-7 text-muted-foreground hover:text-destructive"
-                              onClick={() => deleteCategory(c.id)}
-                            >
-                              <Trash2 className="size-3.5" />
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
+                      {cats
+                        .filter((c) => !c.parent_id)
+                        .map((parent) => (
+                          <React.Fragment key={parent.id}>
+                            <tr className="bg-muted/10">
+                              <td className="p-2 font-bold">{parent.name}</td>
+                              <td className="p-2 capitalize text-[10px] text-muted-foreground">
+                                Main ({parent.metal})
+                              </td>
+                              <td className="p-1 text-center">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="size-7 text-muted-foreground hover:text-destructive"
+                                  onClick={() => deleteCategory(parent.id)}
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </Button>
+                              </td>
+                            </tr>
+                            {cats
+                              .filter((child) => child.parent_id === parent.id)
+                              .map((child) => (
+                                <tr key={child.id} className="hover:bg-muted/30">
+                                  <td className="p-2 pl-8 text-muted-foreground flex items-center gap-1">
+                                    <div className="w-2 h-2 border-l border-b border-muted-foreground/30 -mt-2"></div>
+                                    {child.name}
+                                  </td>
+                                  <td className="p-2 capitalize text-[10px] text-muted-foreground">
+                                    Sub-type
+                                  </td>
+                                  <td className="p-1 text-center">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="size-7 text-muted-foreground hover:text-destructive"
+                                      onClick={() => deleteCategory(child.id)}
+                                    >
+                                      <Trash2 className="size-3.5" />
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ))}
+                          </React.Fragment>
+                        ))}
                       {!cats.length && (
                         <tr>
                           <td colSpan={3} className="p-4 text-center text-muted-foreground">

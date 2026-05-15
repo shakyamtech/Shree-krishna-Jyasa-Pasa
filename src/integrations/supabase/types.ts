@@ -62,18 +62,21 @@ export type Database = {
           id: string;
           metal: Database["public"]["Enums"]["metal_type"];
           name: string;
+          parent_id: string | null;
         };
         Insert: {
           created_at?: string;
           id?: string;
           metal?: Database["public"]["Enums"]["metal_type"];
           name: string;
+          parent_id?: string | null;
         };
         Update: {
           created_at?: string;
           id?: string;
           metal?: Database["public"]["Enums"]["metal_type"];
           name?: string;
+          parent_id?: string | null;
         };
         Relationships: [];
       };
