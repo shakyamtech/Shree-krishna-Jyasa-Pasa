@@ -130,8 +130,30 @@ export function generateBillPDF(d: BillData): jsPDF {
   return doc;
 }
 
-export function downloadBill(d: BillData) {
+export async function downloadBill(d: BillData) {
   const doc = generateBillPDF(d);
+  
+  if ("showSaveFilePicker" in window) {
+    try {
+      const handle = await (window as any).showSaveFilePicker({
+        suggestedName: `${d.invoice_no}.pdf`,
+        types: [{
+          description: "PDF Document",
+          accept: { "application/pdf": [".pdf"] },
+        }],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(doc.output("blob"));
+      await writable.close();
+      return;
+    } catch (err: any) {
+      // If the user cancelled the dialog, stop here to avoid downloading anyway
+      if (err.name === "AbortError") return;
+      console.warn("File System Access API failed, falling back to default download:", err);
+    }
+  }
+
+  // Fallback for browsers that don't support showSaveFilePicker
   doc.save(`${d.invoice_no}.pdf`);
 }
 

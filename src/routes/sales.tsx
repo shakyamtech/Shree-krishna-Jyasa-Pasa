@@ -32,6 +32,7 @@ function SalesPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [open, setOpen] = useState(false);
+  const [wiping, setWiping] = useState(false);
 
   async function load() {
     const [{ data: s }, { data: c }, { data: p }] = await Promise.all([
@@ -44,6 +45,67 @@ function SalesPage() {
     setProducts((p ?? []) as Product[]);
   }
   useEffect(() => { load(); }, []);
+
+  async function deleteSale(saleId: string) {
+    if (!confirm("Are you sure you want to permanently delete this invoice? This action cannot be undone.")) return;
+    try {
+      const { data: items } = await supabase.from("sale_items").select("product_id, qty").eq("sale_id", saleId);
+      if (items) {
+        for (const item of items) {
+          if (!item.product_id) continue;
+          const prod = products.find((p) => p.id === item.product_id);
+          if (prod) {
+            await supabase.from("products").update({ stock_qty: prod.stock_qty + item.qty }).eq("id", item.product_id);
+          }
+        }
+      }
+      await supabase.from("stock_movements").delete().eq("ref_table", "sales").eq("ref_id", saleId);
+      await supabase.from("cashbook").delete().eq("ref_table", "sales").eq("ref_id", saleId);
+      await supabase.from("credits").delete().eq("ref_table", "sales").eq("ref_id", saleId);
+      await supabase.from("sale_items").delete().eq("sale_id", saleId);
+      const { error } = await supabase.from("sales").delete().eq("id", saleId);
+      
+      if (error) throw error;
+      toast.success("Bill deleted.");
+      load();
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  }
+
+  async function wipeAllSales() {
+    const code = prompt("DANGER: Type 'DELETE' to wipe all sales records and reverse inventory.");
+    if (code !== "DELETE") return;
+    setWiping(true);
+    try {
+      const { data: items } = await supabase.from("sale_items").select("product_id, qty");
+      if (items && products.length) {
+        const restoreMap: Record<string, number> = {};
+        for(const it of items) {
+          if(it.product_id) restoreMap[it.product_id] = (restoreMap[it.product_id] || 0) + it.qty;
+        }
+        for (const pid of Object.keys(restoreMap)) {
+          const prod = products.find((p) => p.id === pid);
+          if (prod) {
+            await supabase.from("products").update({ stock_qty: prod.stock_qty + restoreMap[pid] }).eq("id", pid);
+          }
+        }
+      }
+      await supabase.from("stock_movements").delete().eq("ref_table", "sales").not("id", "is", null);
+      await supabase.from("cashbook").delete().eq("ref_table", "sales").not("id", "is", null);
+      await supabase.from("credits").delete().eq("ref_table", "sales").not("id", "is", null);
+      await supabase.from("sale_items").delete().not("id", "is", null);
+      const { error } = await supabase.from("sales").delete().not("id", "is", null);
+
+      if (error) throw error;
+      toast.success("All sales records have been wiped.");
+      load();
+    } catch(e: any) {
+      toast.error(e.message);
+    } finally {
+      setWiping(false);
+    }
+  }
 
   async function reprint(saleId: string) {
     const [{ data: sale }, { data: items }, { data: shop }] = await Promise.all([
@@ -72,7 +134,7 @@ function SalesPage() {
         <h1 className="text-2xl font-bold">Sales / Billing</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button><Plus className="size-4 mr-2" />New sale</Button></DialogTrigger>
-          <NewSaleDialog customers={customers} products={products} onDone={() => { setOpen(false); load(); }} />
+          {open && <NewSaleDialog customers={customers} products={products} onDone={() => { setOpen(false); load(); }} />}
         </Dialog>
       </div>
 
@@ -94,9 +156,14 @@ function SalesPage() {
                 <TableCell className={Number(s.due) > 0 ? "text-destructive font-medium" : ""}>{formatNPR(s.due)}</TableCell>
                 <TableCell className="capitalize">{s.payment_mode}</TableCell>
                 <TableCell className="text-right">
-                  <Button size="sm" variant="ghost" onClick={() => reprint(s.id)}>
-                    <Download className="size-4 mr-1" />PDF
-                  </Button>
+                  <div className="flex justify-end gap-1">
+                    <Button size="sm" variant="ghost" onClick={() => reprint(s.id)}>
+                      <Download className="size-4 mr-1" />PDF
+                    </Button>
+                    <Button size="sm" variant="ghost" className="text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50" onClick={() => deleteSale(s.id)}>
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -104,6 +171,28 @@ function SalesPage() {
           </TableBody>
         </Table>
       </CardContent></Card>
+
+      <div className="pt-10 pb-4">
+        <Card className="border-red-500/30 bg-red-500/5 shadow-none">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-red-600 flex items-center gap-2 text-lg">
+              <Trash2 className="size-5" />
+              Danger Zone
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-foreground">Wipe All Sales Records</p>
+                <p className="text-xs text-muted-foreground mt-1 max-w-xl">Permanently delete all generated invoices, reverse stock quantities, and remove associated ledger entries. This is used to clear test data before going live.</p>
+              </div>
+              <Button variant="destructive" onClick={wipeAllSales} disabled={wiping} className="shrink-0">
+                {wiping ? "Wiping..." : "Delete All Sales"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
@@ -126,6 +215,7 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
   const [vatRate, setVatRate] = useState(0);
   const [shopHasVat, setShopHasVat] = useState(false);
   const [paid, setPaid] = useState(0);
+  const [isPaidEdited, setIsPaidEdited] = useState(false);
   const [paymentMode, setPaymentMode] = useState("cash");
   const [notes, setNotes] = useState("");
   const [lines, setLines] = useState<LineItem[]>([blankLine()]);
@@ -217,6 +307,12 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
     const total = taxable + vat;
     return { subtotal, making, vat, total, due: Math.max(0, total - paid) };
   }, [lines, discount, vatRate, paid]);
+
+  useEffect(() => {
+    if (!isPaidEdited && paymentMode !== "credit") {
+      setPaid(totals.total);
+    }
+  }, [totals.total, paymentMode, isPaidEdited]);
 
   async function submit() {
     if (!lines.length || lines.some((l) => !l.description)) return toast.error("Fill all line items");
@@ -447,14 +543,35 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
           <Row label="TOTAL" value={formatNPR(totals.total)} bold />
           <div className="flex items-center gap-2">
             <Label className="w-32">Paid</Label>
-            <Input type="number" step="0.01" value={paid} onChange={(e) => setPaid(Number(e.target.value))} />
+            <Input type="number" step="0.01" value={paid} onChange={(e) => { setPaid(Number(e.target.value)); setIsPaidEdited(true); }} />
           </div>
           <Row label="Due" value={formatNPR(totals.due)} bold />
         </div>
       </div>
 
-      <DialogFooter>
-        <Button onClick={submit} disabled={busy}>
+      <DialogFooter className="flex-col sm:flex-row sm:justify-between gap-4 mt-4 pt-4 border-t border-border/60">
+        <div className="flex items-center">
+          <Button 
+            type="button" 
+            variant="destructive" 
+            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
+            onClick={() => {
+              if (confirm("Danger Zone: Are you sure you want to completely clear this bill?")) {
+                setLines([blankLine()]);
+                setCustomerId("walk-in");
+                setDiscount(0);
+                setPaid(0);
+                setIsPaidEdited(false);
+                setPaymentMode("cash");
+                setNotes("");
+              }
+            }}
+          >
+            <Trash2 className="size-4 mr-2" />
+            Clear Bill (Danger Zone)
+          </Button>
+        </div>
+        <Button onClick={submit} disabled={busy} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white">
           <FileText className="size-4 mr-2" />{busy ? "Saving…" : "Save & download PDF"}
         </Button>
       </DialogFooter>
