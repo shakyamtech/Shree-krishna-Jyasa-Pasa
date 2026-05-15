@@ -212,8 +212,23 @@
   );
 }
 
+.silver-gradient-bg {
+  background: linear-gradient(
+    135deg,
+    #f8f9fa 0%,
+    #e9ecef 20%,
+    #ced4da 45%,
+    #adb5bd 80%,
+    #6c757d 100%
+  );
+}
+
 .gold-glow {
   box-shadow: 0 0 15px oklch(0.82 0.16 82 / 0.2);
+}
+
+.silver-glow {
+  box-shadow: 0 0 15px rgba(206, 212, 218, 0.2);
 }
 
 :root {

@@ -242,35 +242,112 @@ function Dashboard() {
           : new Date().toLocaleDateString();
 
         return (
-          <Card className="border-slate-400/30 dark:border-slate-500/20 shadow-sm">
+          <Card
+            className={cn(
+              "transition-all",
+              theme === "gold"
+                ? "silver-gradient-bg border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-lg shadow-slate-400/20"
+                : "border-slate-400/30 dark:border-slate-500/20 shadow-sm",
+            )}
+          >
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 capitalize">
-                <Coins className="size-5 text-slate-500 dark:text-slate-400" />
-                Silver Rate {sp ? `(${sp.metal})` : "(Fine Pure)"}
+                <Coins
+                  className={cn(
+                    "size-5",
+                    theme === "gold" ? "text-slate-600" : "text-slate-500 dark:text-slate-400",
+                  )}
+                />
+                <span className={theme === "gold" ? "text-black" : ""}>
+                  Silver Rate {sp ? `(${sp.metal})` : "(Fine Pure)"}
+                </span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2 items-center">
                 <div>
-                  <div className="text-2xl font-bold text-foreground">
+                  <div
+                    className={cn(
+                      "text-2xl font-bold",
+                      theme === "gold" ? "text-black" : "text-foreground",
+                    )}
+                  >
                     {formatNPR(perTola)}{" "}
-                    <span className="text-sm font-normal text-muted-foreground">/ tola</span>
+                    <span
+                      className={cn(
+                        "text-sm font-normal",
+                        theme === "gold" ? "text-black/60" : "text-muted-foreground",
+                      )}
+                    >
+                      / tola
+                    </span>
                   </div>
-                  <div className="text-sm text-muted-foreground mt-0.5">
+                  <div
+                    className={cn(
+                      "text-sm mt-0.5",
+                      theme === "gold" ? "text-black/60" : "text-muted-foreground",
+                    )}
+                  >
                     {formatNPR(perGram)} / gram
                   </div>
-                  <div className="text-xs text-muted-foreground pt-2">Updated {lastUpdated}</div>
+                  <div
+                    className={cn(
+                      "text-xs pt-2",
+                      theme === "gold" ? "text-black/40" : "text-muted-foreground",
+                    )}
+                  >
+                    Updated {lastUpdated}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-3 border-t md:border-t-0 md:border-l pt-3 md:pt-0 md:pl-4 text-xs">
-                  <div className="flex-1 min-w-[100px] rounded border p-2 bg-slate-50/5 dark:bg-slate-950/10">
-                    <div className="text-muted-foreground">Per 10 Grams</div>
-                    <div className="font-semibold text-foreground text-sm mt-0.5">
+                <div
+                  className={cn(
+                    "flex flex-wrap gap-3 border-t md:border-t-0 md:border-l pt-3 md:pt-0 md:pl-4 text-xs",
+                    theme === "gold" ? "border-black/10" : "",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "flex-1 min-w-[100px] rounded border p-2",
+                      theme === "gold"
+                        ? "bg-black/5 border-black/10"
+                        : "bg-slate-50/5 dark:bg-slate-950/10",
+                    )}
+                  >
+                    <div
+                      className={theme === "gold" ? "text-black/50" : "text-muted-foreground"}
+                    >
+                      Per 10 Grams
+                    </div>
+                    <div
+                      className={cn(
+                        "font-semibold text-sm mt-0.5",
+                        theme === "gold" ? "text-black" : "text-foreground",
+                      )}
+                    >
                       {formatNPR(perGram * 10)}
                     </div>
                   </div>
-                  <div className="flex-1 min-w-[100px] rounded border p-2 bg-slate-50/5 dark:bg-slate-950/10">
-                    <div className="text-muted-foreground">Purity Standard</div>
-                    <div className="font-semibold text-foreground text-sm mt-0.5">999 Fine</div>
+                  <div
+                    className={cn(
+                      "flex-1 min-w-[100px] rounded border p-2",
+                      theme === "gold"
+                        ? "bg-black/5 border-black/10"
+                        : "bg-slate-50/5 dark:bg-slate-950/10",
+                    )}
+                  >
+                    <div
+                      className={theme === "gold" ? "text-black/50" : "text-muted-foreground"}
+                    >
+                      Purity Standard
+                    </div>
+                    <div
+                      className={cn(
+                        "font-semibold text-sm mt-0.5",
+                        theme === "gold" ? "text-black" : "text-foreground",
+                      )}
+                    >
+                      999 Fine
+                    </div>
                   </div>
                 </div>
               </div>
