@@ -240,30 +240,30 @@ function ProductsPage() {
               >
                 <div className="h-px flex-1 bg-border/60 group-hover/header:bg-amber-500/30 transition-colors"></div>
                 <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-4 px-6 py-2 rounded-full border border-border/80 bg-white shadow-sm group-hover/header:border-amber-500/50 transition-all hover:shadow-md">
-                    <span className="text-[11px] font-black uppercase tracking-widest text-foreground">
+                  <div className="flex items-center gap-6 px-8 py-3 rounded-full border border-border/80 bg-white shadow-sm group-hover/header:border-amber-500/50 transition-all hover:shadow-md">
+                    <span className="text-xs font-black uppercase tracking-widest text-foreground whitespace-nowrap">
                       {group.name}
                     </span>
-                    <div className="w-px h-4 bg-border/60 mx-1"></div>
+                    <div className="w-px h-5 bg-border/60 mx-1"></div>
                     <div className="flex flex-col items-center leading-tight">
-                      <span className="text-xs font-bold text-amber-600">
+                      <span className="text-sm font-bold text-amber-600">
                         {formatGram(group.totalWeight)}
                       </span>
-                      <span className="text-[10px] font-medium text-amber-600/70">
+                      <span className="text-[11px] font-medium text-amber-600/70">
                         {formatTola(group.totalWeight)}
                       </span>
                     </div>
-                    <span className="text-[10px] font-black uppercase text-amber-600/40 tracking-tighter">
+                    <span className="text-[11px] font-black uppercase text-amber-600/40 tracking-tighter">
                       Total
                     </span>
-                    <div className="flex items-center gap-2 ml-1">
-                      <span className="text-[10px] font-bold text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
+                    <div className="flex items-center gap-4 ml-1">
+                      <span className="text-[11px] font-bold text-muted-foreground bg-muted/50 px-3 py-1 rounded-full whitespace-nowrap">
                         {group.totalStock} units
                       </span>
                       {effectivelyExpanded ? (
-                        <ChevronUp className="size-4 text-muted-foreground group-hover/header:text-amber-500" />
+                        <ChevronUp className="size-5 text-muted-foreground group-hover/header:text-amber-500" />
                       ) : (
-                        <ChevronDown className="size-4 text-muted-foreground group-hover/header:text-amber-500" />
+                        <ChevronDown className="size-5 text-muted-foreground group-hover/header:text-amber-500" />
                       )}
                     </div>
                   </div>
