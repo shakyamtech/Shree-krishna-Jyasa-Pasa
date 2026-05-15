@@ -345,7 +345,7 @@ function ProductForm({
     name: editing?.name ?? "",
     category_id: editing?.category_id ?? "",
     metal: (editing?.metal ?? "gold") as "gold" | "silver" | "other",
-    purity: editing?.purity ?? "22K",
+    purity: editing?.purity ?? "24K",
     weight_gram: editing?.weight_gram ?? 0,
     making_charge: editing?.making_charge ?? 0,
     stock_qty: editing?.stock_qty ?? 1,
