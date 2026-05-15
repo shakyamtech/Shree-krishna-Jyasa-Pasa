@@ -251,7 +251,7 @@ function ProductsPage() {
                 <div className="flex flex-col items-center gap-1">
                   <div
                     className={cn(
-                      "flex items-center gap-3 sm:gap-5 md:gap-8 px-5 sm:px-7 md:px-10 py-2.5 md:py-4 rounded-full border border-border/80 shadow-sm transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99]",
+                      "flex items-center gap-4 sm:gap-6 md:gap-10 px-6 sm:px-8 md:px-12 py-3 md:py-5 rounded-full border border-border/80 shadow-sm transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99]",
                       theme === "gold"
                         ? effectivelyExpanded
                           ? "bg-zinc-950 text-amber-500 border-amber-500/30 shadow-xl shadow-black/40"
@@ -261,7 +261,7 @@ function ProductsPage() {
                   >
                     <span
                       className={cn(
-                        "text-[11px] md:text-sm font-black uppercase tracking-widest whitespace-nowrap",
+                        "text-[12px] md:text-base font-black uppercase tracking-widest whitespace-nowrap",
                         theme === "gold" && !effectivelyExpanded ? "text-black" : "gold-shimmer",
                       )}
                     >
@@ -269,14 +269,14 @@ function ProductsPage() {
                     </span>
                     <div
                       className={cn(
-                        "w-px h-5 md:h-6 mx-1 md:mx-2",
+                        "w-px h-6 md:h-8 mx-1.5 md:mx-3",
                         theme === "gold" && !effectivelyExpanded ? "bg-black/20" : "bg-border/60",
                       )}
                     ></div>
                     <div className="flex flex-col items-center leading-none md:leading-tight min-w-0">
                       <span
                         className={cn(
-                          "text-sm md:text-base font-bold whitespace-nowrap",
+                          "text-base md:text-lg font-bold whitespace-nowrap",
                           theme === "gold"
                             ? effectivelyExpanded
                               ? "text-amber-400"
@@ -288,7 +288,7 @@ function ProductsPage() {
                       </span>
                       <span
                         className={cn(
-                          "text-[10px] md:text-[12px] font-medium whitespace-nowrap",
+                          "text-[11px] md:text-[13px] font-medium whitespace-nowrap",
                           theme === "gold"
                             ? effectivelyExpanded
                               ? "text-amber-400/70"
@@ -301,7 +301,7 @@ function ProductsPage() {
                     </div>
                     <span
                       className={cn(
-                        "hidden sm:block text-xs font-black uppercase tracking-tighter",
+                        "hidden sm:block text-sm font-black uppercase tracking-tighter",
                         theme === "gold"
                           ? effectivelyExpanded
                             ? "text-amber-400/40"
@@ -311,10 +311,10 @@ function ProductsPage() {
                     >
                       Total
                     </span>
-                    <div className="flex items-center gap-3 md:gap-5 ml-auto sm:ml-2">
+                    <div className="flex items-center gap-4 md:gap-6 ml-auto sm:ml-3">
                       <span
                         className={cn(
-                          "text-[10px] md:text-xs font-bold px-3 md:px-4 py-1 md:py-1.5 rounded-full whitespace-nowrap border",
+                          "text-[11px] md:text-sm font-bold px-4 md:px-5 py-1.5 md:py-2 rounded-full whitespace-nowrap border",
                           theme === "gold"
                             ? effectivelyExpanded
                               ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
@@ -327,7 +327,7 @@ function ProductsPage() {
                       {effectivelyExpanded ? (
                         <ChevronUp
                           className={cn(
-                            "size-5 md:size-6",
+                            "size-6 md:size-7",
                             theme === "gold" && !effectivelyExpanded
                               ? "text-black"
                               : "text-muted-foreground",
@@ -336,7 +336,7 @@ function ProductsPage() {
                       ) : (
                         <ChevronDown
                           className={cn(
-                            "size-5 md:size-6",
+                            "size-6 md:size-7",
                             theme === "gold" && !effectivelyExpanded
                               ? "text-black"
                               : "text-muted-foreground",
