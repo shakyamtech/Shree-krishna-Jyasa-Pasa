@@ -97,6 +97,17 @@ function ProductsPage() {
     }
   }
 
+  function getCategoryName(id: string | null) {
+    if (!id) return "—";
+    const cat = cats.find((c) => c.id === id);
+    if (!cat) return "—";
+    if (cat.parent_id) {
+      const parent = cats.find((c) => c.id === cat.parent_id);
+      return parent ? `${parent.name} > ${cat.name}` : cat.name;
+    }
+    return cat.name;
+  }
+
   const filtered = items.filter((i) => {
     if (selectedCat !== "all" && i.category_id !== selectedCat) return false;
     const catName = cats.find((c) => c.id === i.category_id)?.name ?? "";
@@ -173,6 +184,7 @@ function ProductsPage() {
                 <TableRow>
                   <TableHead>SKU</TableHead>
                   <TableHead>Name</TableHead>
+                  <TableHead>Category</TableHead>
                   <TableHead>Metal</TableHead>
                   <TableHead>Purity</TableHead>
                   <TableHead>Weight</TableHead>
@@ -188,6 +200,9 @@ function ProductsPage() {
                   <TableRow key={p.id}>
                     <TableCell className="font-mono text-xs">{p.sku ?? "—"}</TableCell>
                     <TableCell className="font-medium">{p.name}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {getCategoryName(p.category_id)}
+                    </TableCell>
                     <TableCell>
                       <Badge
                         variant={p.metal === "gold" ? "default" : "secondary"}
@@ -246,6 +261,9 @@ function ProductsPage() {
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <div className="font-bold text-sm leading-tight text-foreground">{p.name}</div>
+                  <div className="text-[10px] text-amber-600 dark:text-amber-500 font-medium mt-0.5">
+                    {getCategoryName(p.category_id)}
+                  </div>
                   <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
                     SKU: {p.sku ?? "—"}
                   </div>
