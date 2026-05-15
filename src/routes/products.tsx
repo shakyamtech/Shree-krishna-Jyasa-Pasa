@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { formatNPR, formatGram } from "@/lib/format";
+import { formatNPR, formatGram, formatTola } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/products")({
@@ -240,22 +240,32 @@ function ProductsPage() {
               >
                 <div className="h-px flex-1 bg-border/60 group-hover/header:bg-amber-500/30 transition-colors"></div>
                 <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-border/80 bg-white shadow-sm group-hover/header:border-amber-500/50 transition-all">
-                    <span className="text-xs font-black uppercase tracking-widest text-foreground">
+                  <div className="flex items-center gap-4 px-6 py-2 rounded-full border border-border/80 bg-white shadow-sm group-hover/header:border-amber-500/50 transition-all hover:shadow-md">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-foreground">
                       {group.name}
                     </span>
-                    <div className="w-px h-3 bg-border mx-1"></div>
-                    <span className="text-[10px] font-bold text-amber-600">
-                      {formatGram(group.totalWeight)} Total
+                    <div className="w-px h-4 bg-border/60 mx-1"></div>
+                    <div className="flex flex-col items-center leading-tight">
+                      <span className="text-xs font-bold text-amber-600">
+                        {formatGram(group.totalWeight)}
+                      </span>
+                      <span className="text-[10px] font-medium text-amber-600/70">
+                        {formatTola(group.totalWeight)}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-black uppercase text-amber-600/40 tracking-tighter">
+                      Total
                     </span>
-                    <span className="text-[10px] text-muted-foreground ml-1">
-                      ({group.totalStock} units)
-                    </span>
-                    {effectivelyExpanded ? (
-                      <ChevronUp className="size-3.5 text-muted-foreground group-hover/header:text-amber-500" />
-                    ) : (
-                      <ChevronDown className="size-3.5 text-muted-foreground group-hover/header:text-amber-500" />
-                    )}
+                    <div className="flex items-center gap-2 ml-1">
+                      <span className="text-[10px] font-bold text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full">
+                        {group.totalStock} units
+                      </span>
+                      {effectivelyExpanded ? (
+                        <ChevronUp className="size-4 text-muted-foreground group-hover/header:text-amber-500" />
+                      ) : (
+                        <ChevronDown className="size-4 text-muted-foreground group-hover/header:text-amber-500" />
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="h-px flex-1 bg-border/60 group-hover/header:bg-amber-500/30 transition-colors"></div>
@@ -304,6 +314,9 @@ function ProductsPage() {
                             <span className="font-semibold text-sm">
                               {formatGram(p.weight_gram)}
                             </span>
+                            <div className="text-[10px] text-muted-foreground font-medium italic mt-0.5">
+                              {formatTola(p.weight_gram)}
+                            </div>
                           </div>
                           <div>
                             <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
