@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Coins, RefreshCw, TrendingUp, Package, Receipt, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AppLayout } from "@/components/AppLayout";
@@ -32,6 +33,15 @@ function Dashboard() {
   const [prices, setPrices] = useState<Price[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({ products: 0, customers: 0, salesToday: 0, totalToday: 0 });
+  const [theme, setTheme] = useState(() =>
+    typeof window !== "undefined" ? localStorage.getItem("app_theme") || "default" : "default",
+  );
+
+  useEffect(() => {
+    const syncTheme = () => setTheme(localStorage.getItem("app_theme") || "default");
+    window.addEventListener("storage", syncTheme);
+    return () => window.removeEventListener("storage", syncTheme);
+  }, []);
 
   async function loadPrices() {
     const { data } = await supabase
@@ -109,44 +119,107 @@ function Dashboard() {
           const p = prices.find((x) => x.metal === m);
           const isGold = m === "gold";
           return (
-            <Card key={m} className="border-amber-500/30 dark:border-amber-500/20 shadow-sm">
+            <Card
+              key={m}
+              className={cn(
+                "transition-all",
+                theme === "gold"
+                  ? "gold-gradient-bg border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-lg shadow-amber-500/20"
+                  : "border-amber-500/30 dark:border-amber-500/20 shadow-sm",
+              )}
+            >
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2">
-                  <Coins className="size-5 text-amber-500" />
-                  {isGold ? "Gold (10 Grams)" : "Gold (1 Tola)"}
+                  <Coins
+                    className={cn(
+                      "size-5",
+                      theme === "gold" ? "text-black/60" : "text-amber-500",
+                    )}
+                  />
+                  <span className={theme === "gold" ? "text-black" : ""}>
+                    {isGold ? "Gold (10 Grams)" : "Gold (1 Tola)"}
+                  </span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {p ? (
                   <div className="space-y-1">
-                    <div className="text-2xl font-bold text-foreground">
+                    <div
+                      className={cn(
+                        "text-2xl font-bold",
+                        theme === "gold" ? "text-black" : "text-foreground",
+                      )}
+                    >
                       {formatNPR(p.price_per_tola)}{" "}
-                      <span className="text-sm font-normal text-muted-foreground">
+                      <span
+                        className={cn(
+                          "text-sm font-normal",
+                          theme === "gold" ? "text-black/60" : "text-muted-foreground",
+                        )}
+                      >
                         {isGold ? "/ 10 gram (24K Fine)" : "/ tola (24K Fine)"}
                       </span>
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div
+                      className={cn(
+                        "text-sm",
+                        theme === "gold" ? "text-black/60" : "text-muted-foreground",
+                      )}
+                    >
                       {formatNPR(p.price_per_gram)} / gram
                     </div>
                     <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                      <div className="rounded border p-2 bg-amber-50/20 dark:bg-amber-950/10">
-                        <div className="text-muted-foreground">
+                      <div
+                        className={cn(
+                          "rounded border p-2",
+                          theme === "gold"
+                            ? "bg-black/5 border-black/10"
+                            : "bg-amber-50/20 dark:bg-amber-950/10",
+                        )}
+                      >
+                        <div
+                          className={theme === "gold" ? "text-black/50" : "text-muted-foreground"}
+                        >
                           22K {isGold ? "/ 10g" : "/ tola"}
                         </div>
-                        <div className="font-semibold text-foreground">
+                        <div
+                          className={cn(
+                            "font-semibold",
+                            theme === "gold" ? "text-black" : "text-foreground",
+                          )}
+                        >
                           {formatNPR(p.price_per_tola * 0.9167)}
                         </div>
                       </div>
-                      <div className="rounded border p-2 bg-amber-50/20 dark:bg-amber-950/10">
-                        <div className="text-muted-foreground">
+                      <div
+                        className={cn(
+                          "rounded border p-2",
+                          theme === "gold"
+                            ? "bg-black/5 border-black/10"
+                            : "bg-amber-50/20 dark:bg-amber-950/10",
+                        )}
+                      >
+                        <div
+                          className={theme === "gold" ? "text-black/50" : "text-muted-foreground"}
+                        >
                           18K {isGold ? "/ 10g" : "/ tola"}
                         </div>
-                        <div className="font-semibold text-foreground">
+                        <div
+                          className={cn(
+                            "font-semibold",
+                            theme === "gold" ? "text-black" : "text-foreground",
+                          )}
+                        >
                           {formatNPR(p.price_per_tola * 0.75)}
                         </div>
                       </div>
                     </div>
-                    <div className="text-xs text-muted-foreground pt-1">
+                    <div
+                      className={cn(
+                        "text-xs pt-1",
+                        theme === "gold" ? "text-black/40" : "text-muted-foreground",
+                      )}
+                    >
                       Updated {new Date(p.fetched_at).toLocaleString()}
                     </div>
                   </div>
