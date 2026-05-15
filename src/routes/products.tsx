@@ -355,10 +355,10 @@ function ProductsPage() {
                     <Card
                       key={p.id}
                       className={cn(
-                        "overflow-hidden border border-border/80 shadow-xs flex flex-col group transition-all hover:shadow-md",
+                        "overflow-hidden flex flex-col group transition-all hover:shadow-xl",
                         theme === "gold"
-                          ? "bg-amber-500 text-black border-amber-600 shadow-amber-500/10"
-                          : "dark:border-amber-500/20 dark:bg-card/40 hover:border-amber-500/50 hover:shadow-amber-500/5",
+                          ? "bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 text-black border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-amber-500/20"
+                          : "border border-border/80 dark:border-amber-500/20 dark:bg-card/40 hover:border-amber-500/50 hover:shadow-amber-500/5 rounded-xl",
                       )}
                     >
                       <CardContent className="p-4 flex-1 space-y-3">
