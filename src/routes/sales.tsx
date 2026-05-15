@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Trash2, FileText, Printer, Download } from "lucide-react";
+import { Plus, Trash2, FileText, Printer, Download, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AppLayout } from "@/components/AppLayout";
@@ -52,10 +52,16 @@ interface Sale {
   invoice_no: string;
   sale_date: string;
   customer_id: string | null;
+  subtotal: number;
+  making_total: number;
+  discount: number;
+  vat_rate: number;
+  vat_amount: number;
   total: number;
   paid: number;
   due: number;
   payment_mode: string;
+  notes: string | null;
 }
 interface Customer {
   id: string;
@@ -81,6 +87,7 @@ function SalesPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [open, setOpen] = useState(false);
+  const [editingSale, setEditingSale] = useState<(Sale & { items: LineItem[] }) | null>(null);
 
   async function load() {
     const [{ data: s }, { data: c }, { data: p }] = await Promise.all([
@@ -171,19 +178,28 @@ function SalesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-bold">Sales / Billing</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog
+          open={open}
+          onOpenChange={(v) => {
+            setOpen(v);
+            if (!v) setEditingSale(null);
+          }}
+        >
           <DialogTrigger asChild>
-            <Button>
+            <Button onClick={() => setEditingSale(null)}>
               <Plus className="size-4 mr-2" />
               New sale
             </Button>
           </DialogTrigger>
           {open && (
-            <NewSaleDialog
+            <SaleDialog
+              key={editingSale?.id ?? "new"}
               customers={customers}
               products={products}
+              editing={editingSale}
               onDone={() => {
                 setOpen(false);
+                setEditingSale(null);
                 load();
               }}
             />
@@ -222,9 +238,32 @@ function SalesPage() {
                   <TableCell className="capitalize">{s.payment_mode}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={async () => {
+                          const { data: items } = await supabase
+                            .from("sale_items")
+                            .select("*")
+                            .eq("sale_id", s.id);
+                          setEditingSale({ ...s, items: (items ?? []) as LineItem[] });
+                          setOpen(true);
+                        }}
+                      >
+                        <Pencil className="size-4 mr-1" />
+                        Edit
+                      </Button>
                       <Button size="sm" variant="ghost" onClick={() => reprint(s.id)}>
                         <Download className="size-4 mr-1" />
                         PDF
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => deleteSale(s.id)}
+                      >
+                        <Trash2 className="size-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -257,25 +296,39 @@ interface LineItem {
   jarti_percent: number;
 }
 
-function NewSaleDialog({
+function SaleDialog({
   customers,
   products,
+  editing,
   onDone,
 }: {
   customers: Customer[];
   products: Product[];
+  editing: (Sale & { items: LineItem[] }) | null;
   onDone: () => void;
 }) {
-  const [customerId, setCustomerId] = useState<string>("walk-in");
-  const [date, setDate] = useState(todayISO());
-  const [discount, setDiscount] = useState(0);
-  const [vatRate, setVatRate] = useState(0);
+  const [customerId, setCustomerId] = useState<string>(editing?.customer_id ?? "walk-in");
+  const [date, setDate] = useState(editing?.sale_date ?? todayISO());
+  const [discount, setDiscount] = useState(editing?.discount ?? 0);
+  const [vatRate, setVatRate] = useState(editing?.vat_rate ?? 0);
   const [shopHasVat, setShopHasVat] = useState(false);
-  const [paid, setPaid] = useState(0);
-  const [isPaidEdited, setIsPaidEdited] = useState(false);
-  const [paymentMode, setPaymentMode] = useState("cash");
-  const [notes, setNotes] = useState("");
-  const [lines, setLines] = useState<LineItem[]>([blankLine()]);
+  const [paid, setPaid] = useState(editing?.paid ?? 0);
+  const [isPaidEdited, setIsPaidEdited] = useState(editing ? true : false);
+  const [paymentMode, setPaymentMode] = useState(editing?.payment_mode ?? "cash");
+  const [notes, setNotes] = useState(editing?.notes ?? "");
+  const [lines, setLines] = useState<LineItem[]>(
+    editing?.items.map((it) => ({
+      product_id: it.product_id,
+      description: it.description,
+      metal: it.metal as LineItem["metal"],
+      purity: it.purity ?? "",
+      qty: it.qty,
+      weight_gram: it.weight_gram,
+      rate_per_gram: it.rate_per_gram,
+      making_charge: it.making_charge,
+      jarti_percent: it.jarti_percent ?? 0,
+    })) ?? [blankLine()],
+  );
   const [busy, setBusy] = useState(false);
   const [liveRates, setLiveRates] = useState<Record<string, number>>({
     gold: 22235.03,
@@ -324,7 +377,7 @@ function NewSaleDialog({
       .maybeSingle()
       .then(({ data }) => {
         const v = Number(data?.vat_rate || 0);
-        setVatRate(v);
+        if (!editing) setVatRate(v);
         setShopHasVat(v > 0);
       });
 
@@ -428,6 +481,29 @@ function NewSaleDialog({
 
     setBusy(true);
     try {
+      if (editing) {
+        // Reverse old impacts
+        const oldItems = editing.items;
+        for (const item of oldItems) {
+          if (!item.product_id) continue;
+          const prod = products.find((p) => p.id === item.product_id);
+          if (prod) {
+            await supabase
+              .from("products")
+              .update({ stock_qty: prod.stock_qty + item.qty })
+              .eq("id", item.product_id);
+          }
+        }
+        await supabase
+          .from("stock_movements")
+          .delete()
+          .eq("ref_table", "sales")
+          .eq("ref_id", editing.id);
+        await supabase.from("cashbook").delete().eq("ref_table", "sales").eq("ref_id", editing.id);
+        await supabase.from("credits").delete().eq("ref_table", "sales").eq("ref_id", editing.id);
+        await supabase.from("sale_items").delete().eq("sale_id", editing.id);
+      }
+
       const itemsPayload = lines.map((l) => {
         const jartiWeight = l.weight_gram * (l.jarti_percent / 100);
         return {
@@ -444,39 +520,66 @@ function NewSaleDialog({
         };
       });
 
-      const { data: sale, error } = await supabase
-        .from("sales")
-        .insert({
-          customer_id: customerId === "walk-in" ? null : customerId,
-          sale_date: date,
-          subtotal: totals.subtotal,
-          making_total: totals.making,
-          discount,
-          vat_rate: vatRate,
-          vat_amount: totals.vat,
-          total: totals.total,
-          paid,
-          due: totals.due,
-          payment_mode: paymentMode,
-          notes,
-        })
-        .select("*")
-        .single();
-      if (error) throw error;
+      let saleId = editing?.id;
+      let invoiceNo = editing?.invoice_no;
+
+      const salePayload = {
+        customer_id: customerId === "walk-in" ? null : customerId,
+        sale_date: date,
+        subtotal: totals.subtotal,
+        making_total: totals.making,
+        discount,
+        vat_rate: vatRate,
+        vat_amount: totals.vat,
+        total: totals.total,
+        paid,
+        due: totals.due,
+        payment_mode: paymentMode,
+        notes,
+      };
+
+      if (editing) {
+        const { data: sale, error } = await supabase
+          .from("sales")
+          .update(salePayload)
+          .eq("id", editing.id)
+          .select("*")
+          .single();
+        if (error) throw error;
+        saleId = sale.id;
+        invoiceNo = sale.invoice_no;
+      } else {
+        const { data: sale, error } = await supabase
+          .from("sales")
+          .insert(salePayload)
+          .select("*")
+          .single();
+        if (error) throw error;
+        saleId = sale.id;
+        invoiceNo = sale.invoice_no;
+      }
 
       const { error: e2 } = await supabase
         .from("sale_items")
-        .insert(itemsPayload.map((it) => ({ ...it, sale_id: sale.id })));
+        .insert(itemsPayload.map((it) => ({ ...it, sale_id: saleId })));
       if (e2) throw e2;
 
-      // Reduce stock & log movements
+      // Apply new impacts
       for (const l of lines) {
         if (!l.product_id) continue;
         const prod = products.find((p) => p.id === l.product_id);
         if (!prod) continue;
+        // Re-fetch product to get current stock after reversal
+        const { data: currentProd } = await supabase
+          .from("products")
+          .select("stock_qty")
+          .eq("id", l.product_id)
+          .single();
+        const currentStock = currentProd?.stock_qty ?? prod.stock_qty;
+
         await supabase
           .from("products")
-          .update({ stock_qty: Math.max(0, prod.stock_qty - l.qty) })
+          .update({ stock_qty: Math.max(0, currentStock - l.qty) })
           .eq("id", l.product_id);
         await supabase.from("stock_movements").insert({
           product_id: l.product_id,
@@ -484,8 +587,8 @@ function NewSaleDialog({
           qty: l.qty,
           weight_gram: l.weight_gram * l.qty,
           ref_table: "sales",
-          ref_id: sale.id,
-          note: `Sale ${sale.invoice_no}`,
+          ref_id: saleId,
+          note: `Sale ${invoiceNo} (Updated)`,
         });
       }
       // Credit ledger
@@ -495,10 +598,10 @@ function NewSaleDialog({
           party_id: customerId,
           entry_date: date,
           ref_table: "sales",
-          ref_id: sale.id,
+          ref_id: saleId,
           debit: totals.total,
           credit: paid,
-          note: `Sale ${sale.invoice_no}`,
+          note: `Sale ${invoiceNo}`,
         });
       }
       // Cashbook
@@ -511,9 +614,9 @@ function NewSaleDialog({
           party_type: customerId === "walk-in" ? null : "customer",
           party_id: customerId === "walk-in" ? null : customerId,
           ref_table: "sales",
-          ref_id: sale.id,
+          ref_id: saleId,
           payment_mode: paymentMode,
-          note: `Sale ${sale.invoice_no}`,
+          note: `Sale ${invoiceNo}`,
         });
       }
 
@@ -527,7 +630,7 @@ function NewSaleDialog({
         customerId === "walk-in" ? null : (localCustomers.find((c) => c.id === customerId) ?? null);
       if (shop) {
         downloadBill({
-          invoice_no: sale.invoice_no,
+          invoice_no: invoiceNo || "",
           sale_date: date,
           shop,
           customer,
@@ -555,7 +658,7 @@ function NewSaleDialog({
         });
       }
 
-      toast.success(`Sale recorded: ${sale.invoice_no}`);
+      toast.success(editing ? `Sale updated: ${invoiceNo}` : `Sale recorded: ${invoiceNo}`);
       onDone();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "An unexpected error occurred");
@@ -567,7 +670,7 @@ function NewSaleDialog({
   return (
     <DialogContent className="max-w-7xl w-[96vw] max-h-[90vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>New sale</DialogTitle>
+        <DialogTitle>{editing ? `Edit Sale: ${editing.invoice_no}` : "New sale"}</DialogTitle>
       </DialogHeader>
       <div className="grid gap-3 md:grid-cols-3">
         <div>

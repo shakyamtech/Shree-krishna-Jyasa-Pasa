@@ -120,6 +120,7 @@ export function PartiesPage({ table, title }: { table: "customers" | "suppliers"
             </Button>
           </DialogTrigger>
           <PartyForm
+            key={editing?.id ?? "new"}
             table={table}
             editing={editing}
             onDone={() => {

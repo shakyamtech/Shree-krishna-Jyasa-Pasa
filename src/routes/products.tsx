@@ -124,6 +124,7 @@ function ProductsPage() {
             </Button>
           </DialogTrigger>
           <ProductForm
+            key={editing?.id ?? "new"}
             cats={cats}
             editing={editing}
             onDone={() => {
