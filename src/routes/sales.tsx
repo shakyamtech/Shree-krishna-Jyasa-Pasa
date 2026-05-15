@@ -125,9 +125,6 @@ function SalesPage() {
                     <Button size="sm" variant="ghost" onClick={() => reprint(s.id)}>
                       <Download className="size-4 mr-1" />PDF
                     </Button>
-                    <Button size="sm" variant="ghost" className="text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50" onClick={() => deleteSale(s.id)}>
-                      <Trash2 className="size-4" />
-                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -492,28 +489,7 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
         </div>
       </div>
 
-      <DialogFooter className="flex-col sm:flex-row sm:justify-between gap-4 mt-4 pt-4 border-t border-border/60">
-        <div className="flex items-center">
-          <Button 
-            type="button" 
-            variant="destructive" 
-            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white"
-            onClick={() => {
-              if (confirm("Danger Zone: Are you sure you want to completely clear this bill?")) {
-                setLines([blankLine()]);
-                setCustomerId("walk-in");
-                setDiscount(0);
-                setPaid(0);
-                setIsPaidEdited(false);
-                setPaymentMode("cash");
-                setNotes("");
-              }
-            }}
-          >
-            <Trash2 className="size-4 mr-2" />
-            Clear Bill (Danger Zone)
-          </Button>
-        </div>
+      <DialogFooter className="mt-4 pt-4 border-t border-border/60">
         <Button onClick={submit} disabled={busy} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white">
           <FileText className="size-4 mr-2" />{busy ? "Saving…" : "Save & download PDF"}
         </Button>
