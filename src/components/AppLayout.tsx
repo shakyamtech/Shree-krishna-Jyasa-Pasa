@@ -355,7 +355,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <header className="md:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b border-sidebar-border bg-sidebar shadow-sm">
           <button
             onClick={() => setOpen(true)}
-            className="p-1 hover:bg-sidebar-accent rounded-md transition-colors text-sidebar-foreground"
+            className={cn(
+              "p-1 rounded-md transition-colors",
+              theme === "gold" ? "text-amber-500 hover:bg-white/10" : "text-sidebar-foreground hover:bg-sidebar-accent"
+            )}
           >
             <Menu className="size-5" />
           </button>
