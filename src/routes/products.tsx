@@ -357,7 +357,9 @@ function ProductsPage() {
                       className={cn(
                         "overflow-hidden flex flex-col group transition-all hover:shadow-xl",
                         theme === "gold"
-                          ? "gold-gradient-bg text-black border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-amber-500/20"
+                          ? p.metal?.toLowerCase() === "silver"
+                            ? "silver-gradient-bg text-black border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-slate-400/20"
+                            : "gold-gradient-bg text-black border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-amber-500/20"
                           : "border border-border/80 dark:border-amber-500/20 dark:bg-card/40 hover:border-amber-500/50 hover:shadow-amber-500/5 rounded-xl",
                       )}
                     >
