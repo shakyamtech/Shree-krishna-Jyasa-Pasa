@@ -58,18 +58,18 @@ export function PartiesPage({ table, title }: { table: "customers" | "suppliers"
       <Card><CardContent className="p-0 overflow-x-auto">
         <Table>
           <TableHeader><TableRow>
-            <TableHead>Name</TableHead><TableHead>Phone</TableHead><TableHead>PAN</TableHead>
-            <TableHead>Address</TableHead><TableHead>Opening</TableHead><TableHead></TableHead>
+            <TableHead className="whitespace-nowrap">Name</TableHead><TableHead className="whitespace-nowrap">Phone</TableHead><TableHead className="whitespace-nowrap">PAN</TableHead>
+            <TableHead className="whitespace-nowrap">Address</TableHead><TableHead className="whitespace-nowrap">Opening</TableHead><TableHead></TableHead>
           </TableRow></TableHeader>
           <TableBody>
             {filtered.map((p) => (
               <TableRow key={p.id}>
-                <TableCell className="font-medium">{p.name}</TableCell>
-                <TableCell>{p.phone ?? "—"}</TableCell>
-                <TableCell>{p.pan ?? "—"}</TableCell>
-                <TableCell className="max-w-xs truncate">{p.address ?? "—"}</TableCell>
-                <TableCell>{formatNPR(p.opening_balance)}</TableCell>
-                <TableCell className="text-right">
+                <TableCell className="font-medium whitespace-nowrap">{p.name}</TableCell>
+                <TableCell className="whitespace-nowrap">{p.phone ?? "—"}</TableCell>
+                <TableCell className="whitespace-nowrap">{p.pan ?? "—"}</TableCell>
+                <TableCell className="max-w-[150px] md:max-w-xs truncate">{p.address ?? "—"}</TableCell>
+                <TableCell className="whitespace-nowrap">{formatNPR(p.opening_balance)}</TableCell>
+                <TableCell className="text-right whitespace-nowrap">
                   <Button size="icon" variant="ghost" onClick={() => { setEditing(p); setOpen(true); }}><Pencil className="size-4" /></Button>
                   <Button size="icon" variant="ghost" onClick={() => remove(p.id)}><Trash2 className="size-4" /></Button>
                 </TableCell>
