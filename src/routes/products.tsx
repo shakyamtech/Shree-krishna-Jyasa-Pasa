@@ -109,7 +109,12 @@ function ProductsPage() {
   }
 
   const filtered = items.filter((i) => {
-    if (selectedCat !== "all" && i.category_id !== selectedCat) return false;
+    if (selectedCat !== "all") {
+      const isMatch = i.category_id === selectedCat;
+      const cat = cats.find((c) => c.id === i.category_id);
+      const isChildMatch = cat?.parent_id === selectedCat;
+      if (!isMatch && !isChildMatch) return false;
+    }
     const catName = cats.find((c) => c.id === i.category_id)?.name ?? "";
     return [i.name, i.sku, i.purity, catName]
       .filter(Boolean)
@@ -164,185 +169,112 @@ function ProductsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {cats.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
+                {cats
+                  .filter((c) => !c.parent_id)
+                  .map((parent) => (
+                    <React.Fragment key={parent.id}>
+                      <SelectItem value={parent.id} className="font-bold">
+                        {parent.name}
+                      </SelectItem>
+                      {cats
+                        .filter((child) => child.parent_id === parent.id)
+                        .map((child) => (
+                          <SelectItem key={child.id} value={child.id} className="pl-6 text-xs">
+                            — {child.name}
+                          </SelectItem>
+                        ))}
+                    </React.Fragment>
+                  ))}
               </SelectContent>
             </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Desktop view: Standard Table */}
-      <div className="hidden md:block">
-        <Card>
-          <CardContent className="p-0 overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Metal</TableHead>
-                  <TableHead>Purity</TableHead>
-                  <TableHead>Weight</TableHead>
-                  <TableHead>Jarti%</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Making</TableHead>
-                  <TableHead>Cost</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((p) => (
-                  <TableRow key={p.id}>
-                    <TableCell className="font-mono text-xs">{p.sku ?? "—"}</TableCell>
-                    <TableCell className="font-medium">{p.name}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {getCategoryName(p.category_id)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={p.metal === "gold" ? "default" : "secondary"}
-                        className="capitalize"
-                      >
-                        {p.metal}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{p.purity ?? "—"}</TableCell>
-                    <TableCell>{formatGram(p.weight_gram)}</TableCell>
-                    <TableCell>{p.jarti_percent > 0 ? p.jarti_percent + "%" : "—"}</TableCell>
-                    <TableCell>
-                      <span
-                        className={p.stock_qty <= p.min_stock ? "text-destructive font-medium" : ""}
-                      >
-                        {p.stock_qty}
-                      </span>
-                    </TableCell>
-                    <TableCell>{formatNPR(p.making_charge)}</TableCell>
-                    <TableCell>{formatNPR(p.cost_price)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => {
-                          setEditing(p);
-                          setOpen(true);
-                        }}
-                      >
-                        <Pencil className="size-4" />
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => remove(p.id)}>
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {!filtered.length && (
-                  <TableRow>
-                    <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
-                      No products
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Mobile view: Premium Touch-Optimized Stacked Cards */}
-      <div className="grid gap-3 md:hidden">
+      {/* Product Grid View (Desktop & Mobile) */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filtered.map((p) => (
-          <Card key={p.id} className="overflow-hidden border border-border/80 shadow-xs">
-            <CardContent className="p-3.5 space-y-2.5">
+          <Card key={p.id} className="overflow-hidden border border-border/80 shadow-xs flex flex-col group hover:border-amber-500/50 transition-colors">
+            <CardContent className="p-4 flex-1 space-y-3">
               <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="font-bold text-sm leading-tight text-foreground">{p.name}</div>
-                  <div className="text-[10px] text-amber-600 dark:text-amber-500 font-medium mt-0.5">
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-base leading-tight text-foreground truncate group-hover:text-amber-600 transition-colors">
+                    {p.name}
+                  </div>
+                  <div className="text-[10px] text-amber-600 dark:text-amber-500 font-semibold mt-0.5 truncate">
                     {getCategoryName(p.category_id)}
                   </div>
-                  <div className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                  <div className="text-[10px] text-muted-foreground font-mono mt-1">
                     SKU: {p.sku ?? "—"}
                   </div>
                 </div>
-                <Badge
-                  variant={p.metal === "gold" ? "default" : "secondary"}
-                  className="capitalize text-[10px] px-2 py-0.5 font-medium shrink-0"
-                >
-                  {p.metal} {p.purity && `• ${p.purity}`}
-                </Badge>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <Badge
+                    variant={p.metal === "gold" ? "default" : "secondary"}
+                    className="capitalize text-[10px] px-2 py-0.5 font-medium"
+                  >
+                    {p.metal}
+                  </Badge>
+                  {p.purity && (
+                    <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                      {p.purity}
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 pt-1.5 border-t text-xs bg-muted/20 p-2.5 rounded-md">
+              <div className="grid grid-cols-2 gap-3 pt-3 border-t text-xs">
                 <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-semibold">
+                  <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
                     Weight
                   </span>
-                  <span className="font-medium">{formatGram(p.weight_gram)}</span>
+                  <span className="font-semibold text-sm">{formatGram(p.weight_gram)}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-semibold">
-                    Stock
+                  <span className="text-muted-foreground block text-[10px] uppercase font-bold tracking-tight">
+                    In Stock
                   </span>
                   <span
                     className={cn(
-                      "font-medium",
-                      p.stock_qty <= p.min_stock && "text-destructive font-bold",
+                      "font-semibold text-sm",
+                      p.stock_qty <= p.min_stock && "text-destructive font-black animate-pulse",
                     )}
                   >
                     {p.stock_qty} {p.stock_qty <= p.min_stock && "⚠️"}
                   </span>
                 </div>
-                <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-semibold">
-                    Jarti (DOM)
-                  </span>
-                  <span className="font-medium">{p.jarti_percent}%</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-semibold">
-                    Making
-                  </span>
-                  <span className="font-medium">{formatNPR(p.making_charge)}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-semibold">
-                    Cost
-                  </span>
-                  <span className="font-medium">{formatNPR(p.cost_price)}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-1 pt-0.5">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 px-2.5 text-xs font-medium"
-                  onClick={() => {
-                    setEditing(p);
-                    setOpen(true);
-                  }}
-                >
-                  <Pencil className="size-3 mr-1.5" /> Edit
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 px-2.5 text-xs font-medium text-destructive hover:text-destructive hover:bg-destructive/10"
-                  onClick={() => remove(p.id)}
-                >
-                  <Trash2 className="size-3 mr-1.5" /> Delete
-                </Button>
               </div>
             </CardContent>
+
+            <div className="bg-muted/30 p-2 border-t flex items-center justify-end gap-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-8 px-3 text-xs gap-1.5 hover:bg-amber-500/10 hover:text-amber-600"
+                onClick={() => {
+                  setEditing(p);
+                  setOpen(true);
+                }}
+              >
+                <Pencil className="size-3.5" />
+                Edit
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-8 px-3 text-xs gap-1.5 hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => remove(p.id)}
+              >
+                <Trash2 className="size-3.5" />
+                Delete
+              </Button>
+            </div>
           </Card>
         ))}
         {!filtered.length && (
-          <div className="text-center text-muted-foreground py-8 border rounded-lg bg-card text-xs">
-            No products found
+          <div className="col-span-full py-12 text-center text-muted-foreground bg-muted/20 rounded-lg border-2 border-dashed">
+            <div className="text-lg font-medium">No products found</div>
+            <p className="text-sm">Try adjusting your search or filters</p>
           </div>
         )}
       </div>
