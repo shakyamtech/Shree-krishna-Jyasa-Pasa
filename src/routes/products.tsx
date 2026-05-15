@@ -251,18 +251,18 @@ function ProductsPage() {
                 <div className="flex flex-col items-center gap-1">
                   <div
                     className={cn(
-                      "flex items-center gap-6 px-8 py-3 rounded-full border border-border/80 shadow-sm transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99] gold-glow",
+                      "flex items-center gap-6 px-8 py-3 rounded-full border border-border/80 shadow-sm transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99]",
                       theme === "gold"
                         ? effectivelyExpanded
-                          ? "bg-zinc-950 text-amber-500 border-amber-500/30"
-                          : "bg-amber-500 text-black border-amber-600"
+                          ? "bg-zinc-950 text-amber-500 border-amber-500/30 shadow-xl shadow-black/40"
+                          : "gold-gradient-bg text-black border-amber-600 shadow-lg shadow-amber-500/20"
                         : "bg-white dark:bg-card/50 backdrop-blur-md text-foreground",
                     )}
                   >
                     <span
                       className={cn(
                         "text-xs font-black uppercase tracking-widest whitespace-nowrap",
-                        theme === "gold" && !effectivelyExpanded ? "" : "gold-shimmer",
+                        theme === "gold" && !effectivelyExpanded ? "text-black" : "gold-shimmer",
                       )}
                     >
                       {group.name}
@@ -305,7 +305,7 @@ function ProductsPage() {
                         theme === "gold"
                           ? effectivelyExpanded
                             ? "text-amber-400/40"
-                            : "text-black/40"
+                            : "text-black/60"
                           : "text-amber-600/40 dark:text-amber-400/40",
                       )}
                     >
@@ -357,7 +357,7 @@ function ProductsPage() {
                       className={cn(
                         "overflow-hidden flex flex-col group transition-all hover:shadow-xl",
                         theme === "gold"
-                          ? "bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 text-black border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-amber-500/20"
+                          ? "gold-gradient-bg text-black border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-amber-500/20"
                           : "border border-border/80 dark:border-amber-500/20 dark:bg-card/40 hover:border-amber-500/50 hover:shadow-amber-500/5 rounded-xl",
                       )}
                     >
