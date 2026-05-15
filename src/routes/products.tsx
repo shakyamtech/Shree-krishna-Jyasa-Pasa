@@ -244,7 +244,20 @@ function ProductForm({ cats, editing, onDone }: { cats: Category[]; editing: Pro
             </SelectContent>
           </Select>
         </div>
-        <div><Label>Purity</Label><Input value={f.purity} onChange={(e) => setF({ ...f, purity: e.target.value })} placeholder="24K / 22K / 999" /></div>
+        <div>
+          <Label>Purity</Label>
+          <Select value={f.purity} onValueChange={(v) => setF({ ...f, purity: v })}>
+            <SelectTrigger><SelectValue placeholder="Select Purity" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="24K">24K</SelectItem>
+              <SelectItem value="22K">22K</SelectItem>
+              <SelectItem value="18K">18K</SelectItem>
+              <SelectItem value="999">999 (Fine Silver)</SelectItem>
+              <SelectItem value="925">925 (Sterling)</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div><Label>Weight (gram)</Label><Input type="number" step="0.001" value={f.weight_gram} onChange={(e) => setF({ ...f, weight_gram: Number(e.target.value) })} /></div>
         <div><Label>Making charge (Rs)</Label><Input type="number" step="0.01" value={f.making_charge} onChange={(e) => setF({ ...f, making_charge: Number(e.target.value) })} /></div>
         <div>

@@ -63,7 +63,7 @@ function SalesPage() {
       await supabase.from("credits").delete().eq("ref_table", "sales").eq("ref_id", saleId);
       await supabase.from("sale_items").delete().eq("sale_id", saleId);
       const { error } = await supabase.from("sales").delete().eq("id", saleId);
-      
+
       if (error) throw error;
       toast.success("Bill deleted.");
       load();
@@ -256,6 +256,17 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
 
   async function submit() {
     if (!lines.length || lines.some((l) => !l.description)) return toast.error("Fill all line items");
+    
+    // 1. Check stock for each item
+    for (const l of lines) {
+      if (!l.product_id) continue;
+      const prod = products.find((p) => p.id === l.product_id);
+      if (prod && prod.stock_qty < l.qty) {
+        toast.error(`Out of stock: ${prod.name} (Available: ${prod.stock_qty})`);
+        return;
+      }
+    }
+
     setBusy(true);
     try {
       const itemsPayload = lines.map((l) => ({
@@ -485,7 +496,7 @@ function NewSaleDialog({ customers, products, onDone }: { customers: Customer[];
             <Label className="w-32">Paid</Label>
             <Input type="number" step="0.01" value={paid} onChange={(e) => { setPaid(Number(e.target.value)); setIsPaidEdited(true); }} />
           </div>
-          <Row label="Due" value={formatNPR(totals.due)} bold />
+          {totals.due > 0 && <Row label="Due" value={formatNPR(totals.due)} bold />}
         </div>
       </div>
 

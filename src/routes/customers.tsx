@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, History } from "lucide-react";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AppLayout } from "@/components/AppLayout";
@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { formatNPR } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/customers")({
   component: () => <AuthGuard><AppLayout><PartiesPage table="customers" title="Customers" /></AppLayout></AuthGuard>,
@@ -23,17 +24,36 @@ interface Party {
   pan: string | null; opening_balance: number; notes: string | null;
 }
 
+interface CreditEntry {
+  id: string; party_type: string; party_id: string; entry_date: string;
+  debit: number; credit: number; note: string | null; ref_table: string | null;
+}
+
 export function PartiesPage({ table, title }: { table: "customers" | "suppliers"; title: string }) {
   const [items, setItems] = useState<Party[]>([]);
+  const [credits, setCredits] = useState<CreditEntry[]>([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Party | null>(null);
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
   async function load() {
-    const { data } = await supabase.from(table).select("*").order("name");
-    setItems((data ?? []) as Party[]);
+    const partyType = table.replace(/s$/, "");
+    const [{ data: pData }, { data: cData }] = await Promise.all([
+      supabase.from(table).select("*").order("name"),
+      supabase.from("credits").select("*").eq("party_type", partyType),
+    ]);
+    setItems((pData ?? []) as Party[]);
+    setCredits((cData ?? []) as CreditEntry[]);
   }
   useEffect(() => { load(); }, [table]);
+
+  function getBalance(party: Party) {
+    const sum = credits
+      .filter((x) => x.party_id === party.id)
+      .reduce((s, x) => s + Number(x.debit) - Number(x.credit), 0);
+    return Number(party.opening_balance ?? 0) + sum;
+  }
 
   async function remove(id: string) {
     if (!confirm("Delete?")) return;
@@ -59,23 +79,30 @@ export function PartiesPage({ table, title }: { table: "customers" | "suppliers"
         <Table>
           <TableHeader><TableRow>
             <TableHead className="whitespace-nowrap">Name</TableHead><TableHead className="whitespace-nowrap">Phone</TableHead><TableHead className="whitespace-nowrap">PAN</TableHead>
-            <TableHead className="whitespace-nowrap">Address</TableHead><TableHead className="whitespace-nowrap">Opening</TableHead><TableHead></TableHead>
+            <TableHead className="whitespace-nowrap">Address</TableHead><TableHead className="whitespace-nowrap">Opening</TableHead><TableHead className="whitespace-nowrap">Balance</TableHead><TableHead></TableHead>
           </TableRow></TableHeader>
           <TableBody>
-            {filtered.map((p) => (
-              <TableRow key={p.id}>
-                <TableCell className="font-medium whitespace-nowrap">{p.name}</TableCell>
-                <TableCell className="whitespace-nowrap">{p.phone ?? "—"}</TableCell>
-                <TableCell className="whitespace-nowrap">{p.pan ?? "—"}</TableCell>
-                <TableCell className="max-w-[150px] md:max-w-xs truncate">{p.address ?? "—"}</TableCell>
-                <TableCell className="whitespace-nowrap">{formatNPR(p.opening_balance)}</TableCell>
-                <TableCell className="text-right whitespace-nowrap">
-                  <Button size="icon" variant="ghost" onClick={() => { setEditing(p); setOpen(true); }}><Pencil className="size-4" /></Button>
-                  <Button size="icon" variant="ghost" onClick={() => remove(p.id)}><Trash2 className="size-4" /></Button>
-                </TableCell>
-              </TableRow>
-            ))}
-            {!filtered.length && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No records</TableCell></TableRow>}
+            {filtered.map((p) => {
+              const bal = getBalance(p);
+              return (
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium whitespace-nowrap">{p.name}</TableCell>
+                  <TableCell className="whitespace-nowrap">{p.phone ?? "—"}</TableCell>
+                  <TableCell className="whitespace-nowrap">{p.pan ?? "—"}</TableCell>
+                  <TableCell className="max-w-[150px] md:max-w-xs truncate">{p.address ?? "—"}</TableCell>
+                  <TableCell className="whitespace-nowrap">{formatNPR(p.opening_balance)}</TableCell>
+                  <TableCell className={cn("whitespace-nowrap font-semibold", bal > 0 ? "text-destructive" : (bal < 0 ? "text-green-600" : ""))}>
+                    {formatNPR(Math.abs(bal))} {bal > 0 ? (table === "customers" ? "Dr" : "Cr") : (bal < 0 ? (table === "customers" ? "Cr" : "Dr") : "")}
+                  </TableCell>
+                  <TableCell className="text-right whitespace-nowrap">
+                    <Button size="icon" variant="ghost" onClick={() => navigate({ to: '/ledger/' + p.id })} title="Ledger & History"><History className="size-4" /></Button>
+                    <Button size="icon" variant="ghost" onClick={() => { setEditing(p); setOpen(true); }}><Pencil className="size-4" /></Button>
+                    <Button size="icon" variant="ghost" onClick={() => remove(p.id)}><Trash2 className="size-4 text-red-600" /></Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+            {!filtered.length && <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">No records</TableCell></TableRow>}
           </TableBody>
         </Table>
       </CardContent></Card>
