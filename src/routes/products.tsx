@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React, { useEffect, useState, useMemo } from "react";
-import { Plus, Pencil, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Pencil, Trash2, ChevronDown, ChevronUp, Package, Scale } from "lucide-react";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AppLayout } from "@/components/AppLayout";
@@ -264,38 +264,76 @@ function ProductsPage() {
       {/* Total Summary Card */}
       {showTotals && (
         <Card className={cn(
-          "mb-2 animate-in fade-in slide-in-from-top-2 duration-300",
+          "mb-4 animate-in fade-in slide-in-from-top-2 duration-300 overflow-hidden",
           theme === "gold"
-            ? "gold-gradient-bg border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-lg shadow-amber-500/20"
-            : "border-amber-500/30 dark:border-amber-500/20 shadow-sm"
+            ? "gold-gradient-bg border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-xl shadow-amber-500/20"
+            : "bg-white dark:bg-zinc-900 border border-amber-500/20 dark:border-amber-500/10 shadow-lg shadow-amber-500/5 rounded-2xl"
         )}>
-          <CardContent className="p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-3">
-              <Badge className={cn(
-                "text-lg px-4 py-1.5 font-bold rounded-full",
-                theme === "gold" ? "bg-black text-amber-500" : "bg-amber-500 text-white"
-              )}>
-                {totals.units} Units
-              </Badge>
-              <span className={cn(
-                "text-sm font-medium",
-                theme === "gold" ? "text-black/60" : "text-muted-foreground"
-              )}>
-                Total Inventory Stock
-              </span>
-            </div>
-            <div className="text-center sm:text-right">
-              <div className={cn(
-                "text-3xl font-black",
-                theme === "gold" ? "text-black" : "text-amber-600 dark:text-amber-400"
-              )}>
-                {formatGram(totals.weight)}
+          <CardContent className="p-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-amber-500/10">
+              {/* Units Section */}
+              <div className="p-6 flex items-center gap-4">
+                <div className={cn(
+                  "size-12 rounded-full flex items-center justify-center shadow-inner",
+                  theme === "gold" ? "bg-black/10" : "bg-amber-50 dark:bg-amber-950/20"
+                )}>
+                  <Package className={cn(
+                    "size-6",
+                    theme === "gold" ? "text-black" : "text-amber-600 dark:text-amber-400"
+                  )} />
+                </div>
+                <div>
+                  <div className={cn(
+                    "text-xs font-medium uppercase tracking-wider",
+                    theme === "gold" ? "text-black/50" : "text-muted-foreground"
+                  )}>
+                    Total Units
+                  </div>
+                  <div className={cn(
+                    "text-3xl font-black mt-0.5",
+                    theme === "gold" ? "text-black" : "text-foreground"
+                  )}>
+                    {totals.units}{" "}
+                    <span className="text-sm font-medium">Items</span>
+                  </div>
+                </div>
               </div>
-              <div className={cn(
-                "text-sm font-medium",
-                theme === "gold" ? "text-black/60" : "text-muted-foreground"
-              )}>
-                {formatTola(totals.weight)}
+
+              {/* Weight Section */}
+              <div className="p-6 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className={cn(
+                    "size-12 rounded-full flex items-center justify-center shadow-inner",
+                    theme === "gold" ? "bg-black/10" : "bg-amber-50 dark:bg-amber-950/20"
+                  )}>
+                    <Scale className={cn(
+                      "size-6",
+                      theme === "gold" ? "text-black" : "text-amber-600 dark:text-amber-400"
+                    )} />
+                  </div>
+                  <div>
+                    <div className={cn(
+                      "text-xs font-medium uppercase tracking-wider",
+                      theme === "gold" ? "text-black/50" : "text-muted-foreground"
+                    )}>
+                      Total Weight
+                    </div>
+                    <div className={cn(
+                      "text-3xl font-black mt-0.5",
+                      theme === "gold" ? "text-black" : "text-foreground"
+                    )}>
+                      {formatGram(totals.weight)}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className={cn(
+                    "text-sm font-bold px-3 py-1 rounded-lg",
+                    theme === "gold" ? "bg-black/10 text-black" : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                  )}>
+                    {formatTola(totals.weight)}
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
