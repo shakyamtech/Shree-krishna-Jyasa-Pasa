@@ -220,7 +220,7 @@ function Dashboard() {
                         theme === "gold" ? "text-black/40" : "text-muted-foreground",
                       )}
                     >
-                      Updated {new Date(p.fetched_at).toLocaleString()}
+                      Updated {new Date(p.fetched_at).toLocaleString()} | Source: {p.source === "fenegosida.org" ? "FENEGOSIDA" : "International"}
                     </div>
                   </div>
                 ) : (
@@ -296,7 +296,7 @@ function Dashboard() {
                       theme === "gold" ? "text-black/40" : "text-muted-foreground",
                     )}
                   >
-                    Updated {lastUpdated}
+                    Updated {lastUpdated} | Source: {sp?.source === "fenegosida.org" ? "FENEGOSIDA" : "International"}
                   </div>
                 </div>
                 <div
