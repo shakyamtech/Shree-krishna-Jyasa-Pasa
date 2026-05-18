@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React, { useEffect, useState, useMemo } from "react";
-import { Plus, Pencil, Trash2, ChevronDown, ChevronUp, Package, Scale } from "lucide-react";
+import { Plus, Pencil, Trash2, ChevronDown, ChevronUp, Package, Scale, Coins } from "lucide-react";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AppLayout } from "@/components/AppLayout";
@@ -168,11 +168,17 @@ function ProductsPage() {
   const totals = useMemo(() => {
     return filtered.reduce(
       (acc, p) => {
-        acc.units += p.stock_qty;
-        acc.weight += p.weight_gram * p.stock_qty;
+        const metal = p.metal?.toLowerCase() || "other";
+        if (!acc[metal]) {
+          acc[metal] = { units: 0, weight: 0 };
+        }
+        acc[metal].units += p.stock_qty;
+        acc[metal].weight += p.weight_gram * p.stock_qty;
+        acc.all.units += p.stock_qty;
+        acc.all.weight += p.weight_gram * p.stock_qty;
         return acc;
       },
-      { units: 0, weight: 0 },
+      { all: { units: 0, weight: 0 } } as Record<string, { units: number; weight: number }>,
     );
   }, [filtered]);
 
@@ -270,68 +276,87 @@ function ProductsPage() {
             : "bg-white dark:bg-zinc-900 border border-amber-500/20 dark:border-amber-500/10 shadow-lg shadow-amber-500/5 rounded-2xl"
         )}>
           <CardContent className="p-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-amber-500/10">
-              {/* Units Section */}
-              <div className="p-6 flex items-center gap-4">
-                <div className={cn(
-                  "size-12 rounded-full flex items-center justify-center shadow-inner",
-                  theme === "gold" ? "bg-black/10" : "bg-amber-50 dark:bg-amber-950/20"
-                )}>
-                  <Package className={cn(
-                    "size-6",
-                    theme === "gold" ? "text-black" : "text-amber-600 dark:text-amber-400"
-                  )} />
-                </div>
-                <div>
-                  <div className={cn(
-                    "text-xs font-medium uppercase tracking-wider",
-                    theme === "gold" ? "text-black/50" : "text-muted-foreground"
-                  )}>
-                    Total Units
+            <div className="divide-y divide-amber-500/10">
+              {Object.entries(totals)
+                .filter(([k]) => k !== "all")
+                .map(([metal, data]) => (
+                  <div key={metal} className="p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className={cn(
+                        "size-10 rounded-full flex items-center justify-center shadow-inner",
+                        theme === "gold" ? "bg-black/10" : "bg-amber-50 dark:bg-amber-950/20"
+                      )}>
+                        {metal === "gold" ? (
+                          <Coins className={cn("size-5", theme === "gold" ? "text-black" : "text-amber-600")} />
+                        ) : (
+                          <Package className={cn("size-5", theme === "gold" ? "text-black" : "text-amber-600")} />
+                        )}
+                      </div>
+                      <div>
+                        <div className={cn(
+                          "text-xs font-medium uppercase tracking-wider capitalize",
+                          theme === "gold" ? "text-black/50" : "text-muted-foreground"
+                        )}>
+                          {metal}
+                        </div>
+                        <div className={cn(
+                          "text-xl font-black mt-0.5",
+                          theme === "gold" ? "text-black" : "text-foreground"
+                        )}>
+                          {data.units} <span className="text-sm font-medium">Units</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <div className={cn(
+                          "text-xl font-black",
+                          theme === "gold" ? "text-black" : "text-foreground"
+                        )}>
+                          {formatGram(data.weight)}
+                        </div>
+                        <div className={cn(
+                          "text-xs font-medium",
+                          theme === "gold" ? "text-black/60" : "text-muted-foreground"
+                        )}>
+                          {formatTola(data.weight)}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className={cn(
-                    "text-3xl font-black mt-0.5",
-                    theme === "gold" ? "text-black" : "text-foreground"
-                  )}>
-                    {totals.units}{" "}
-                    <span className="text-sm font-medium">Items</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Weight Section */}
-              <div className="p-6 flex items-center justify-between gap-4">
+                ))}
+              
+              {/* Grand Total Row */}
+              <div className={cn(
+                "p-4 flex flex-col sm:flex-row justify-between items-center gap-4",
+                theme === "gold" ? "bg-black/20" : "bg-amber-50/50 dark:bg-amber-950/10"
+              )}>
                 <div className="flex items-center gap-4">
                   <div className={cn(
-                    "size-12 rounded-full flex items-center justify-center shadow-inner",
-                    theme === "gold" ? "bg-black/10" : "bg-amber-50 dark:bg-amber-950/20"
+                    "font-bold uppercase text-xs tracking-wider",
+                    theme === "gold" ? "text-black/50" : "text-muted-foreground"
                   )}>
-                    <Scale className={cn(
-                      "size-6",
-                      theme === "gold" ? "text-black" : "text-amber-600 dark:text-amber-400"
-                    )} />
+                    Grand Total
                   </div>
-                  <div>
-                    <div className={cn(
-                      "text-xs font-medium uppercase tracking-wider",
-                      theme === "gold" ? "text-black/50" : "text-muted-foreground"
-                    )}>
-                      Total Weight
-                    </div>
-                    <div className={cn(
-                      "text-3xl font-black mt-0.5",
-                      theme === "gold" ? "text-black" : "text-foreground"
-                    )}>
-                      {formatGram(totals.weight)}
-                    </div>
+                  <div className={cn(
+                    "text-2xl font-black",
+                    theme === "gold" ? "text-black" : "text-foreground"
+                  )}>
+                    {totals.all.units} <span className="text-sm font-medium">Units</span>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className={cn(
-                    "text-sm font-bold px-3 py-1 rounded-lg",
-                    theme === "gold" ? "bg-black/10 text-black" : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                    "text-2xl font-black",
+                    theme === "gold" ? "text-black" : "text-amber-600 dark:text-amber-400"
                   )}>
-                    {formatTola(totals.weight)}
+                    {formatGram(totals.all.weight)}
+                  </div>
+                  <div className={cn(
+                    "text-sm font-medium",
+                    theme === "gold" ? "text-black/60" : "text-muted-foreground"
+                  )}>
+                    {formatTola(totals.all.weight)}
                   </div>
                 </div>
               </div>
