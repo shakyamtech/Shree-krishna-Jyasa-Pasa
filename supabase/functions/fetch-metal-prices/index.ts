@@ -85,14 +85,16 @@ Deno.serve(async (req) => {
       const html = await r.text();
       const goldMatch = html.match(/FINE GOLD[^<]*<[^>]*>[\s\S]*?<b>\s*(\d[\d,]*)\s*<\/b>/i);
       const silverMatch = html.match(
-        /SILVER[^<]*<[^>]*>[\s\S]*?per 1 tola[\s\S]*?<b>\s*(\d[\d,]*)\s*<\/b>/i,
+        /SILVER[^<]*<[^>]*>[\s\S]*?per 10 grm[\s\S]*?<b>\s*(\d[\d,]*)\s*<\/b>/i,
       );
       const gold = goldMatch ? Number(goldMatch[1].replace(/,/g, "")) : NaN;
-      const silver = silverMatch ? Number(silverMatch[1].replace(/,/g, "")) : NaN;
+      const silverPer10g = silverMatch ? Number(silverMatch[1].replace(/,/g, "")) : NaN;
+      
       if (!Number.isFinite(gold) || gold <= 0) throw new Error("no gold rate");
-      if (!Number.isFinite(silver) || silver <= 0) throw new Error("no silver rate");
+      if (!Number.isFinite(silverPer10g) || silverPer10g <= 0) throw new Error("no silver rate");
+      
       goldPerTola_NPR = gold;
-      silverPerTola_NPR = silver;
+      silverPerTola_NPR = (silverPer10g / 10) * TOLA;
     } catch (primaryErr) {
       console.warn("Primary failed, using fallback:", (primaryErr as Error).message);
       // Fallback: international spot (gold-api.com) + USD->NPR FX. Spot rate ≈ 24K pure.

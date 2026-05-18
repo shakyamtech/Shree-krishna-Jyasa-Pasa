@@ -391,7 +391,7 @@ function SaleDialog({
         const gp = data?.find((x) => x.metal === "gold");
         if (gp?.price_per_gram) map.gold = Number(gp.price_per_gram);
 
-        const sp = data?.find((x) => x.metal !== "gold" && x.metal !== "silver");
+        const sp = data?.find((x) => x.metal === "silver");
         if (sp?.price_per_gram) map.silver = Number(sp.price_per_gram);
         setLiveRates(map);
       });

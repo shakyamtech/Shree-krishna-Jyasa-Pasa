@@ -235,8 +235,8 @@ function Dashboard() {
       {/* Silver Price Section */}
       {(() => {
         const sp = prices.find((x) => x.metal === "silver" && x.price_per_tola < 10000);
-        const perTola = sp ? sp.price_per_tola : 5745.0;
-        const perGram = sp ? sp.price_per_gram : 492.5;
+        const perTola = sp ? sp.price_per_tola : 5060.0; // Updated fallback for 18/05/2026
+        const perGram = sp ? sp.price_per_gram : 433.8;  // Updated fallback for 18/05/2026
         const lastUpdated = sp
           ? new Date(sp.fetched_at).toLocaleString()
           : new Date().toLocaleDateString();
