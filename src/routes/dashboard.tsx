@@ -26,7 +26,6 @@ interface Price {
   price_per_gram: number;
   price_per_tola: number;
   fetched_at: string;
-  source?: string;
 }
 
 function Dashboard() {
@@ -47,7 +46,7 @@ function Dashboard() {
   async function loadPrices() {
     const { data } = await supabase
       .from("metal_prices")
-      .select("metal, price_per_gram, price_per_tola, fetched_at, source")
+      .select("metal, price_per_gram, price_per_tola, fetched_at")
       .order("fetched_at", { ascending: false })
       .limit(10);
     const seen = new Set<string>();
@@ -221,7 +220,7 @@ function Dashboard() {
                         theme === "gold" ? "text-black/40" : "text-muted-foreground",
                       )}
                     >
-                      Updated {new Date(p.fetched_at).toLocaleString()} | Source: {p.source === "fenegosida.org" ? "FENEGOSIDA" : "International"}
+                      Updated {new Date(p.fetched_at).toLocaleString()}
                     </div>
                   </div>
                 ) : (
@@ -297,7 +296,7 @@ function Dashboard() {
                       theme === "gold" ? "text-black/40" : "text-muted-foreground",
                     )}
                   >
-                    Updated {lastUpdated} | Source: {sp?.source === "fenegosida.org" ? "FENEGOSIDA" : "International"}
+                    Updated {lastUpdated}
                   </div>
                 </div>
                 <div
