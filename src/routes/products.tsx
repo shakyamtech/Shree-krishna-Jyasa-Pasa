@@ -3,7 +3,6 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Plus, Pencil, Trash2, ChevronDown, ChevronUp, Package, Scale, Coins } from "lucide-react";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/AuthGuard";
-import { useAuth } from "@/lib/auth-context";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,8 +68,6 @@ interface Category {
 }
 
 function ProductsPage() {
-  const { role } = useAuth();
-  const isStaff = role === "staff";
   const [items, setItems] = useState<Product[]>([]);
   const [cats, setCats] = useState<Category[]>([]);
   const [search, setSearch] = useState("");
@@ -254,26 +251,24 @@ function ProductsPage() {
       </Card>
 
       {/* Total Summary Card Toggle */}
-      {!isStaff && (
-        <div className="flex justify-end">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => setShowTotals(!showTotals)}
-            className={cn(
-              "text-xs gap-1",
-              theme === "gold" 
-                ? "border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-400" 
-                : "border-border hover:bg-muted"
-            )}
-          >
-            {showTotals ? "Hide Totals" : "Show Totals"}
-          </Button>
-        </div>
-      )}
+      <div className="flex justify-end">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setShowTotals(!showTotals)}
+          className={cn(
+            "text-xs gap-1",
+            theme === "gold" 
+              ? "border-amber-500/30 text-amber-500 hover:bg-amber-500/10 hover:text-amber-400" 
+              : "border-border hover:bg-muted"
+          )}
+        >
+          {showTotals ? "Hide Totals" : "Show Totals"}
+        </Button>
+      </div>
 
       {/* Total Summary Card */}
-      {!isStaff && showTotals && (
+      {showTotals && (
         <Card className={cn(
           "mb-4 animate-in fade-in slide-in-from-top-2 duration-300 overflow-hidden",
           theme === "gold"
