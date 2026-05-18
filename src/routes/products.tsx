@@ -164,6 +164,17 @@ function ProductsPage() {
     return Object.entries(groups).sort((a, b) => a[1].name.localeCompare(b[1].name));
   }, [filtered, cats]);
 
+  const totals = useMemo(() => {
+    return filtered.reduce(
+      (acc, p) => {
+        acc.units += p.stock_qty;
+        acc.weight += p.weight_gram * p.stock_qty;
+        return acc;
+      },
+      { units: 0, weight: 0 },
+    );
+  }, [filtered]);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
@@ -228,6 +239,45 @@ function ProductsPage() {
                   ))}
               </SelectContent>
             </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Total Summary Card */}
+      <Card className={cn(
+        "mb-2",
+        theme === "gold"
+          ? "gold-gradient-bg border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-lg shadow-amber-500/20"
+          : "border-amber-500/30 dark:border-amber-500/20 shadow-sm"
+      )}>
+        <CardContent className="p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            <Badge className={cn(
+              "text-lg px-4 py-1.5 font-bold rounded-full",
+              theme === "gold" ? "bg-black text-amber-500" : "bg-amber-500 text-white"
+            )}>
+              {totals.units} Units
+            </Badge>
+            <span className={cn(
+              "text-sm font-medium",
+              theme === "gold" ? "text-black/60" : "text-muted-foreground"
+            )}>
+              Total Inventory Stock
+            </span>
+          </div>
+          <div className="text-center sm:text-right">
+            <div className={cn(
+              "text-3xl font-black",
+              theme === "gold" ? "text-black" : "text-amber-600 dark:text-amber-400"
+            )}>
+              {formatGram(totals.weight)}
+            </div>
+            <div className={cn(
+              "text-sm font-medium",
+              theme === "gold" ? "text-black/60" : "text-muted-foreground"
+            )}>
+              {formatTola(totals.weight)}
+            </div>
           </div>
         </CardContent>
       </Card>
