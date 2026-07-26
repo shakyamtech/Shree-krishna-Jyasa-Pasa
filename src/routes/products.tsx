@@ -67,6 +67,16 @@ interface Category {
   parent_id: string | null;
 }
 
+const DEFAULT_CATEGORIES: Category[] = [
+  { id: "cat-haar", name: "हार तथा रानीहार (Necklaces)", metal: "gold", parent_id: null },
+  { id: "cat-tilhari", name: "तिलहरी तथा नौगेडी (Tilhari & Nau Gedi)", metal: "gold", parent_id: null },
+  { id: "cat-jhumka", name: "झुम्का तथा कानका गहना (Earrings & Jhumka)", metal: "gold", parent_id: null },
+  { id: "cat-bala", name: "बाला तथा चुरा (Bangles & Bala)", metal: "gold", parent_id: null },
+  { id: "cat-sirbandi", name: "सिरबन्दी, नथिया र फुली (Head & Nose Accessories)", metal: "gold", parent_id: null },
+  { id: "cat-ring", name: "सुनका अँगुठीहरू (Gold Rings)", metal: "gold", parent_id: null },
+  { id: "cat-silver", name: "चाँदीका गहना तथा भाँडाहरू (Silver Collection)", metal: "silver", parent_id: null },
+];
+
 const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
   {
     id: "sample-rh-1",
@@ -79,7 +89,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 5,
     min_stock: 1,
     cost_price: 525000,
-    category_id: null,
+    category_id: "cat-haar",
     jarti_percent: 2,
   },
   {
@@ -93,7 +103,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 4,
     min_stock: 1,
     cost_price: 437400,
-    category_id: null,
+    category_id: "cat-haar",
     jarti_percent: 2,
   },
   {
@@ -107,7 +117,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 7,
     min_stock: 2,
     cost_price: 262500,
-    category_id: null,
+    category_id: "cat-haar",
     jarti_percent: 1.5,
   },
   {
@@ -121,7 +131,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 8,
     min_stock: 2,
     cost_price: 300000,
-    category_id: null,
+    category_id: "cat-tilhari",
     jarti_percent: 1.5,
   },
   {
@@ -135,7 +145,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 10,
     min_stock: 2,
     cost_price: 175400,
-    category_id: null,
+    category_id: "cat-tilhari",
     jarti_percent: 1,
   },
   {
@@ -149,7 +159,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 6,
     min_stock: 1,
     cost_price: 350000,
-    category_id: null,
+    category_id: "cat-tilhari",
     jarti_percent: 1.5,
   },
   {
@@ -163,7 +173,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 12,
     min_stock: 3,
     cost_price: 232000,
-    category_id: null,
+    category_id: "cat-jhumka",
     jarti_percent: 1,
   },
   {
@@ -177,7 +187,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 15,
     min_stock: 3,
     cost_price: 131250,
-    category_id: null,
+    category_id: "cat-jhumka",
     jarti_percent: 1,
   },
   {
@@ -191,7 +201,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 20,
     min_stock: 5,
     cost_price: 87500,
-    category_id: null,
+    category_id: "cat-jhumka",
     jarti_percent: 0.5,
   },
   {
@@ -205,7 +215,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 6,
     min_stock: 1,
     cost_price: 700000,
-    category_id: null,
+    category_id: "cat-bala",
     jarti_percent: 2,
   },
   {
@@ -219,7 +229,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 9,
     min_stock: 2,
     cost_price: 524000,
-    category_id: null,
+    category_id: "cat-bala",
     jarti_percent: 1.5,
   },
   {
@@ -233,7 +243,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 6,
     min_stock: 1,
     cost_price: 270000,
-    category_id: null,
+    category_id: "cat-sirbandi",
     jarti_percent: 1.5,
   },
   {
@@ -247,7 +257,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 18,
     min_stock: 4,
     cost_price: 70000,
-    category_id: null,
+    category_id: "cat-sirbandi",
     jarti_percent: 0.5,
   },
   {
@@ -261,7 +271,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 14,
     min_stock: 3,
     cost_price: 105000,
-    category_id: null,
+    category_id: "cat-ring",
     jarti_percent: 1,
   },
   {
@@ -275,7 +285,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 10,
     min_stock: 2,
     cost_price: 175000,
-    category_id: null,
+    category_id: "cat-ring",
     jarti_percent: 1,
   },
   {
@@ -289,7 +299,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 15,
     min_stock: 3,
     cost_price: 20500,
-    category_id: null,
+    category_id: "cat-silver",
     jarti_percent: 0,
   },
   {
@@ -303,7 +313,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 5,
     min_stock: 1,
     cost_price: 61500,
-    category_id: null,
+    category_id: "cat-silver",
     jarti_percent: 0,
   },
   {
@@ -317,7 +327,7 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     stock_qty: 20,
     min_stock: 5,
     cost_price: 10250,
-    category_id: null,
+    category_id: "cat-silver",
     jarti_percent: 0,
   },
 ];
@@ -341,7 +351,18 @@ function ProductsPage() {
     }
     return DEFAULT_SAMPLE_PRODUCTS;
   });
-  const [cats, setCats] = useState<Category[]>([]);
+  const [cats, setCats] = useState<Category[]>(() => {
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem("custom_categories_cache");
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.length > 0) return parsed;
+        } catch {}
+      }
+    }
+    return DEFAULT_CATEGORIES;
+  });
   const [search, setSearch] = useState("");
   const [selectedCat, setSelectedCat] = useState("all");
   const [open, setOpen] = useState(false);
@@ -370,8 +391,20 @@ function ProductsPage() {
       
       const mergedMap = new Map<string, Product>();
       DEFAULT_SAMPLE_PRODUCTS.forEach((item) => mergedMap.set(item.id, item));
-      storedList.forEach((item) => mergedMap.set(item.id, item));
-      combined.forEach((item) => mergedMap.set(item.id, item));
+      storedList.forEach((item) => {
+        const sample = DEFAULT_SAMPLE_PRODUCTS.find((s) => s.id === item.id);
+        if (sample && (!item.category_id || item.category_id === "null")) {
+          item.category_id = sample.category_id;
+        }
+        mergedMap.set(item.id, item);
+      });
+      combined.forEach((item) => {
+        const sample = DEFAULT_SAMPLE_PRODUCTS.find((s) => s.id === item.id);
+        if (sample && (!item.category_id || item.category_id === "null")) {
+          item.category_id = sample.category_id;
+        }
+        mergedMap.set(item.id, item);
+      });
       
       const finalList = Array.from(mergedMap.values());
       setItems(finalList);
@@ -379,15 +412,33 @@ function ProductsPage() {
 
       if (c && c.length > 0) {
         setCats(c as Category[]);
+        localStorage.setItem("custom_categories_cache", JSON.stringify(c));
+      } else {
+        const cachedCats = localStorage.getItem("custom_categories_cache");
+        let catList: Category[] = cachedCats ? JSON.parse(cachedCats) : [];
+        if (!catList || catList.length === 0) catList = DEFAULT_CATEGORIES;
+        setCats(catList);
+        localStorage.setItem("custom_categories_cache", JSON.stringify(catList));
       }
     } catch {
       const cached = localStorage.getItem("custom_products_cache");
       let storedList: Product[] = cached ? JSON.parse(cached) : [];
       const mergedMap = new Map<string, Product>();
       DEFAULT_SAMPLE_PRODUCTS.forEach((item) => mergedMap.set(item.id, item));
-      storedList.forEach((item) => mergedMap.set(item.id, item));
+      storedList.forEach((item) => {
+        const sample = DEFAULT_SAMPLE_PRODUCTS.find((s) => s.id === item.id);
+        if (sample && (!item.category_id || item.category_id === "null")) {
+          item.category_id = sample.category_id;
+        }
+        mergedMap.set(item.id, item);
+      });
       const finalList = Array.from(mergedMap.values());
       setItems(finalList);
+
+      const cachedCats = localStorage.getItem("custom_categories_cache");
+      let catList: Category[] = cachedCats ? JSON.parse(cachedCats) : [];
+      if (!catList || catList.length === 0) catList = DEFAULT_CATEGORIES;
+      setCats(catList);
     }
   }
 
