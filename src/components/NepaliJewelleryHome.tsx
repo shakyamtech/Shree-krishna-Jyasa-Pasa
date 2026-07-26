@@ -14,6 +14,7 @@ import {
   MapPin,
   Clock,
   ChevronRight,
+  ChevronLeft,
   X,
   Lock,
   UserCheck,
@@ -173,10 +174,13 @@ export function NepaliJewelleryHome() {
   // Hero background slider state
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
 
+  const nextSlide = () => setCurrentSlideIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+  const prevSlide = () => setCurrentSlideIndex((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlideIndex((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 4500);
+    }, 4000);
     return () => clearInterval(timer);
   }, []);
 
@@ -329,22 +333,46 @@ export function NepaliJewelleryHome() {
 
       {/* HERO SECTION */}
       <section className="relative overflow-hidden pt-16 pb-24 md:pt-24 md:pb-32 bg-[#0d0a08]">
-        {/* Jewellery background image slideshow with crossfade animation */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        {/* Jewellery background image slideshow with smooth sliding & Ken-Burns animation */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           {HERO_SLIDES.map((slide, idx) => (
-            <img
+            <div
               key={slide.id}
-              src={slide.image}
-              alt={slide.caption}
-              className={`absolute inset-0 w-full h-full object-cover scale-105 filter brightness-90 contrast-110 transition-opacity duration-1000 ease-in-out ${
-                idx === currentSlideIndex ? "opacity-60 z-0" : "opacity-0 -z-10"
+              className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out ${
+                idx === currentSlideIndex
+                  ? "opacity-60 scale-100 translate-x-0 z-0"
+                  : idx < currentSlideIndex
+                  ? "opacity-0 scale-105 -translate-x-full -z-10"
+                  : "opacity-0 scale-105 translate-x-full -z-10"
               }`}
-            />
+            >
+              <img
+                src={slide.image}
+                alt={slide.caption}
+                className="w-full h-full object-cover filter brightness-90 contrast-110"
+              />
+            </div>
           ))}
           {/* Black gradient dim overlay to ensure text contrast while showcasing jewellery */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#0d0a08]/75 via-[#0d0a08]/50 to-[#0d0a08]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#0d0a08_90%)]" />
         </div>
+
+        {/* Left & Right Slider Arrow Controls */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3.5 rounded-full bg-[#1c140c]/80 text-[#d4af37] border border-[#d4af37]/40 hover:bg-[#d4af37] hover:text-black transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] cursor-pointer backdrop-blur-md hidden sm:flex items-center justify-center group"
+          aria-label="Previous background slide"
+        >
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-0.5 transition-transform" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3.5 rounded-full bg-[#1c140c]/80 text-[#d4af37] border border-[#d4af37]/40 hover:bg-[#d4af37] hover:text-black transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] cursor-pointer backdrop-blur-md hidden sm:flex items-center justify-center group"
+          aria-label="Next background slide"
+        >
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-0.5 transition-transform" />
+        </button>
 
         {/* Background glow graphics */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-to-tr from-[#d4af37]/20 via-[#b8860b]/15 to-transparent rounded-full blur-3xl pointer-events-none z-0" />
