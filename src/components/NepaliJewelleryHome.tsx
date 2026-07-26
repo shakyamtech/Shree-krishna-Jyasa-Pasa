@@ -224,40 +224,42 @@ export function NepaliJewelleryHome() {
   return (
     <div className="min-h-screen bg-[#0d0a08] text-[#f4efe8] font-sans antialiased selection:bg-[#d4af37] selection:text-[#0d0a08]">
       {/* TOP LIVE METAL RATES TICKER */}
-      <div className="bg-gradient-to-r from-[#1c150f] via-[#2a1e14] to-[#1c150f] border-b border-[#3a2c1d] py-2.5 px-4 text-xs md:text-sm">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-[#d4af37] font-semibold">
+      <div className="bg-gradient-to-r from-[#17110c] via-[#241a11] to-[#17110c] border-b border-[#3a2c1d] py-2 px-3 sm:px-4 text-xs">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
+          {/* Live Indicator Title */}
+          <div className="flex items-center gap-2 text-[#d4af37] font-semibold shrink-0">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#d4af37] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#d4af37]"></span>
             </span>
-            <TrendingUp className="w-4 h-4" />
-            <span>आजको सुन/चाँदीको भाउ (Nepal Today's Metal Rate):</span>
+            <TrendingUp className="w-3.5 h-3.5" />
+            <span className="text-xs sm:text-sm tracking-tight">आजको सुन/चाँदीको भाउ (Today's Rates):</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-mono">
-            <div className="bg-[#140e0a]/80 px-3 py-1 rounded border border-[#4a3925]">
-              <span className="text-gray-400 mr-1.5">छापावाल सुन (२४K):</span>
+          {/* Rates Badges Container: Horizontally scrollable on mobile without ugly box breaks */}
+          <div className="w-full md:w-auto overflow-x-auto no-scrollbar flex items-center justify-start md:justify-end gap-2 text-xs py-0.5">
+            <div className="shrink-0 bg-[#1e150d] hover:bg-[#281c12] transition-colors px-3 py-1 rounded-full border border-[#d4af37]/30 flex items-center gap-1.5 shadow-sm">
+              <span className="text-amber-200/70 text-[11px]">छापावाल (२४K):</span>
               <span className="text-[#fbf2c0] font-bold">
                 रू {rates.gold24k.toLocaleString("ne-NP")}
               </span>
-              <span className="text-gray-400 text-[10px] ml-1">/तोला</span>
+              <span className="text-amber-400/60 text-[10px]">/तोला</span>
             </div>
 
-            <div className="bg-[#140e0a]/80 px-3 py-1 rounded border border-[#4a3925]">
-              <span className="text-gray-400 mr-1.5">तेजाबी सुन (२२K):</span>
+            <div className="shrink-0 bg-[#1e150d] hover:bg-[#281c12] transition-colors px-3 py-1 rounded-full border border-[#d4af37]/30 flex items-center gap-1.5 shadow-sm">
+              <span className="text-amber-200/70 text-[11px]">तेजाबी (२२K):</span>
               <span className="text-[#fbf2c0] font-bold">
                 रू {rates.gold22k.toLocaleString("ne-NP")}
               </span>
-              <span className="text-gray-400 text-[10px] ml-1">/तोला</span>
+              <span className="text-amber-400/60 text-[10px]">/तोला</span>
             </div>
 
-            <div className="bg-[#140e0a]/80 px-3 py-1 rounded border border-[#4a3925]">
-              <span className="text-gray-400 mr-1.5">चाँदी (Silver):</span>
-              <span className="text-[#e2e8f0] font-bold">
+            <div className="shrink-0 bg-[#1e150d] hover:bg-[#281c12] transition-colors px-3 py-1 rounded-full border border-slate-400/30 flex items-center gap-1.5 shadow-sm">
+              <span className="text-slate-300/70 text-[11px]">चाँदी (Silver):</span>
+              <span className="text-slate-100 font-bold">
                 रू {rates.silver.toLocaleString("ne-NP")}
               </span>
-              <span className="text-gray-400 text-[10px] ml-1">/तोला</span>
+              <span className="text-slate-400 text-[10px]">/तोला</span>
             </div>
           </div>
         </div>
