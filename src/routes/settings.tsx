@@ -58,11 +58,33 @@ interface Category {
   parent_id: string | null;
 }
 
+const DEFAULT_SHOP: Shop = {
+  id: "default-shop-id",
+  shop_name: "Shree Krishna Jyasa Pasa",
+  address: "Patan Durbar Square, Lalitpur, Nepal",
+  phone: "+977 01-5555555 / 9851000000",
+  email: "shakya.mahes@gmail.com",
+  pan_vat: "600123456",
+  vat_rate: 13,
+  currency: "NPR",
+  invoice_prefix: "SKJP-",
+  bill_footer: "विशुद्ध २४ क्यारेट सुन तथा चाँदीका गहनाहरूको भरपर्दो प्रतिष्ठान। धन्यवाद!",
+  logo_url: "/logo.jpg",
+};
+
 function SettingsPage() {
   const navigate = useNavigate();
   const { role } = useAuth();
   const isStaff = role === "staff";
-  const [s, setS] = useState<Shop | null>(null);
+  const [s, setS] = useState<Shop>(() => {
+    const cached = localStorage.getItem("custom_shop_settings");
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch {}
+    }
+    return DEFAULT_SHOP;
+  });
   const [busy, setBusy] = useState(false);
   const [savedTheme, setSavedTheme] = useState("default");
   const [ownerName, setOwnerName] = useState(
@@ -80,8 +102,10 @@ function SettingsPage() {
   const [busyCat, setBusyCat] = useState(false);
 
   async function loadCategories() {
-    const { data } = await supabase.from("categories").select("*").order("name");
-    setCats((data || []) as Category[]);
+    try {
+      const { data } = await supabase.from("categories").select("*").order("name");
+      if (data) setCats(data as Category[]);
+    } catch {}
   }
 
   async function addCategory() {
@@ -125,7 +149,6 @@ function SettingsPage() {
     setBusyCat(true);
     try {
       for (const name of list) {
-        // Only insert if it doesn't exist
         const exists = cats.some((c) => c.name.toLowerCase() === name.toLowerCase());
         if (!exists) {
           await supabase.from("categories").insert({ name, metal: "gold" });
@@ -195,9 +218,11 @@ function SettingsPage() {
         if (data) {
           const d = data as Shop & { owner_name?: string };
           setS(d);
+          localStorage.setItem("custom_shop_settings", JSON.stringify(d));
           if (d.owner_name) setOwnerName(d.owner_name);
         }
-      });
+      })
+      .catch(() => {});
 
     if (role && role !== "staff") {
       setLoadingStaff(true);
@@ -314,7 +339,6 @@ function SettingsPage() {
     setTimeout(() => window.location.reload(), 50);
   };
 
-  if (!s) return <div className="text-muted-foreground">Loading…</div>;
   return (
     <div className="space-y-6 max-w-5xl">
       <h1 className="text-2xl font-bold">Shop Settings</h1>
