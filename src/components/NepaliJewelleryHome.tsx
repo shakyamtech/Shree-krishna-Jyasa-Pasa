@@ -301,10 +301,11 @@ export function NepaliJewelleryHome() {
           <img
             src="/hero_bg.png"
             alt="Nepali Traditional Gold Jewellery Background"
-            className="w-full h-full object-cover opacity-30 scale-105 filter brightness-75 contrast-125"
+            className="w-full h-full object-cover opacity-20 scale-105 filter brightness-60 contrast-110 blur-[0.5px]"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0d0a08]/90 via-[#0d0a08]/70 to-[#0d0a08]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#0d0a08_95%)]" />
+          {/* Deep black gradient dim overlays */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#070504] via-[#070504]/75 to-[#070504]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(7,5,4,0.4)_0%,rgba(7,5,4,0.85)_60%,#070504_100%)]" />
         </div>
 
         {/* Background glow graphics */}
