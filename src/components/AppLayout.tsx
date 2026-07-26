@@ -24,6 +24,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
+import { DevInfoModal } from "./DevInfoModal";
 
 const ReceiptRs = ({ className }: { className?: string }) => (
   <svg
@@ -71,6 +72,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const { lang, setLang, t } = useI18n();
   const loc = useLocation();
   const [open, setOpen] = useState(false);
+  const [showDevModal, setShowDevModal] = useState(false);
   const [shopName, setShopName] = useState("Shree Krishna Jyasa Pasa");
   const [logoUrl, setLogoUrl] = useState<string | null>("/logo.jpg");
   const [ownerName, setOwnerName] = useState(
@@ -390,9 +392,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
             theme === "gold" ? "text-black/80" : "text-sidebar-foreground/70"
           )}>
             <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1">
-                <Code className="size-3 text-amber-500" />
-                <span>Dev:</span> <strong className="font-bold">Shakya M. Tech</strong>
+              <span
+                onClick={() => setShowDevModal(true)}
+                className="flex items-center gap-1 cursor-pointer hover:text-amber-500 transition-colors group"
+                title="View System & Developer Information"
+              >
+                <Code className="size-3 text-amber-500 group-hover:scale-110 transition-transform" />
+                <span>Dev:</span> <strong className="font-bold underline underline-offset-2 decoration-amber-500/50">Shakya M. Tech</strong>
               </span>
             </div>
             <div className="flex items-center gap-1">
@@ -442,8 +448,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
             {displayShopName}
           </span>
         </header>
-        <main className="flex-1 p-4 md:p-6 overflow-x-hidden">{children}</main>
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">{children}</main>
       </div>
+
+      {/* Developer & System Info Modal */}
+      <DevInfoModal isOpen={showDevModal} onClose={() => setShowDevModal(false)} />
     </div>
   );
 }

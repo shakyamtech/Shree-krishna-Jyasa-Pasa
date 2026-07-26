@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
+import { DevInfoModal } from "./DevInfoModal";
 import {
   Sparkles,
   ShieldCheck,
@@ -172,6 +173,7 @@ export function NepaliJewelleryHome() {
   const [rates] = useState(INITIAL_RATES);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [activeModalProduct, setActiveModalProduct] = useState<ProductItem | null>(null);
+  const [showDevModal, setShowDevModal] = useState<boolean>(false);
 
   // Hero background slider state
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
@@ -987,19 +989,26 @@ export function NepaliJewelleryHome() {
               © {new Date().getFullYear()} Shree Krishna Jyasa Pasa • All Rights Reserved. Nepali Traditional Jewellery.
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-medium">
-              <span className="flex items-center gap-1.5 text-amber-200/90">
-                <Code className="w-3.5 h-3.5 text-[#d4af37]" />
-                <span>Developed by:</span> <strong className="text-[#fbf2c0] font-bold">Shakya M. Tech</strong>
+              <span
+                onClick={() => setShowDevModal(true)}
+                className="flex items-center gap-1.5 text-amber-200/90 hover:text-[#fbf2c0] transition-all cursor-pointer group bg-[#1a120b] hover:bg-[#281b10] px-2.5 py-1 rounded-full border border-[#d4af37]/30 hover:border-[#d4af37]/70 shadow-sm"
+                title="Click to view System & Developer Information"
+              >
+                <Code className="w-3.5 h-3.5 text-[#d4af37] group-hover:scale-110 transition-transform" />
+                <span>Developed by:</span> <strong className="text-[#fbf2c0] font-bold underline decoration-amber-500/50 underline-offset-2">Shakya M. Tech</strong>
               </span>
               <span className="text-gray-700 hidden sm:inline">•</span>
               <span className="flex items-center gap-1.5 text-amber-200/90">
                 <Headphones className="w-3.5 h-3.5 text-[#d4af37]" />
-                <span>Support:</span> <a href="tel:+9779800000000" className="text-[#fbf2c0] font-bold hover:underline">+९७७-९८XXXXXXXX</a>
+                <span>Support:</span> <a href="tel:+9779800000000" className="text-[#fbf2c0] font-bold hover:underline">+९७-९८XXXXXXXX</a>
               </span>
             </div>
           </div>
         </div>
       </footer>
+
+      {/* Developer & System Info Modal */}
+      <DevInfoModal isOpen={showDevModal} onClose={() => setShowDevModal(false)} />
     </div>
   );
 }
