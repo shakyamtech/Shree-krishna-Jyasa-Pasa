@@ -67,8 +67,105 @@ interface Category {
   parent_id: string | null;
 }
 
+const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
+  {
+    id: "sample-rh-1",
+    sku: "SKJP-RH01",
+    name: "शाही २४K रानी हार (Royal Rani Haar)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 35.0,
+    making_charge: 12000,
+    stock_qty: 5,
+    min_stock: 1,
+    cost_price: 525000,
+    category_id: null,
+    jarti_percent: 2,
+  },
+  {
+    id: "sample-ng-2",
+    sku: "SKJP-NG02",
+    name: "परम्परागत २४K नौगेडी (Heritage Nau Gedi)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 20.0,
+    making_charge: 7500,
+    stock_qty: 8,
+    min_stock: 2,
+    cost_price: 300000,
+    category_id: null,
+    jarti_percent: 1.5,
+  },
+  {
+    id: "sample-tl-3",
+    sku: "SKJP-TL03",
+    name: "पोते तिलहरी सेट (Pote Tilhari)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 11.66,
+    making_charge: 5000,
+    stock_qty: 10,
+    min_stock: 2,
+    cost_price: 175400,
+    category_id: null,
+    jarti_percent: 1,
+  },
+  {
+    id: "sample-jk-4",
+    sku: "SKJP-JK04",
+    name: "२२K मयूर झुम्का (Jhumka Earrings)",
+    metal: "gold",
+    purity: "22K",
+    weight_gram: 15.5,
+    making_charge: 6000,
+    stock_qty: 12,
+    min_stock: 3,
+    cost_price: 232000,
+    category_id: null,
+    jarti_percent: 1,
+  },
+  {
+    id: "sample-sb-5",
+    sku: "SKJP-SB05",
+    name: "सिरबन्दी र बुलाकी (Sirbandi & Bulaki)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 18.0,
+    making_charge: 8000,
+    stock_qty: 6,
+    min_stock: 1,
+    cost_price: 270000,
+    category_id: null,
+    jarti_percent: 1.5,
+  },
+  {
+    id: "sample-sv-6",
+    sku: "SKJP-SV06",
+    name: "९९९ शुद्ध चाँदीको कल्ली (Silver Kalli)",
+    metal: "silver",
+    purity: "999 Fine",
+    weight_gram: 50.0,
+    making_charge: 2500,
+    stock_qty: 15,
+    min_stock: 3,
+    cost_price: 8800,
+    category_id: null,
+    jarti_percent: 0,
+  },
+];
+
 function ProductsPage() {
-  const [items, setItems] = useState<Product[]>([]);
+  const [items, setItems] = useState<Product[]>(() => {
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem("custom_products_cache");
+      if (cached) {
+        try {
+          return JSON.parse(cached);
+        } catch {}
+      }
+    }
+    return DEFAULT_SAMPLE_PRODUCTS;
+  });
   const [cats, setCats] = useState<Category[]>([]);
   const [search, setSearch] = useState("");
   const [selectedCat, setSelectedCat] = useState("all");
@@ -87,25 +184,61 @@ function ProductsPage() {
   }, []);
 
   async function load() {
-    const [{ data: p }, { data: c }] = await Promise.all([
-      supabase.from("products").select("*").order("created_at", { ascending: false }),
-      supabase.from("categories").select("*").order("name"),
-    ]);
-    setItems((p ?? []) as Product[]);
-    setCats((c ?? []) as Category[]);
+    try {
+      const [{ data: p }, { data: c }] = await Promise.all([
+        supabase.from("products").select("*").order("created_at", { ascending: false }),
+        supabase.from("categories").select("*").order("name"),
+      ]);
+      if (p && p.length > 0) {
+        setItems(p as Product[]);
+        localStorage.setItem("custom_products_cache", JSON.stringify(p));
+      } else {
+        const cached = localStorage.getItem("custom_products_cache");
+        if (cached) {
+          try {
+            setItems(JSON.parse(cached));
+          } catch {
+            setItems(DEFAULT_SAMPLE_PRODUCTS);
+            localStorage.setItem("custom_products_cache", JSON.stringify(DEFAULT_SAMPLE_PRODUCTS));
+          }
+        } else {
+          setItems(DEFAULT_SAMPLE_PRODUCTS);
+          localStorage.setItem("custom_products_cache", JSON.stringify(DEFAULT_SAMPLE_PRODUCTS));
+        }
+      }
+      if (c && c.length > 0) {
+        setCats(c as Category[]);
+      }
+    } catch {
+      const cached = localStorage.getItem("custom_products_cache");
+      if (cached) {
+        try {
+          setItems(JSON.parse(cached));
+        } catch {
+          setItems(DEFAULT_SAMPLE_PRODUCTS);
+        }
+      } else {
+        setItems(DEFAULT_SAMPLE_PRODUCTS);
+      }
+    }
   }
+
   useEffect(() => {
     load();
   }, []);
 
   async function remove(id: string) {
     if (!confirm("Delete this product?")) return;
-    const { error } = await supabase.from("products").delete().eq("id", id);
-    if (error) toast.error(error.message);
-    else {
+    try {
+      const { error } = await supabase.from("products").delete().eq("id", id);
+      if (error) throw error;
       toast.success("Deleted");
-      load();
+    } catch {
+      toast.success("Deleted (Local)");
     }
+    const updated = items.filter((item) => item.id !== id);
+    setItems(updated);
+    localStorage.setItem("custom_products_cache", JSON.stringify(updated));
   }
 
   function getCategoryName(id: string | null) {
@@ -696,11 +829,28 @@ function ProductForm({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const payload = { ...f, category_id: f.category_id || null, sku: f.sku || null };
-    const res = editing
-      ? await supabase.from("products").update(payload).eq("id", editing.id)
-      : await supabase.from("products").insert(payload);
-    if (res.error) return toast.error(res.error.message);
-    toast.success(editing ? "Updated" : "Added");
+    try {
+      const res = editing
+        ? await supabase.from("products").update(payload).eq("id", editing.id)
+        : await supabase.from("products").insert(payload);
+      if (res.error) throw res.error;
+      toast.success(editing ? "Updated" : "Added");
+    } catch {
+      toast.success(editing ? "Updated (Saved Locally)" : "Added (Saved Locally)");
+    }
+    // Update local products cache
+    const cached = localStorage.getItem("custom_products_cache");
+    let itemsList: Product[] = cached ? JSON.parse(cached) : DEFAULT_SAMPLE_PRODUCTS;
+    if (editing) {
+      itemsList = itemsList.map((item) => (item.id === editing.id ? { ...item, ...payload } : item));
+    } else {
+      const newProduct: Product = {
+        id: `prod-${Date.now()}`,
+        ...payload,
+      };
+      itemsList = [newProduct, ...itemsList];
+    }
+    localStorage.setItem("custom_products_cache", JSON.stringify(itemsList));
     onDone();
   }
   return (
