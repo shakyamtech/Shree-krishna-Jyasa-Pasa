@@ -83,8 +83,36 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     jarti_percent: 2,
   },
   {
-    id: "sample-ng-2",
-    sku: "SKJP-NG02",
+    id: "sample-ch-2",
+    sku: "SKJP-CH02",
+    name: "२४K चन्द्रहार (Chandrakala Haar)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 29.16,
+    making_charge: 9500,
+    stock_qty: 4,
+    min_stock: 1,
+    cost_price: 437400,
+    category_id: null,
+    jarti_percent: 2,
+  },
+  {
+    id: "sample-ms-3",
+    sku: "SKJP-MS03",
+    name: "२४K परम्परागत मङ्गलसूत्र (Gold Mangalsutra)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 17.5,
+    making_charge: 6500,
+    stock_qty: 7,
+    min_stock: 2,
+    cost_price: 262500,
+    category_id: null,
+    jarti_percent: 1.5,
+  },
+  {
+    id: "sample-ng-4",
+    sku: "SKJP-NG04",
     name: "परम्परागत २४K नौगेडी (Heritage Nau Gedi)",
     metal: "gold",
     purity: "24K",
@@ -97,8 +125,8 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     jarti_percent: 1.5,
   },
   {
-    id: "sample-tl-3",
-    sku: "SKJP-TL03",
+    id: "sample-tl-5",
+    sku: "SKJP-TL05",
     name: "पोते तिलहरी सेट (Pote Tilhari)",
     metal: "gold",
     purity: "24K",
@@ -111,9 +139,23 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     jarti_percent: 1,
   },
   {
-    id: "sample-jk-4",
-    sku: "SKJP-JK04",
-    name: "२२K मयूर झुम्का (Jhumka Earrings)",
+    id: "sample-km-6",
+    sku: "SKJP-KM06",
+    name: "कण्ठमाला तथा पोते (Kantha Mala Set)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 23.33,
+    making_charge: 8000,
+    stock_qty: 6,
+    min_stock: 1,
+    cost_price: 350000,
+    category_id: null,
+    jarti_percent: 1.5,
+  },
+  {
+    id: "sample-jk-7",
+    sku: "SKJP-JK07",
+    name: "२२K मयूर झुम्का (Peacock Jhumka Earrings)",
     metal: "gold",
     purity: "22K",
     weight_gram: 15.5,
@@ -125,9 +167,65 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     jarti_percent: 1,
   },
   {
-    id: "sample-sb-5",
-    sku: "SKJP-SB05",
-    name: "सिरबन्दी र बुलाकी (Sirbandi & Bulaki)",
+    id: "sample-kf-8",
+    sku: "SKJP-KF08",
+    name: "२४K मारवाड़ी तथा कानफुली (Marwadi Ear Ring)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 8.75,
+    making_charge: 4000,
+    stock_qty: 15,
+    min_stock: 3,
+    cost_price: 131250,
+    category_id: null,
+    jarti_percent: 1,
+  },
+  {
+    id: "sample-tp-9",
+    sku: "SKJP-TP09",
+    name: "२४K टप्स तथा कुण्डल (Top Earrings)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 5.83,
+    making_charge: 3000,
+    stock_qty: 20,
+    min_stock: 5,
+    cost_price: 87500,
+    category_id: null,
+    jarti_percent: 0.5,
+  },
+  {
+    id: "sample-bl-10",
+    sku: "SKJP-BL10",
+    name: "२४K हस्तनिर्मित कटिङ बाला (Gold Bala Pair)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 46.65,
+    making_charge: 15000,
+    stock_qty: 6,
+    min_stock: 1,
+    cost_price: 700000,
+    category_id: null,
+    jarti_percent: 2,
+  },
+  {
+    id: "sample-cr-11",
+    sku: "SKJP-CR11",
+    name: "२२K प्लेन सुनको चुरा (Plain Gold Chura Set)",
+    metal: "gold",
+    purity: "22K",
+    weight_gram: 34.99,
+    making_charge: 10000,
+    stock_qty: 9,
+    min_stock: 2,
+    cost_price: 524000,
+    category_id: null,
+    jarti_percent: 1.5,
+  },
+  {
+    id: "sample-sb-12",
+    sku: "SKJP-SB12",
+    name: "सिरबन्दी र बुलाकी सेट (Sirbandi & Bulaki)",
     metal: "gold",
     purity: "24K",
     weight_gram: 18.0,
@@ -139,16 +237,86 @@ const DEFAULT_SAMPLE_PRODUCTS: Product[] = [
     jarti_percent: 1.5,
   },
   {
-    id: "sample-sv-6",
-    sku: "SKJP-SV06",
-    name: "९९९ शुद्ध चाँदीको कल्ली (Silver Kalli)",
+    id: "sample-nt-13",
+    sku: "SKJP-NT13",
+    name: "२४K परम्परागत नथिया र फुली (Nathiya & Phuli)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 4.66,
+    making_charge: 2500,
+    stock_qty: 18,
+    min_stock: 4,
+    cost_price: 70000,
+    category_id: null,
+    jarti_percent: 0.5,
+  },
+  {
+    id: "sample-rg-14",
+    sku: "SKJP-RG14",
+    name: "२४K नौगेडी ढाँचा अँगुठी (Nau Gedi Ring)",
+    metal: "gold",
+    purity: "24K",
+    weight_gram: 7.0,
+    making_charge: 3500,
+    stock_qty: 14,
+    min_stock: 3,
+    cost_price: 105000,
+    category_id: null,
+    jarti_percent: 1,
+  },
+  {
+    id: "sample-rg-15",
+    sku: "SKJP-RG15",
+    name: "२२K जेन्ट्स अँगुठी (Gents Solitaire Ring)",
+    metal: "gold",
+    purity: "22K",
+    weight_gram: 11.66,
+    making_charge: 5000,
+    stock_qty: 10,
+    min_stock: 2,
+    cost_price: 175000,
+    category_id: null,
+    jarti_percent: 1,
+  },
+  {
+    id: "sample-sv-16",
+    sku: "SKJP-SV16",
+    name: "९९९ शुद्ध चाँदीको कल्ली (Pure Silver Kalli Pair)",
     metal: "silver",
     purity: "999 Fine",
-    weight_gram: 50.0,
-    making_charge: 2500,
+    weight_gram: 116.64,
+    making_charge: 4500,
     stock_qty: 15,
     min_stock: 3,
-    cost_price: 8800,
+    cost_price: 20500,
+    category_id: null,
+    jarti_percent: 0,
+  },
+  {
+    id: "sample-sv-17",
+    sku: "SKJP-SV17",
+    name: "९९९ चाँदीको करुवा र थाली (Silver Karuwa Set)",
+    metal: "silver",
+    purity: "999 Fine",
+    weight_gram: 349.91,
+    making_charge: 12000,
+    stock_qty: 5,
+    min_stock: 1,
+    cost_price: 61500,
+    category_id: null,
+    jarti_percent: 0,
+  },
+  {
+    id: "sample-sv-18",
+    sku: "SKJP-SV18",
+    name: "९९९ चाँदीको पाउजु (Silver Pauju Anklet)",
+    metal: "silver",
+    purity: "999 Fine",
+    weight_gram: 58.32,
+    making_charge: 3000,
+    stock_qty: 20,
+    min_stock: 5,
+    cost_price: 10250,
     category_id: null,
     jarti_percent: 0,
   },
@@ -160,7 +328,14 @@ function ProductsPage() {
       const cached = localStorage.getItem("custom_products_cache");
       if (cached) {
         try {
-          return JSON.parse(cached);
+          const parsed: Product[] = JSON.parse(cached);
+          if (parsed && parsed.length > 0) {
+            const existingIds = new Set(parsed.map((x) => x.id));
+            DEFAULT_SAMPLE_PRODUCTS.forEach((sample) => {
+              if (!existingIds.has(sample.id)) parsed.push(sample);
+            });
+            return parsed;
+          }
         } catch {}
       }
     }
@@ -189,37 +364,30 @@ function ProductsPage() {
         supabase.from("products").select("*").order("created_at", { ascending: false }),
         supabase.from("categories").select("*").order("name"),
       ]);
-      if (p && p.length > 0) {
-        setItems(p as Product[]);
-        localStorage.setItem("custom_products_cache", JSON.stringify(p));
-      } else {
-        const cached = localStorage.getItem("custom_products_cache");
-        if (cached) {
-          try {
-            setItems(JSON.parse(cached));
-          } catch {
-            setItems(DEFAULT_SAMPLE_PRODUCTS);
-            localStorage.setItem("custom_products_cache", JSON.stringify(DEFAULT_SAMPLE_PRODUCTS));
-          }
-        } else {
-          setItems(DEFAULT_SAMPLE_PRODUCTS);
-          localStorage.setItem("custom_products_cache", JSON.stringify(DEFAULT_SAMPLE_PRODUCTS));
-        }
-      }
+      let combined: Product[] = p && p.length > 0 ? (p as Product[]) : [];
+      const cached = localStorage.getItem("custom_products_cache");
+      let storedList: Product[] = cached ? JSON.parse(cached) : [];
+      
+      const mergedMap = new Map<string, Product>();
+      DEFAULT_SAMPLE_PRODUCTS.forEach((item) => mergedMap.set(item.id, item));
+      storedList.forEach((item) => mergedMap.set(item.id, item));
+      combined.forEach((item) => mergedMap.set(item.id, item));
+      
+      const finalList = Array.from(mergedMap.values());
+      setItems(finalList);
+      localStorage.setItem("custom_products_cache", JSON.stringify(finalList));
+
       if (c && c.length > 0) {
         setCats(c as Category[]);
       }
     } catch {
       const cached = localStorage.getItem("custom_products_cache");
-      if (cached) {
-        try {
-          setItems(JSON.parse(cached));
-        } catch {
-          setItems(DEFAULT_SAMPLE_PRODUCTS);
-        }
-      } else {
-        setItems(DEFAULT_SAMPLE_PRODUCTS);
-      }
+      let storedList: Product[] = cached ? JSON.parse(cached) : [];
+      const mergedMap = new Map<string, Product>();
+      DEFAULT_SAMPLE_PRODUCTS.forEach((item) => mergedMap.set(item.id, item));
+      storedList.forEach((item) => mergedMap.set(item.id, item));
+      const finalList = Array.from(mergedMap.values());
+      setItems(finalList);
     }
   }
 
