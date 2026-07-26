@@ -12,13 +12,12 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/login")({ component: Login });
 
 function Login() {
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const [shopName, setShopName] = useState("Shree Krishna Jyasa Pasa");
   const [logoUrl, setLogoUrl] = useState<string | null>("/logo.jpg");
 
@@ -40,29 +39,13 @@ function Login() {
     if (user) navigate({ to: "/dashboard", replace: true });
   }, [user, navigate]);
 
-  // Default to Sign In mode since owner accounts are already configured
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      if (isSignUp) {
-        const { error } = await signUp(email, password);
-        if (error) return toast.error(error);
-        const { error: e2 } = await signIn(email, password);
-        if (e2) {
-          toast.success(
-            "Account registered. Please check email confirmation if enabled, then sign in.",
-          );
-          setIsSignUp(false);
-        } else {
-          toast.success("Account successfully created and signed in!");
-        }
-      } else {
-        const { error } = await signIn(email, password);
-        if (error) return toast.error(error);
-        toast.success("Signed in");
-      }
+      const { error } = await signIn(email, password);
+      if (error) return toast.error(error);
+      toast.success("Signed in");
     } finally {
       setBusy(false);
     }
@@ -91,7 +74,7 @@ function Login() {
             </CardTitle>
           </Link>
           <CardDescription className="text-xs font-medium mt-1">
-            {isSignUp ? "Register a new credentials account" : "Sign in to your shop account"}
+            Sign in to your shop account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -114,7 +97,6 @@ function Login() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   required
-                  minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
@@ -135,20 +117,8 @@ function Login() {
               className="w-full bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
               disabled={busy}
             >
-              {busy ? "Please wait…" : isSignUp ? "Create account & sign in" : "Sign in"}
+              {busy ? "Signing in…" : "Sign in"}
             </Button>
-
-            <div className="text-center pt-2 border-t border-border/40">
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-xs text-muted-foreground hover:text-amber-600 dark:hover:text-amber-400 underline transition-colors cursor-pointer"
-              >
-                {isSignUp
-                  ? "Already registered? Sign in instead"
-                  : "Need to register a new staff/user account? Click here"}
-              </button>
-            </div>
           </form>
         </CardContent>
       </Card>
