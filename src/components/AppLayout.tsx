@@ -403,7 +403,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </div>
             <div className="flex items-center gap-1">
               <Headphones className="size-3 text-amber-500" />
-              <span>Support:</span> <a href="tel:+9779800000000" className="hover:underline font-bold">+९७७-९८XXXXXXXX</a>
+              <span>Support:</span> <a href="tel:+9779851180556" className="hover:underline font-bold">+९७७ ९८५११८०५५६</a>
             </div>
           </div>
         </div>

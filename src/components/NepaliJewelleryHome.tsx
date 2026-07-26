@@ -958,7 +958,7 @@ export function NepaliJewelleryHome() {
                 </li>
                 <li className="flex items-center gap-2.5 hover:text-[#fbf2c0] transition-colors cursor-pointer group">
                   <PhoneCall className="w-4 h-4 text-[#d4af37] group-hover:scale-110 transition-transform" />
-                  <span>+९७७ ०१-XXXXXXX / ९८XXXXXXXX</span>
+                  <a href="tel:+9779851180556" className="hover:underline">+९७७ ९८५११८०५५६</a>
                 </li>
                 <li className="flex items-center gap-2.5 hover:text-[#fbf2c0] transition-colors cursor-pointer group">
                   <Clock className="w-4 h-4 text-[#d4af37] group-hover:scale-110 transition-transform" />
@@ -1000,7 +1000,7 @@ export function NepaliJewelleryHome() {
               <span className="text-gray-700 hidden sm:inline">•</span>
               <span className="flex items-center gap-1.5 text-amber-200/90">
                 <Headphones className="w-3.5 h-3.5 text-[#d4af37]" />
-                <span>Support:</span> <a href="tel:+9779800000000" className="text-[#fbf2c0] font-bold hover:underline">+९७-९८XXXXXXXX</a>
+                <span>Support:</span> <a href="tel:+9779851180556" className="text-[#fbf2c0] font-bold hover:underline">+९७७ ९८५११८०५५६</a>
               </span>
             </div>
           </div>
