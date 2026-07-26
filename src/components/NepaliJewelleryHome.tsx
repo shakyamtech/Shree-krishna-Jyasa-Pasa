@@ -287,7 +287,7 @@ export function NepaliJewelleryHome() {
             </Link>
             <div>
               <h1 className="font-serif text-lg md:text-xl font-bold bg-gradient-to-r from-[#fbf2c0] via-[#d4af37] to-[#b8860b] bg-clip-text text-transparent inline-block py-1 px-1">
-                श्री कृष्ण ज्यास पस
+                श्री कृष्ण ज्यासः पस
               </h1>
               <p className="text-[10px] tracking-widest text-amber-200/70 uppercase">
                 Shree Krishna Jyasa Pasa • Established Craft
@@ -746,7 +746,7 @@ export function NepaliJewelleryHome() {
               </div>
 
               <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#fbf2c0] leading-tight">
-                श्री कृष्ण ज्यास पसको इतिहास र मौलिकता
+                श्री कृष्ण ज्यासः पसको इतिहास र मौलिकता
               </h2>
 
               <p className="mt-4 text-sm text-amber-100/70 leading-relaxed">
@@ -893,7 +893,7 @@ export function NepaliJewelleryHome() {
               <div className="flex items-center gap-2 mb-4">
                 <Gem className="w-5 h-5 text-[#d4af37]" />
                 <span className="font-serif font-bold text-base text-[#fbf2c0]">
-                  श्री कृष्ण ज्यास पस
+                  श्री कृष्ण ज्यासः पस
                 </span>
               </div>
               <p className="text-gray-400 text-xs leading-relaxed">

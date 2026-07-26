@@ -172,7 +172,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   const displayShopName =
     lang === "ne" && shopName.toLowerCase().includes("shree krishna")
-      ? "श्री कृष्ण ज्यास: पस"
+      ? "श्री कृष्ण ज्यासः पस"
       : shopName;
 
   return (
