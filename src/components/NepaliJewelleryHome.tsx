@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
 import {
@@ -140,12 +140,45 @@ const PRODUCTS: ProductItem[] = [
   },
 ];
 
+const HERO_SLIDES = [
+  {
+    id: "slide-1",
+    image: "/hero_bg.png",
+    caption: "शाही सुनका परम्परागत गहनाहरू • Royal 24K Gold Set",
+  },
+  {
+    id: "slide-2",
+    image: "/hero_bg_2.png",
+    caption: "नक्काशीदार सुनको चूरा र मयूर झुम्का • Fine Gold Chura & Jhumka",
+  },
+  {
+    id: "slide-3",
+    image: "/kantha.png",
+    caption: "मौलिक नेवारी कण्ठ र बेहुलीको सिरबन्दी • Heritage Kantha & Sirbandi",
+  },
+  {
+    id: "slide-4",
+    image: "/naugedi.png",
+    caption: "परम्परागत रातो नौगेडी र तिलहरी • Traditional Nau Gedi & Tilhari",
+  },
+];
+
 export function NepaliJewelleryHome() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [rates] = useState(INITIAL_RATES);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [activeModalProduct, setActiveModalProduct] = useState<ProductItem | null>(null);
+
+  // Hero background slider state
+  const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlideIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
 
   // Calculator State
   const [calcMetal, setCalcMetal] = useState<"gold24k" | "gold22k" | "silver">("gold24k");
@@ -296,13 +329,18 @@ export function NepaliJewelleryHome() {
 
       {/* HERO SECTION */}
       <section className="relative overflow-hidden pt-16 pb-24 md:pt-24 md:pb-32 bg-[#0d0a08]">
-        {/* Jewellery background image with dark vignette overlay */}
+        {/* Jewellery background image slideshow with crossfade animation */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <img
-            src="/hero_bg.png"
-            alt="Nepali Traditional Gold Jewellery Background"
-            className="w-full h-full object-cover opacity-60 scale-105 filter brightness-90 contrast-110"
-          />
+          {HERO_SLIDES.map((slide, idx) => (
+            <img
+              key={slide.id}
+              src={slide.image}
+              alt={slide.caption}
+              className={`absolute inset-0 w-full h-full object-cover scale-105 filter brightness-90 contrast-110 transition-opacity duration-1000 ease-in-out ${
+                idx === currentSlideIndex ? "opacity-60 z-0" : "opacity-0 -z-10"
+              }`}
+            />
+          ))}
           {/* Black gradient dim overlay to ensure text contrast while showcasing jewellery */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#0d0a08]/75 via-[#0d0a08]/50 to-[#0d0a08]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#0d0a08_90%)]" />
@@ -327,6 +365,23 @@ export function NepaliJewelleryHome() {
           <p className="mt-6 text-base sm:text-lg text-amber-100/70 max-w-2xl mx-auto leading-relaxed">
             पाटन तथा काठमाडौँका सिद्धहस्त सुवर्णकारहरूद्वारा निर्मित विशुद्ध २४ क्यारेट तिलहरी, नौगेडी, कण्ठ, सिरबन्दी र शाही झुम्काहरूको अनुपम प्रस्तुति।
           </p>
+
+          {/* Slide Indicator Dots */}
+          <div className="mt-6 flex items-center justify-center gap-2 relative z-20">
+            {HERO_SLIDES.map((slide, idx) => (
+              <button
+                key={slide.id}
+                onClick={() => setCurrentSlideIndex(idx)}
+                title={slide.caption}
+                className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
+                  idx === currentSlideIndex
+                    ? "w-8 bg-[#d4af37] shadow-[0_0_12px_rgba(212,175,55,0.9)]"
+                    : "w-2 bg-amber-100/30 hover:bg-amber-100/60"
+                }`}
+                aria-label={`Slide ${idx + 1}`}
+              />
+            ))}
+          </div>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <a
