@@ -340,7 +340,7 @@ export function NepaliJewelleryHome() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-[#d4af37] to-[#b8860b] text-[#0d0a08] font-semibold text-sm shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:brightness-110 transition"
               >
                 <Lock className="w-4 h-4" />
-                <span>पसल लगइन (Staff Login)</span>
+                <span>पसल लगइन (Shop Login)</span>
               </button>
             )}
           </div>
