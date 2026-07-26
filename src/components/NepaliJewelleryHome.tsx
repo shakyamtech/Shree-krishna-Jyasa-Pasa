@@ -294,7 +294,7 @@ export function NepaliJewelleryHome() {
           {/* Nav links */}
           <nav className="hidden md:flex items-center gap-8 text-sm text-amber-100/80 font-medium">
             <a href="#collections" className="hover:text-[#d4af37] transition-colors">
-              गहना सङ्ग्रह (Collections)
+              गहना संग्रह (Collections)
             </a>
             <a href="#calculator" className="hover:text-[#d4af37] transition-colors">
               मूल्य क्याल्कुलेटर (Estimator)
@@ -357,8 +357,8 @@ export function NepaliJewelleryHome() {
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-[#fbf2c0] max-w-4xl mx-auto leading-relaxed md:leading-relaxed">
             परम्परा र उत्कृष्ट कालीगढीको <br />
-            <span className="inline-block py-2 px-1 bg-gradient-to-r from-[#fbf2c0] via-[#d4af37] to-[#8b6d05] bg-clip-text text-transparent italic">
-              शाही गहना सङ्ग्रह
+            <span className="inline-block pt-2 pb-6 px-3 bg-gradient-to-r from-[#fbf2c0] via-[#d4af37] to-[#8b6d05] bg-clip-text text-transparent italic">
+              शाही गहना संग्रह
             </span>
           </h1>
 
@@ -388,7 +388,7 @@ export function NepaliJewelleryHome() {
               href="#collections"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#fbf2c0] to-[#b8860b] text-[#0d0a08] font-bold text-sm shadow-[0_0_25px_rgba(212,175,55,0.4)] hover:scale-[1.02] transition-all duration-200"
             >
-              <span>गहना सङ्ग्रह हेर्नुहोस् (Explore Catalog)</span>
+              <span>गहना संग्रह हेर्नुहोस् (Explore Catalog)</span>
               <ArrowRight className="w-4 h-4" />
             </a>
 
