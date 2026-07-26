@@ -243,7 +243,7 @@ export function NepaliJewelleryHome() {
               <Gem className="w-6 h-6 text-[#d4af37]" />
             </div>
             <div>
-              <h1 className="font-serif text-lg md:text-xl font-bold bg-gradient-to-r from-[#fbf2c0] via-[#d4af37] to-[#b8860b] bg-clip-text text-transparent">
+              <h1 className="font-serif text-lg md:text-xl font-bold bg-gradient-to-r from-[#fbf2c0] via-[#d4af37] to-[#b8860b] bg-clip-text text-transparent inline-block py-1 px-1">
                 श्री कृष्ण ज्यासा पसा
               </h1>
               <p className="text-[10px] tracking-widest text-amber-200/70 uppercase">
@@ -298,9 +298,9 @@ export function NepaliJewelleryHome() {
             <span>२४ क्यारेट विशुद्ध नेपाली परम्परागत गहनाहरू • 24K Pure Gold</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-[#fbf2c0] max-w-4xl mx-auto leading-tight md:leading-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-[#fbf2c0] max-w-4xl mx-auto leading-relaxed md:leading-relaxed">
             परम्परा र उत्कृष्ट कालीगढीको <br />
-            <span className="bg-gradient-to-r from-[#fbf2c0] via-[#d4af37] to-[#8b6d05] bg-clip-text text-transparent italic">
+            <span className="inline-block py-2 px-1 bg-gradient-to-r from-[#fbf2c0] via-[#d4af37] to-[#8b6d05] bg-clip-text text-transparent italic">
               शाही गहना सङ्ग्रह
             </span>
           </h1>
