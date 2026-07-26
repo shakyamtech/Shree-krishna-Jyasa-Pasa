@@ -295,8 +295,20 @@ export function NepaliJewelleryHome() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-28">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-[#d4af37]/15 via-[#b8860b]/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <section className="relative overflow-hidden pt-16 pb-24 md:pt-24 md:pb-32 bg-[#0d0a08]">
+        {/* Jewellery background image with dark vignette overlay */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <img
+            src="/hero_bg.png"
+            alt="Nepali Traditional Gold Jewellery Background"
+            className="w-full h-full object-cover opacity-30 scale-105 filter brightness-75 contrast-125"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0d0a08]/90 via-[#0d0a08]/70 to-[#0d0a08]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#0d0a08_95%)]" />
+        </div>
+
+        {/* Background glow graphics */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-to-tr from-[#d4af37]/20 via-[#b8860b]/15 to-transparent rounded-full blur-3xl pointer-events-none z-0" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#241a11]/90 border border-[#d4af37]/40 text-[#fbf2c0] text-xs font-medium mb-8 backdrop-blur-md shadow-lg">
