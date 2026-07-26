@@ -175,14 +175,31 @@ function Dashboard() {
         </Button>
       </div>
 
-      {/* Live prices */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {["gold", "silver"].map((m) => {
-          const p = prices.find((x) => x.metal === m) || DEFAULT_PRICES.find((x) => x.metal === m)!;
-          const isGold = m === "gold";
-          return (
+      {/* Live Metal Rates Display (Converted from 10g to 1 Tola: 1 Tola = 11.6638 grams) */}
+      {(() => {
+        const goldPrice = prices.find((x) => x.metal === "gold") || DEFAULT_PRICES[0];
+        const silverPrice = prices.find((x) => x.metal === "silver") || DEFAULT_PRICES[1];
+
+        const TOLA_GRAMS = 11.6638;
+
+        // Gold Calculations
+        const goldGramRate = goldPrice.price_per_gram;
+        const gold10gRate = goldGramRate * 10;
+        const gold1TolaRate = goldGramRate * TOLA_GRAMS;
+        const gold22kTolaRate = gold1TolaRate * (22 / 24);
+        const gold22k10gRate = gold10gRate * (22 / 24);
+        const gold18kTolaRate = gold1TolaRate * (18 / 24);
+        const gold18k10gRate = gold10gRate * (18 / 24);
+
+        // Silver Calculations
+        const silverGramRate = silverPrice.price_per_gram;
+        const silver10gRate = silverGramRate * 10;
+        const silver1TolaRate = silverGramRate * TOLA_GRAMS;
+
+        return (
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Gold Card */}
             <Card
-              key={m}
               className={cn(
                 "transition-all",
                 theme === "gold"
@@ -191,230 +208,206 @@ function Dashboard() {
               )}
             >
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2">
-                  <Coins
-                    className={cn(
-                      "size-5",
-                      theme === "gold" ? "text-black/60" : "text-amber-500",
-                    )}
-                  />
-                  <span className={theme === "gold" ? "text-black" : ""}>
-                    {isGold ? "Gold (10 Grams)" : "Gold (1 Tola)"}
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Coins
+                      className={cn(
+                        "size-5",
+                        theme === "gold" ? "text-black/60" : "text-amber-500",
+                      )}
+                    />
+                    <span className={theme === "gold" ? "text-black" : ""}>
+                      Gold Rate (छापावाल सुन 24K)
+                    </span>
+                  </div>
+                  <span className="text-xs px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 border border-amber-500/20 font-semibold">
+                    Live FENEGOSIDA
                   </span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                {p ? (
-                  <div className="space-y-1">
-                    <div
+              <CardContent className="space-y-3">
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <span
                       className={cn(
-                        "text-2xl font-bold",
+                        "text-3xl font-extrabold tracking-tight",
                         theme === "gold" ? "text-black" : "text-foreground",
                       )}
                     >
-                      {formatNPR(p.price_per_tola)}{" "}
-                      <span
-                        className={cn(
-                          "text-sm font-normal",
-                          theme === "gold" ? "text-black/60" : "text-muted-foreground",
-                        )}
-                      >
-                        {isGold ? "/ 10 gram (24K Fine)" : "/ tola (24K Fine)"}
-                      </span>
-                    </div>
-                    <div
-                      className={cn(
-                        "text-sm",
-                        theme === "gold" ? "text-black/60" : "text-muted-foreground",
-                      )}
-                    >
-                      {formatNPR(p.price_per_gram)} / gram
-                    </div>
-                    <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                      <div
-                        className={cn(
-                          "rounded border p-2",
-                          theme === "gold"
-                            ? "bg-black/5 border-black/10"
-                            : "bg-amber-50/20 dark:bg-amber-950/10",
-                        )}
-                      >
-                        <div
-                          className={theme === "gold" ? "text-black/50" : "text-muted-foreground"}
-                        >
-                          22K {isGold ? "/ 10g" : "/ tola"}
-                        </div>
-                        <div
-                          className={cn(
-                            "font-semibold",
-                            theme === "gold" ? "text-black" : "text-foreground",
-                          )}
-                        >
-                          {formatNPR(p.price_per_tola * 0.9167)}
-                        </div>
-                      </div>
-                      <div
-                        className={cn(
-                          "rounded border p-2",
-                          theme === "gold"
-                            ? "bg-black/5 border-black/10"
-                            : "bg-amber-50/20 dark:bg-amber-950/10",
-                        )}
-                      >
-                        <div
-                          className={theme === "gold" ? "text-black/50" : "text-muted-foreground"}
-                        >
-                          18K {isGold ? "/ 10g" : "/ tola"}
-                        </div>
-                        <div
-                          className={cn(
-                            "font-semibold",
-                            theme === "gold" ? "text-black" : "text-foreground",
-                          )}
-                        >
-                          {formatNPR(p.price_per_tola * 0.75)}
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      className={cn(
-                        "text-xs pt-1",
-                        theme === "gold" ? "text-black/40" : "text-muted-foreground",
-                      )}
-                    >
-                      Updated {new Date(p.fetched_at).toLocaleString()} | Source: {p.source === "fenegosida.org" ? "FENEGOSIDA" : "International"}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-muted-foreground">No price yet — click Refresh</div>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Silver Price Section */}
-      {(() => {
-        const sp = prices.find((x) => x.metal === "silver" && x.price_per_tola < 10000);
-        const perTola = sp ? sp.price_per_tola : 5060.0; // Updated fallback for 18/05/2026
-        const perGram = sp ? sp.price_per_gram : 433.8;  // Updated fallback for 18/05/2026
-        const lastUpdated = sp
-          ? new Date(sp.fetched_at).toLocaleString()
-          : new Date().toLocaleDateString();
-
-        return (
-          <Card
-            className={cn(
-              "transition-all",
-              theme === "gold"
-                ? "silver-gradient-bg border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-lg shadow-slate-400/20"
-                : "border-slate-400/30 dark:border-slate-500/20 shadow-sm",
-            )}
-          >
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 capitalize">
-                <Coins
-                  className={cn(
-                    "size-5",
-                    theme === "gold" ? "text-slate-600" : "text-slate-500 dark:text-slate-400",
-                  )}
-                />
-                <span className={theme === "gold" ? "text-black" : ""}>
-                  Silver Rate {sp ? `(${sp.metal})` : "(Fine Pure)"}
-                </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 items-center">
-                <div>
-                  <div
-                    className={cn(
-                      "text-2xl font-bold",
-                      theme === "gold" ? "text-black" : "text-foreground",
-                    )}
-                  >
-                    {formatNPR(perTola)}{" "}
+                      {formatNPR(gold1TolaRate)}
+                    </span>
                     <span
                       className={cn(
-                        "text-sm font-normal",
-                        theme === "gold" ? "text-black/60" : "text-muted-foreground",
+                        "text-sm font-semibold",
+                        theme === "gold" ? "text-black/70" : "text-amber-600 dark:text-amber-400",
                       )}
                     >
-                      / tola
+                      / 1 Tola (१ तोला)
                     </span>
                   </div>
-                  <div
+                  <p
                     className={cn(
-                      "text-sm mt-0.5",
+                      "text-xs mt-0.5 font-medium",
                       theme === "gold" ? "text-black/60" : "text-muted-foreground",
                     )}
                   >
-                    {formatNPR(perGram)} / gram
-                  </div>
+                    10 Gram Rate: <strong className="text-foreground">{formatNPR(gold10gRate)}</strong> ({formatNPR(goldGramRate)} / gram)
+                  </p>
+                  <p className="text-[10px] text-amber-700/80 dark:text-amber-400/80 italic mt-0.5">
+                    *Converted: (10g Rate ÷ 10) × 11.6638 grams = 1 Tola Rate
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs pt-1">
                   <div
                     className={cn(
-                      "text-xs pt-2",
-                      theme === "gold" ? "text-black/40" : "text-muted-foreground",
+                      "rounded-lg border p-2.5 space-y-0.5",
+                      theme === "gold"
+                        ? "bg-black/5 border-black/10"
+                        : "bg-amber-50/40 dark:bg-amber-950/20 border-amber-200/50 dark:border-amber-800/30",
                     )}
                   >
-                    Updated {lastUpdated} | Source: {sp?.source === "fenegosida.org" ? "FENEGOSIDA" : "International"}
+                    <div className="font-semibold text-amber-700 dark:text-amber-300 text-[11px]">
+                      तेजाबी सुन (22K Gold)
+                    </div>
+                    <div className="font-bold text-sm">{formatNPR(gold22kTolaRate)} / tola</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {formatNPR(gold22k10gRate)} / 10g
+                    </div>
+                  </div>
+
+                  <div
+                    className={cn(
+                      "rounded-lg border p-2.5 space-y-0.5",
+                      theme === "gold"
+                        ? "bg-black/5 border-black/10"
+                        : "bg-amber-50/40 dark:bg-amber-950/20 border-amber-200/50 dark:border-amber-800/30",
+                    )}
+                  >
+                    <div className="font-semibold text-amber-700 dark:text-amber-300 text-[11px]">
+                      १८ क्यारेट सुन (18K Gold)
+                    </div>
+                    <div className="font-bold text-sm">{formatNPR(gold18kTolaRate)} / tola</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {formatNPR(gold18k10gRate)} / 10g
+                    </div>
                   </div>
                 </div>
+
                 <div
                   className={cn(
-                    "flex flex-wrap gap-3 border-t md:border-t-0 md:border-l pt-3 md:pt-0 md:pl-4 text-xs",
-                    theme === "gold" ? "border-black/10" : "",
+                    "text-[11px] pt-1 border-t border-border/40",
+                    theme === "gold" ? "text-black/50" : "text-muted-foreground",
                   )}
                 >
-                  <div
-                    className={cn(
-                      "flex-1 min-w-[100px] rounded border p-2",
-                      theme === "gold"
-                        ? "bg-black/5 border-black/10"
-                        : "bg-slate-50/5 dark:bg-slate-950/10",
-                    )}
-                  >
-                    <div
-                      className={theme === "gold" ? "text-black/50" : "text-muted-foreground"}
-                    >
-                      Per 10 Grams
-                    </div>
-                    <div
+                  Updated {new Date(goldPrice.fetched_at).toLocaleString()} | Source: {goldPrice.source === "fenegosida.org" ? "FENEGOSIDA Nepal" : "International Spot"}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Silver Card */}
+            <Card
+              className={cn(
+                "transition-all",
+                theme === "gold"
+                  ? "silver-gradient-bg border-none rounded-tl-none rounded-tr-3xl rounded-bl-3xl rounded-br-3xl shadow-lg shadow-slate-400/20"
+                  : "border-slate-400/30 dark:border-slate-500/20 shadow-sm",
+              )}
+            >
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Coins
                       className={cn(
-                        "font-semibold text-sm mt-0.5",
-                        theme === "gold" ? "text-black" : "text-foreground",
+                        "size-5",
+                        theme === "gold" ? "text-slate-600" : "text-slate-500 dark:text-slate-400",
                       )}
-                    >
-                      {formatNPR(perGram * 10)}
-                    </div>
+                    />
+                    <span className={theme === "gold" ? "text-black" : ""}>
+                      Silver Rate (शुद्ध चाँदी 999 Fine)
+                    </span>
                   </div>
-                  <div
-                    className={cn(
-                      "flex-1 min-w-[100px] rounded border p-2",
-                      theme === "gold"
-                        ? "bg-black/5 border-black/10"
-                        : "bg-slate-50/5 dark:bg-slate-950/10",
-                    )}
-                  >
-                    <div
-                      className={theme === "gold" ? "text-black/50" : "text-muted-foreground"}
-                    >
-                      Purity Standard
-                    </div>
-                    <div
+                  <span className="text-xs px-2 py-0.5 rounded bg-slate-500/10 text-slate-600 border border-slate-500/20 font-semibold">
+                    Live FENEGOSIDA
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <span
                       className={cn(
-                        "font-semibold text-sm mt-0.5",
+                        "text-3xl font-extrabold tracking-tight",
                         theme === "gold" ? "text-black" : "text-foreground",
                       )}
                     >
-                      999 Fine
+                      {formatNPR(silver1TolaRate)}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-sm font-semibold",
+                        theme === "gold" ? "text-black/70" : "text-slate-600 dark:text-slate-300",
+                      )}
+                    >
+                      / 1 Tola (१ तोला)
+                    </span>
+                  </div>
+                  <p
+                    className={cn(
+                      "text-xs mt-0.5 font-medium",
+                      theme === "gold" ? "text-black/60" : "text-muted-foreground",
+                    )}
+                  >
+                    10 Gram Rate: <strong className="text-foreground">{formatNPR(silver10gRate)}</strong> ({formatNPR(silverGramRate)} / gram)
+                  </p>
+                  <p className="text-[10px] text-slate-600/80 dark:text-slate-400/80 italic mt-0.5">
+                    *Converted: (10g Rate ÷ 10) × 11.6638 grams = 1 Tola Rate
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs pt-1">
+                  <div
+                    className={cn(
+                      "rounded-lg border p-2.5 space-y-0.5",
+                      theme === "gold"
+                        ? "bg-black/5 border-black/10"
+                        : "bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-800",
+                    )}
+                  >
+                    <div className="font-semibold text-slate-600 dark:text-slate-400 text-[11px]">
+                      Per 10 Grams Rate
                     </div>
+                    <div className="font-bold text-sm">{formatNPR(silver10gRate)}</div>
+                    <div className="text-[10px] text-muted-foreground">Rate for 10g fine silver</div>
+                  </div>
+
+                  <div
+                    className={cn(
+                      "rounded-lg border p-2.5 space-y-0.5",
+                      theme === "gold"
+                        ? "bg-black/5 border-black/10"
+                        : "bg-slate-50/50 dark:bg-slate-950/20 border-slate-200 dark:border-slate-800",
+                    )}
+                  >
+                    <div className="font-semibold text-slate-600 dark:text-slate-400 text-[11px]">
+                      Purity & Grade
+                    </div>
+                    <div className="font-bold text-sm">999 Fine Silver</div>
+                    <div className="text-[10px] text-muted-foreground">Certified 100% Pure</div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+
+                <div
+                  className={cn(
+                    "text-[11px] pt-1 border-t border-border/40",
+                    theme === "gold" ? "text-black/50" : "text-muted-foreground",
+                  )}
+                >
+                  Updated {new Date(silverPrice.fetched_at).toLocaleString()} | Source: {silverPrice.source === "fenegosida.org" ? "FENEGOSIDA Nepal" : "International Spot"}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         );
       })()}
 
