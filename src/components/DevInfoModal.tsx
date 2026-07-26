@@ -100,8 +100,8 @@ export function DevInfoModal({ isOpen, onClose }: DevInfoModalProps) {
             <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </a>
 
-          <p className="text-[10px] text-gray-500 pt-2">
-            Visit <span className="text-amber-300">shakyamahesh.com.np</span> for custom software & AI development.
+          <p className="text-[10px] text-gray-400 pt-2">
+            Visit <a href="https://shakyamahesh.com.np" target="_blank" rel="noopener noreferrer" className="text-[#fbf2c0] font-bold hover:underline">shakyamahesh.com.np</a> for custom software, apps, & full fledge websites.
           </p>
         </div>
       </div>
