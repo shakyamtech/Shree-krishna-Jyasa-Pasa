@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Gem, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
@@ -72,19 +72,25 @@ function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary to-accent p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto mb-3 flex size-20 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 p-0.5 shadow-lg shadow-amber-500/10">
-            {logoUrl ? (
-              <img src={logoUrl} alt={shopName} className="size-full rounded-full object-cover" />
-            ) : (
-              <div className="flex size-full items-center justify-center rounded-full bg-background text-primary">
-                <Gem className="size-8" />
-              </div>
-            )}
-          </div>
-          <CardTitle className="text-2xl font-extrabold bg-gradient-to-r from-amber-600 via-amber-700 to-yellow-600 bg-clip-text text-transparent tracking-tight">
-            {shopName}
-          </CardTitle>
-          <CardDescription className="text-xs font-medium">
+          <Link
+            to="/"
+            title="Go to Homepage"
+            className="inline-flex flex-col items-center mx-auto cursor-pointer group hover:scale-105 transition-transform duration-300 mb-2"
+          >
+            <div className="mb-3 flex size-20 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 p-0.5 shadow-lg shadow-amber-500/20 group-hover:shadow-[0_0_25px_rgba(212,175,55,0.6)] transition-shadow">
+              {logoUrl ? (
+                <img src={logoUrl} alt={shopName} className="size-full rounded-full object-cover" />
+              ) : (
+                <div className="flex size-full items-center justify-center rounded-full bg-background text-primary">
+                  <Gem className="size-8 text-amber-600" />
+                </div>
+              )}
+            </div>
+            <CardTitle className="text-2xl font-extrabold bg-gradient-to-r from-amber-600 via-amber-700 to-yellow-600 bg-clip-text text-transparent tracking-tight group-hover:brightness-125 transition-all">
+              {shopName}
+            </CardTitle>
+          </Link>
+          <CardDescription className="text-xs font-medium mt-1">
             {isSignUp ? "Register a new credentials account" : "Sign in to your shop account"}
           </CardDescription>
         </CardHeader>

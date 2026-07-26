@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth-context";
 import {
   Sparkles,
@@ -230,8 +230,12 @@ export function NepaliJewelleryHome() {
       <header className="sticky top-0 z-40 backdrop-blur-md bg-[#0d0a08]/90 border-b border-[#2a1f15]/80 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate({ to: "/" })}>
-            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#d4af37] shadow-[0_0_15px_rgba(212,175,55,0.3)] bg-[#1a130b] flex items-center justify-center p-0.5">
+          <Link
+            to="/"
+            title="होमपेजमा जानुहोस् (Go to Homepage)"
+            className="flex items-center gap-3 cursor-pointer group hover:scale-[1.04] transition-transform duration-200"
+          >
+            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#d4af37] shadow-[0_0_15px_rgba(212,175,55,0.3)] group-hover:shadow-[0_0_25px_rgba(212,175,55,0.7)] group-hover:border-[#fbf2c0] bg-[#1a130b] flex items-center justify-center p-0.5 transition-all">
               <img
                 src="/logo.jpg"
                 alt="Shree Krishna Jyasa Pasa Logo"
@@ -243,14 +247,14 @@ export function NepaliJewelleryHome() {
               <Gem className="w-6 h-6 text-[#d4af37]" />
             </div>
             <div>
-              <h1 className="font-serif text-lg md:text-xl font-bold bg-gradient-to-r from-[#fbf2c0] via-[#d4af37] to-[#b8860b] bg-clip-text text-transparent inline-block py-1 px-1">
+              <h1 className="font-serif text-lg md:text-xl font-bold bg-gradient-to-r from-[#fbf2c0] via-[#d4af37] to-[#b8860b] bg-clip-text text-transparent inline-block py-1 px-1 group-hover:brightness-125 transition-all">
                 श्री कृष्ण ज्यास पस
               </h1>
               <p className="text-[10px] tracking-widest text-amber-200/70 uppercase">
                 Shree Krishna Jyasa Pasa • Established Craft
               </p>
             </div>
-          </div>
+          </Link>
 
           {/* Nav links */}
           <nav className="hidden md:flex items-center gap-8 text-sm text-amber-100/80 font-medium">

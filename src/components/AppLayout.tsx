@@ -185,23 +185,27 @@ export function AppLayout({ children }: { children: ReactNode }) {
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className={cn(
-          "flex items-center gap-3 px-5 py-4 border-b border-sidebar-border backdrop-blur-sm",
-          theme === "gold" ? "bg-black/5" : "bg-sidebar/50"
-        )}>
+        <Link
+          to="/"
+          title="Go to Homepage"
+          className={cn(
+            "flex items-center gap-3 px-5 py-4 border-b border-sidebar-border backdrop-blur-sm cursor-pointer group hover:opacity-95 hover:scale-[1.02] transition-all",
+            theme === "gold" ? "bg-black/5" : "bg-sidebar/50"
+          )}
+        >
           {logoUrl ? (
-            <div className="relative shrink-0 rounded-full p-0.5 bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 shadow-md">
+            <div className="relative shrink-0 rounded-full p-0.5 bg-gradient-to-tr from-amber-500 via-yellow-200 to-amber-600 shadow-md group-hover:shadow-[0_0_15px_rgba(212,175,55,0.6)] transition-shadow">
               <img src={logoUrl} alt={shopName} className="size-10 rounded-full object-cover" />
             </div>
           ) : (
-            <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
+            <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0 group-hover:scale-110 transition-transform">
               <Gem className="size-5" />
             </div>
           )}
           <div className="min-w-0 flex-1">
             <div
               className={cn(
-                "font-extrabold text-base truncate tracking-tight",
+                "font-extrabold text-base truncate tracking-tight group-hover:brightness-125 transition-all",
                 theme === "gold"
                   ? "text-black"
                   : theme === "sapphire"
@@ -246,8 +250,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             onClick={() => setOpen(false)}
           >
             <X className="size-5" />
-          </button>
-        </div>
+        </Link>
         <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
           {navItems.map((n) => {
             const active = loc.pathname.startsWith(n.to);
