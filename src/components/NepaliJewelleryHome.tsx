@@ -991,11 +991,11 @@ export function NepaliJewelleryHome() {
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-medium">
               <span
                 onClick={() => setShowDevModal(true)}
-                className="flex items-center gap-1.5 text-amber-200/90 hover:text-[#fbf2c0] transition-all cursor-pointer group bg-[#1a120b] hover:bg-[#281b10] px-2.5 py-1 rounded-full border border-[#d4af37]/30 hover:border-[#d4af37]/70 shadow-sm"
+                className="flex items-center gap-1.5 text-amber-200/90 hover:text-[#fbf2c0] transition-colors cursor-pointer group"
                 title="Click to view System & Developer Information"
               >
                 <Code className="w-3.5 h-3.5 text-[#d4af37] group-hover:scale-110 transition-transform" />
-                <span>Developed by:</span> <strong className="text-[#fbf2c0] font-bold underline decoration-amber-500/50 underline-offset-2">Shakya M. Tech</strong>
+                <span>Developed by:</span> <strong className="text-[#fbf2c0] font-bold hover:underline decoration-amber-500/50 underline-offset-2">Shakya M. Tech</strong>
               </span>
               <span className="text-gray-700 hidden sm:inline">•</span>
               <span className="flex items-center gap-1.5 text-amber-200/90">
