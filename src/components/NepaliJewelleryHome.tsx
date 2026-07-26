@@ -19,6 +19,8 @@ import {
   Lock,
   UserCheck,
   CheckCircle2,
+  Code,
+  Headphones,
 } from "lucide-react";
 
 // Initial metal rates in NPR per Tola (1 Tola = 11.664 grams = 10 Lal)
@@ -980,8 +982,21 @@ export function NepaliJewelleryHome() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-[#1a120b] text-center text-gray-500 text-[11px]">
-            © {new Date().getFullYear()} Shree Krishna Jyasa Pasa • All Rights Reserved. Nepali Traditional Jewellery.
+          <div className="pt-6 border-t border-[#1a120b] flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left text-gray-400 text-xs">
+            <div>
+              © {new Date().getFullYear()} Shree Krishna Jyasa Pasa • All Rights Reserved. Nepali Traditional Jewellery.
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-medium">
+              <span className="flex items-center gap-1.5 text-amber-200/90">
+                <Code className="w-3.5 h-3.5 text-[#d4af37]" />
+                <span>Developed by:</span> <strong className="text-[#fbf2c0] font-bold">Shakya M. Tech</strong>
+              </span>
+              <span className="text-gray-700 hidden sm:inline">•</span>
+              <span className="flex items-center gap-1.5 text-amber-200/90">
+                <Headphones className="w-3.5 h-3.5 text-[#d4af37]" />
+                <span>Support:</span> <a href="tel:+9779800000000" className="text-[#fbf2c0] font-bold hover:underline">+९७७-९८XXXXXXXX</a>
+              </span>
+            </div>
           </div>
         </div>
       </footer>

@@ -17,6 +17,8 @@ import {
   X,
   Gem,
   User,
+  Code,
+  Headphones,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -381,6 +383,23 @@ export function AppLayout({ children }: { children: ReactNode }) {
           >
             <LogOut className="size-3.5" /> {t.logout}
           </button>
+
+          {/* Developer & Support Credit */}
+          <div className={cn(
+            "pt-2 px-1 text-[10px] space-y-1 opacity-80 border-t border-sidebar-border/40 mt-1",
+            theme === "gold" ? "text-black/80" : "text-sidebar-foreground/70"
+          )}>
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1">
+                <Code className="size-3 text-amber-500" />
+                <span>Dev:</span> <strong className="font-bold">Shakya M. Tech</strong>
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Headphones className="size-3 text-amber-500" />
+              <span>Support:</span> <a href="tel:+9779800000000" className="hover:underline font-bold">+९७७-९८XXXXXXXX</a>
+            </div>
+          </div>
         </div>
       </aside>
 
