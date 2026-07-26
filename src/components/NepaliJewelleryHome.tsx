@@ -997,11 +997,6 @@ export function NepaliJewelleryHome() {
                 <Code className="w-3.5 h-3.5 text-[#d4af37] group-hover:scale-110 transition-transform" />
                 <span>Developed by:</span> <strong className="text-[#fbf2c0] font-bold hover:underline decoration-amber-500/50 underline-offset-2">Shakya M. Tech</strong>
               </span>
-              <span className="text-gray-700 hidden sm:inline">•</span>
-              <span className="flex items-center gap-1.5 text-amber-200/90">
-                <Headphones className="w-3.5 h-3.5 text-[#d4af37]" />
-                <span>Support:</span> <a href="tel:+9779851180556" className="text-[#fbf2c0] font-bold hover:underline">+९७७ ९८५११८०५५६</a>
-              </span>
             </div>
           </div>
         </div>

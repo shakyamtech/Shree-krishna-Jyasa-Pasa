@@ -386,7 +386,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <LogOut className="size-3.5" /> {t.logout}
           </button>
 
-          {/* Developer & Support Credit */}
+          {/* Developer Credit */}
           <div className={cn(
             "pt-2 px-1 text-[10px] space-y-1 opacity-80 border-t border-sidebar-border/40 mt-1",
             theme === "gold" ? "text-black/80" : "text-sidebar-foreground/70"
@@ -400,10 +400,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <Code className="size-3 text-amber-500 group-hover:scale-110 transition-transform" />
                 <span>Dev:</span> <strong className="font-bold underline underline-offset-2 decoration-amber-500/50">Shakya M. Tech</strong>
               </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Headphones className="size-3 text-amber-500" />
-              <span>Support:</span> <a href="tel:+9779851180556" className="hover:underline font-bold">+९७७ ९८५११८०५५६</a>
             </div>
           </div>
         </div>
