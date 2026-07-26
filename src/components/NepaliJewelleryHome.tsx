@@ -441,37 +441,37 @@ export function NepaliJewelleryHome() {
             </a>
           </div>
 
-          {/* Quick Features Row */}
+          {/* Quick Features Row with interactive gold hover effects */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div className="p-4 rounded-xl bg-[#16100a]/80 border border-[#332516] flex items-center gap-3 text-left">
-              <ShieldCheck className="w-8 h-8 text-[#d4af37] shrink-0" />
+            <div className="p-4 rounded-xl bg-[#16100a]/80 border border-[#332516] flex items-center gap-3 text-left transition-all duration-300 hover:scale-[1.05] hover:-translate-y-1 hover:border-[#d4af37]/70 hover:bg-[#241a11] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] cursor-pointer group backdrop-blur-sm">
+              <ShieldCheck className="w-8 h-8 text-[#d4af37] shrink-0 group-hover:scale-110 group-hover:rotate-3 group-hover:text-[#fbf2c0] transition-transform duration-300" />
               <div>
-                <h4 className="text-xs font-bold text-[#fbf2c0]">100% BIS Hallmark</h4>
-                <p className="text-[11px] text-gray-400">प्रमाणित शुद्धता ग्यारेन्टी</p>
+                <h4 className="text-xs font-bold text-[#fbf2c0] group-hover:text-[#d4af37] transition-colors">100% BIS Hallmark</h4>
+                <p className="text-[11px] text-gray-400 group-hover:text-amber-100/90 transition-colors">प्रमाणित शुद्धता ग्यारेन्टी</p>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#16100a]/80 border border-[#332516] flex items-center gap-3 text-left">
-              <Gem className="w-8 h-8 text-[#d4af37] shrink-0" />
+            <div className="p-4 rounded-xl bg-[#16100a]/80 border border-[#332516] flex items-center gap-3 text-left transition-all duration-300 hover:scale-[1.05] hover:-translate-y-1 hover:border-[#d4af37]/70 hover:bg-[#241a11] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] cursor-pointer group backdrop-blur-sm">
+              <Gem className="w-8 h-8 text-[#d4af37] shrink-0 group-hover:scale-110 group-hover:rotate-3 group-hover:text-[#fbf2c0] transition-transform duration-300" />
               <div>
-                <h4 className="text-xs font-bold text-[#fbf2c0]">24K Pure Gold</h4>
-                <p className="text-[11px] text-gray-400">विशुद्ध सुनको बनावट</p>
+                <h4 className="text-xs font-bold text-[#fbf2c0] group-hover:text-[#d4af37] transition-colors">24K Pure Gold</h4>
+                <p className="text-[11px] text-gray-400 group-hover:text-amber-100/90 transition-colors">विशुद्ध सुनको बनावट</p>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#16100a]/80 border border-[#332516] flex items-center gap-3 text-left">
-              <Compass className="w-8 h-8 text-[#d4af37] shrink-0" />
+            <div className="p-4 rounded-xl bg-[#16100a]/80 border border-[#332516] flex items-center gap-3 text-left transition-all duration-300 hover:scale-[1.05] hover:-translate-y-1 hover:border-[#d4af37]/70 hover:bg-[#241a11] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] cursor-pointer group backdrop-blur-sm">
+              <Compass className="w-8 h-8 text-[#d4af37] shrink-0 group-hover:scale-110 group-hover:rotate-3 group-hover:text-[#fbf2c0] transition-transform duration-300" />
               <div>
-                <h4 className="text-xs font-bold text-[#fbf2c0]">Custom Orders</h4>
-                <p className="text-[11px] text-gray-400">चाहेको डिजाइनमा तयार</p>
+                <h4 className="text-xs font-bold text-[#fbf2c0] group-hover:text-[#d4af37] transition-colors">Custom Orders</h4>
+                <p className="text-[11px] text-gray-400 group-hover:text-amber-100/90 transition-colors">चाहेको डिजाइनमा तयार</p>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#16100a]/80 border border-[#332516] flex items-center gap-3 text-left">
-              <Award className="w-8 h-8 text-[#d4af37] shrink-0" />
+            <div className="p-4 rounded-xl bg-[#16100a]/80 border border-[#332516] flex items-center gap-3 text-left transition-all duration-300 hover:scale-[1.05] hover:-translate-y-1 hover:border-[#d4af37]/70 hover:bg-[#241a11] hover:shadow-[0_0_20px_rgba(212,175,55,0.35)] cursor-pointer group backdrop-blur-sm">
+              <Award className="w-8 h-8 text-[#d4af37] shrink-0 group-hover:scale-110 group-hover:rotate-3 group-hover:text-[#fbf2c0] transition-transform duration-300" />
               <div>
-                <h4 className="text-xs font-bold text-[#fbf2c0]">Buyback Guarantee</h4>
-                <p className="text-[11px] text-gray-400">१००% फिर्ता तथा सट्टा-पट्टा</p>
+                <h4 className="text-xs font-bold text-[#fbf2c0] group-hover:text-[#d4af37] transition-colors">Buyback Guarantee</h4>
+                <p className="text-[11px] text-gray-400 group-hover:text-amber-100/90 transition-colors">१००% फिर्ता तथा सट्टा-पट्टा</p>
               </div>
             </div>
           </div>
