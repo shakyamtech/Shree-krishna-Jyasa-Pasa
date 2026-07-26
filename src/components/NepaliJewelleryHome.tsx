@@ -295,16 +295,28 @@ export function NepaliJewelleryHome() {
             </div>
           </div>
 
-          {/* Nav links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm text-amber-100/80 font-medium">
-            <a href="#collections" className="hover:text-[#d4af37] transition-colors">
-              गहना संग्रह (Collections)
+          {/* Nav links with animated gold underline on hover */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+            <a
+              href="#collections"
+              className="relative text-amber-100/80 hover:text-[#fbf2c0] transition-colors py-1 group"
+            >
+              <span>गहना संग्रह (Collections)</span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#d4af37] to-[#fbf2c0] group-hover:w-full transition-all duration-300 rounded-full" />
             </a>
-            <a href="#calculator" className="hover:text-[#d4af37] transition-colors">
-              मूल्य क्याल्कुलेटर (Estimator)
+            <a
+              href="#calculator"
+              className="relative text-amber-100/80 hover:text-[#fbf2c0] transition-colors py-1 group"
+            >
+              <span>मूल्य क्याल्कुलेटर (Estimator)</span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#d4af37] to-[#fbf2c0] group-hover:w-full transition-all duration-300 rounded-full" />
             </a>
-            <a href="#heritage" className="hover:text-[#d4af37] transition-colors">
-              हाम्रो विरासत (Heritage)
+            <a
+              href="#heritage"
+              className="relative text-amber-100/80 hover:text-[#fbf2c0] transition-colors py-1 group"
+            >
+              <span>हाम्रो विरासत (Heritage)</span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#d4af37] to-[#fbf2c0] group-hover:w-full transition-all duration-300 rounded-full" />
             </a>
           </nav>
 
@@ -902,41 +914,62 @@ export function NepaliJewelleryHome() {
             </div>
 
             <div>
-              <h4 className="font-bold text-[#fbf2c0] mb-3 text-sm">मुख्य गहनाहरू</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>• हरियो तथा रातो पोते तिलहरी</li>
-                <li>• नौगेडी र कण्ठमाला</li>
-                <li>• मयूर झुम्का र मारवाडी</li>
-                <li>• सिरबन्दी र बुलाकी</li>
+              <h4 className="font-bold text-[#fbf2c0] mb-3 text-sm flex items-center gap-2 group cursor-pointer hover:text-[#d4af37] transition-colors">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37] group-hover:scale-150 group-hover:shadow-[0_0_8px_rgba(212,175,55,0.9)] transition-all" />
+                <span>मुख्य गहनाहरू</span>
+              </h4>
+              <ul className="space-y-2 text-gray-400 text-xs">
+                <li className="hover:text-[#fbf2c0] hover:translate-x-1.5 transition-all duration-200 cursor-pointer flex items-center gap-1.5">
+                  <span className="text-[#d4af37]">•</span>
+                  <a href="#collections">हरियो तथा रातो पोते तिलहरी</a>
+                </li>
+                <li className="hover:text-[#fbf2c0] hover:translate-x-1.5 transition-all duration-200 cursor-pointer flex items-center gap-1.5">
+                  <span className="text-[#d4af37]">•</span>
+                  <a href="#collections">नौगेडी र कण्ठमाला</a>
+                </li>
+                <li className="hover:text-[#fbf2c0] hover:translate-x-1.5 transition-all duration-200 cursor-pointer flex items-center gap-1.5">
+                  <span className="text-[#d4af37]">•</span>
+                  <a href="#collections">मयूर झुम्का र मारवाडी</a>
+                </li>
+                <li className="hover:text-[#fbf2c0] hover:translate-x-1.5 transition-all duration-200 cursor-pointer flex items-center gap-1.5">
+                  <span className="text-[#d4af37]">•</span>
+                  <a href="#collections">सिरबन्दी र बुलाकी</a>
+                </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-bold text-[#fbf2c0] mb-3 text-sm">सम्पर्क तथा ठेगाना</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li className="flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-[#d4af37]" />
+              <h4 className="font-bold text-[#fbf2c0] mb-3 text-sm flex items-center gap-2 group cursor-pointer hover:text-[#d4af37] transition-colors">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37] group-hover:scale-150 group-hover:shadow-[0_0_8px_rgba(212,175,55,0.9)] transition-all" />
+                <span>सम्पर्क तथा ठेगाना</span>
+              </h4>
+              <ul className="space-y-2.5 text-gray-400 text-xs">
+                <li className="flex items-center gap-2.5 hover:text-[#fbf2c0] transition-colors cursor-pointer group">
+                  <MapPin className="w-4 h-4 text-[#d4af37] group-hover:scale-110 transition-transform" />
                   <span>काठमाडौँ / पाटन दरबार क्षेत्र, नेपाल</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <PhoneCall className="w-3.5 h-3.5 text-[#d4af37]" />
+                <li className="flex items-center gap-2.5 hover:text-[#fbf2c0] transition-colors cursor-pointer group">
+                  <PhoneCall className="w-4 h-4 text-[#d4af37] group-hover:scale-110 transition-transform" />
                   <span>+९७७ ०१-XXXXXXX / ९८XXXXXXXX</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-[#d4af37]" />
+                <li className="flex items-center gap-2.5 hover:text-[#fbf2c0] transition-colors cursor-pointer group">
+                  <Clock className="w-4 h-4 text-[#d4af37] group-hover:scale-110 transition-transform" />
                   <span>आइतबार - शुक्रबार: बिहान १०:०० - साँझ ६:००</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-bold text-[#fbf2c0] mb-3 text-sm">पसल व्यवस्थापन</h4>
+              <h4 className="font-bold text-[#fbf2c0] mb-3 text-sm flex items-center gap-2 group cursor-pointer hover:text-[#d4af37] transition-colors">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37] group-hover:scale-150 group-hover:shadow-[0_0_8px_rgba(212,175,55,0.9)] transition-all" />
+                <span>पसल व्यवस्थापन</span>
+              </h4>
               <p className="text-gray-400 mb-4 text-xs">
                 स्टाफ तथा पसल सञ्चालक लगइन गरी बिलिङ र स्टक व्यवस्थापन गर्न सक्नुहुन्छ।
               </p>
               <button
                 onClick={() => navigate({ to: "/login" })}
-                className="w-full py-2.5 rounded-lg bg-[#1c140d] border border-[#d4af37]/50 text-[#fbf2c0] font-semibold text-xs hover:bg-[#281c11] transition"
+                className="w-full py-2.5 rounded-lg bg-[#1c140d] border border-[#d4af37]/50 text-[#fbf2c0] font-semibold text-xs hover:bg-[#d4af37] hover:text-[#0d0a08] hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] hover:scale-[1.02] transition-all duration-200 cursor-pointer"
               >
                 Sign In to Shop Dashboard
               </button>
